@@ -8,14 +8,16 @@
 
 - ✅ **Easy to Use**: Simple form-based interface to generate badges
 - 🎨 **Multiple IDEs**: Support for VS Code, VS Code Insiders, and Visual Studio
-- 🔧 **Five Configuration Types**: 
+- 🔧 **Six Configuration Types**: 
   - Remote HTTP Server (HTTP/SSE transport)
   - NPX Package (Node.js packages)
   - UVX Package (Python packages with uv)
+  - DNX Package (.NET packages)
   - Docker Container
   - Local Binary (custom commands)
 - 📋 **Copy to Clipboard**: One-click copy of generated markdown
-- 👀 **Live Preview**: See your badges before copying
+- 🖥️ **CLI Commands**: Generate cross-platform `code --add-mcp` commands for terminal installation
+- � **Live Preview**: See your badges before copying
 - 🎨 **Beautiful Design**: Modern, responsive UI with VS Code Insiders green theme
 
 ## 🚀 Live Demo
@@ -37,10 +39,14 @@ MCP badges provide a seamless way for users to install your Model Context Protoc
 For MCP servers hosted remotely and accessible via HTTP/HTTPS with SSE transport.
 
 ```json
+
 {
-  "name": "your-server-name",
-  "type": "http",
-  "url": "https://your-server-url.com/"
+  "servers": {
+    "server-name": {
+      "type": "http",
+      "url": "https://your-server-url.com"
+    }
+  }
 }
 ```
 
@@ -49,7 +55,6 @@ For MCP servers distributed as NPM packages, commonly used in the MCP ecosystem.
 
 ```json
 {
-  "name": "filesystem",
   "command": "npx",
   "args": ["-y", "@modelcontextprotocol/server-filesystem"],
   "env": {}
@@ -66,7 +71,6 @@ For Python-based MCP servers using uv/uvx for fast, reliable Python package exec
 
 ```json
 {
-  "name": "git-server",
   "command": "uvx",
   "args": ["--from", "mcp-server-git", "mcp-server-git"],
   "env": {}
@@ -76,31 +80,39 @@ For Python-based MCP servers using uv/uvx for fast, reliable Python package exec
 **Alternative without --from:**
 ```json
 {
-  "name": "git-server",
   "command": "uvx",
   "args": ["mcp-server-git"],
   "env": {}
 }
 ```
 
-### 4. Docker Container
+### 4. DNX Package (.NET)
+For .NET-based MCP servers using DNX package manager.
+
+```json
+{
+  "command": "dnx",
+  "args": ["Contoso.SampleMcpServer@0.0.1-beta", "--yes"],
+  "env": {}
+}
+```
+
+### 5. Docker Container
 For MCP servers packaged as Docker images.
 
 ```json
 {
-  "name": "your-server-name",
   "command": "docker",
   "args": ["run", "-i", "--rm", "your-username/your-image"],
   "env": {}
 }
 ```
 
-### 5. Local Binary
+### 6. Local Binary
 For MCP servers running as local executables with custom commands.
 
 ```json
 {
-  "name": "your-server-name",
   "command": "node",
   "args": ["path/to/server.js"],
   "env": {}
@@ -117,7 +129,29 @@ For MCP servers running as local executables with custom commands.
 1. **Fill in Server Details**: Enter your MCP server name and configuration
 2. **Choose Configuration Type**: Select between HTTP, NPX, UVX, Docker, or Local
 3. **Select Target IDEs**: Choose which IDEs to generate badges for
-4. **Copy & Use**: Copy the generated markdown and add it to your README
+4. **Copy & Use**: 
+   - Copy the generated markdown badges for your README
+   - Copy the JSON configuration for manual setup
+   - Copy the CLI commands for terminal installation
+
+### 🖥️ CLI Command Installation
+
+The badge creator also generates ready-to-use CLI commands for installing MCP servers:
+
+```bash
+# For VS Code
+code --add-mcp '{\"name\":\"server-name\",\"command\":\"npx\",\"args\":[\"-y\",\"package\"],\"env\":{}}'
+
+# For VS Code Insiders
+code-insiders --add-mcp '{\"name\":\"server-name\",\"command\":\"npx\",\"args\":[\"-y\",\"package\"],\"env\":{}}'
+```
+
+These commands work cross-platform in:
+- ✅ PowerShell (Windows)
+- ✅ Bash (Linux/macOS)
+- ✅ Zsh (macOS default)
+
+See [CLI-COMMANDS.md](CLI-COMMANDS.md) for detailed documentation and examples.
 
 ## 💻 Development
 

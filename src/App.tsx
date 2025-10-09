@@ -1,10 +1,10 @@
 import { useState } from 'react'
 import './App.css'
 
-type ConfigType = 'http' | 'docker' | 'local' | 'npx' | 'uvx';
+type ConfigType = 'http' | 'docker' | 'local' | 'npx' | 'uvx' | 'dnx';
 
 interface MCPConfig {
-  name: string;
+  name?: string; // Only used for encoding in URL parameters, not in the actual config
   type?: string;
   url?: string;
   command?: string;
@@ -22,20 +22,26 @@ function App() {
   const [npxPackage, setNpxPackage] = useState('')
   const [uvxPackage, setUvxPackage] = useState('')
   const [uvxFrom, setUvxFrom] = useState('')
+  const [dnxPackage, setDnxPackage] = useState('')
   const [includeVSCode, setIncludeVSCode] = useState(true)
   const [includeVSCodeInsiders, setIncludeVSCodeInsiders] = useState(true)
   const [includeVisualStudio, setIncludeVisualStudio] = useState(true)
   const [copied, setCopied] = useState(false)
+  const [copiedJson, setCopiedJson] = useState(false)
+  const [copiedCli, setCopiedCli] = useState(false)
+  const [copiedCliInsiders, setCopiedCliInsiders] = useState(false)
 
   const generateConfig = (): MCPConfig => {
-    const config: MCPConfig = { name: serverName };
+    const config: MCPConfig = {};
     
     switch (configType) {
       case 'http':
+        // HTTP servers only have type and url (no name in the actual config)
         config.type = 'http';
         config.url = serverUrl;
         break;
       case 'docker':
+        // STDIO servers have command, args, and env (no name or type)
         config.command = 'docker';
         config.args = ['run', '-i', '--rm', dockerImage];
         config.env = {};
@@ -45,10 +51,16 @@ function App() {
         config.args = ['-y', npxPackage];
         config.env = {};
         break;
-      case 'uvx':
+      case 'uvx': {
         config.command = 'uvx';
         const uvxArgs = uvxFrom ? ['--from', uvxFrom, uvxPackage] : [uvxPackage];
         config.args = uvxArgs;
+        config.env = {};
+        break;
+      }
+      case 'dnx':
+        config.command = 'dnx';
+        config.args = [dnxPackage, '--yes'];
         config.env = {};
         break;
       case 'local':
@@ -63,6 +75,34 @@ function App() {
 
   const encodeConfig = (config: MCPConfig): string => {
     return encodeURIComponent(JSON.stringify(config));
+  }
+
+  const generateCliCommand = (isInsiders: boolean = false): string => {
+    const config = generateConfig();
+    // CLI command requires name property inside the config JSON
+    const cliConfig = { name: serverName, ...config };
+    const jsonString = JSON.stringify(cliConfig);
+    // Escape with backslashes for cross-platform compatibility (works in PowerShell, Bash, Zsh)
+    const escapedJson = jsonString.replace(/"/g, '\\"');
+    const command = isInsiders ? 'code-insiders' : 'code';
+    return `${command} --add-mcp '${escapedJson}'`;
+  }
+
+  const generateFullConfig = () => {
+    const config = generateConfig();
+    return {
+      servers: {
+        [serverName]: config
+      }
+    };
+  }
+
+  const copyToClipboardWithState = async (text: string, setStateFn: (value: boolean) => void) => {
+    if (text) {
+      await navigator.clipboard.writeText(text);
+      setStateFn(true);
+      setTimeout(() => setStateFn(false), 2000);
+    }
   }
 
   const generateMarkdown = (): string => {
@@ -135,6 +175,7 @@ function App() {
               <option value="http">Remote HTTP Server</option>
               <option value="npx">NPX Package (Node.js)</option>
               <option value="uvx">UVX Package (Python)</option>
+              <option value="dnx">DNX Package (.NET)</option>
               <option value="docker">Docker Container</option>
               <option value="local">Local Binary</option>
             </select>
@@ -193,6 +234,20 @@ function App() {
                 <small className="field-hint">Use --from flag for PyPI package name if different</small>
               </div>
             </>
+          )}
+
+          {configType === 'dnx' && (
+            <div className="form-group">
+              <label htmlFor="dnxPackage">DNX Package *</label>
+              <input
+                id="dnxPackage"
+                type="text"
+                placeholder="Contoso.SampleMcpServer@0.0.1-beta"
+                value={dnxPackage}
+                onChange={(e) => setDnxPackage(e.target.value)}
+              />
+              <small className="field-hint">Example: Contoso.SampleMcpServer@0.0.1-beta or your-package@version</small>
+            </div>
           )}
 
           {configType === 'docker' && (
@@ -328,9 +383,50 @@ function App() {
               </div>
 
               <div className="config-output">
-                <h3>JSON Configuration</h3>
-                <pre><code>{JSON.stringify(generateConfig(), null, 2)}</code></pre>
+                <div className="output-header">
+                  <h3>mcp.json Configuration</h3>
+                  <button 
+                    className="copy-btn" 
+                    onClick={() => copyToClipboardWithState(JSON.stringify(generateFullConfig(), null, 2), setCopiedJson)}
+                  >
+                    {copiedJson ? '✓ Copied!' : '📋 Copy'}
+                  </button>
+                </div>
+                <pre><code>{JSON.stringify(generateFullConfig(), null, 2)}</code></pre>
+                <small className="field-hint">Add this to your workspace or user mcp.json file</small>
               </div>
+
+              {includeVSCode && (
+                <div className="config-output">
+                  <div className="output-header">
+                    <h3>VS Code CLI Command</h3>
+                    <button 
+                      className="copy-btn" 
+                      onClick={() => copyToClipboardWithState(generateCliCommand(false), setCopiedCli)}
+                    >
+                      {copiedCli ? '✓ Copied!' : '📋 Copy'}
+                    </button>
+                  </div>
+                  <pre><code>{generateCliCommand(false)}</code></pre>
+                  <small className="field-hint">Works in PowerShell, Bash, and Zsh</small>
+                </div>
+              )}
+
+              {includeVSCodeInsiders && (
+                <div className="config-output">
+                  <div className="output-header">
+                    <h3>VS Code Insiders CLI Command</h3>
+                    <button 
+                      className="copy-btn" 
+                      onClick={() => copyToClipboardWithState(generateCliCommand(true), setCopiedCliInsiders)}
+                    >
+                      {copiedCliInsiders ? '✓ Copied!' : '📋 Copy'}
+                    </button>
+                  </div>
+                  <pre><code>{generateCliCommand(true)}</code></pre>
+                  <small className="field-hint">Works in PowerShell, Bash, and Zsh</small>
+                </div>
+              )}
             </>
           ) : (
             <p className="placeholder">Fill in the form to generate your badges</p>

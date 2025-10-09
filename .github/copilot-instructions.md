@@ -160,5 +160,5 @@ Edit Shields.io URL parameters in `generateMarkdown()`:
 5. Remember GitHub Actions will auto-deploy on push to main
 
 
-## When documenting and creating memories
-put items in the .vscode\memory folder
+## When documenting and creating memories at the end of a turn
+ALWAYS put the documents in the .vscode\memory folder
