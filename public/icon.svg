@@ -1,0 +1,39 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <!-- Background with gradient -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a9667;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#24bfa5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0e7153;stop-opacity:1" />
+    </linearGradient>
+    <filter id="shadow">
+      <feDropShadow dx="0" dy="2" stdDeviation="3" flood-opacity="0.3"/>
+    </filter>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="100" height="100" rx="20" fill="url(#bgGradient)" filter="url(#shadow)"/>
+  
+  <!-- Badge icon -->
+  <g transform="translate(50, 50)">
+    <!-- Shield -->
+    <path d="M 0,-30 L 22,-30 C 22,-30 22,-10 22,0 C 22,18 0,28 0,28 C 0,28 -22,18 -22,0 C -22,-10 -22,-30 -22,-30 Z" 
+          fill="white" opacity="0.95"/>
+    
+    <!-- Ribbon at top -->
+    <rect x="-25" y="-32" width="50" height="6" rx="2" fill="white" opacity="0.95"/>
+    
+    <!-- Checkmark -->
+    <path d="M -8,-3 L -3,6 L 12,-12 L 9,-15 L -3,0 L -6,-6 Z" 
+          fill="#24bfa5" 
+          stroke="#24bfa5" 
+          stroke-width="2"
+          stroke-linejoin="round"
+          stroke-linecap="round"/>
+    
+    <!-- Decorative dots -->
+    <circle cx="0" cy="15" r="2" fill="#24bfa5" opacity="0.7"/>
+    <circle cx="-10" cy="10" r="2" fill="#24bfa5" opacity="0.7"/>
+    <circle cx="10" cy="10" r="2" fill="#24bfa5" opacity="0.7"/>
+  </g>
+</svg>

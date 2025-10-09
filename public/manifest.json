@@ -1,0 +1,27 @@
+{
+  "name": "MCP Badge Creator",
+  "short_name": "MCP Badges",
+  "description": "Create beautiful one-click install badges for your Model Context Protocol (MCP) servers",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icon-192.svg",
+      "sizes": "192x192",
+      "type": "image/svg+xml"
+    },
+    {
+      "src": "/icon-192.svg",
+      "sizes": "512x512",
+      "type": "image/svg+xml"
+    }
+  ],
+  "theme_color": "#24bfa5",
+  "background_color": "#1a9667",
+  "display": "standalone",
+  "start_url": "/mcp-badge-creator/"
+}

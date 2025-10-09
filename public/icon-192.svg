@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 192 192">
+  <!-- High-res version for apple-touch-icon and PWA -->
+  <defs>
+    <linearGradient id="bgGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a9667;stop-opacity:1" />
+      <stop offset="50%" style="stop-color:#24bfa5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0e7153;stop-opacity:1" />
+    </linearGradient>
+    <filter id="glow">
+      <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+      <feMerge>
+        <feMergeNode in="coloredBlur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+  
+  <!-- Rounded square background -->
+  <rect width="192" height="192" rx="38" fill="url(#bgGrad)"/>
+  
+  <!-- Large badge icon -->
+  <g transform="translate(96, 96)">
+    <!-- Shield shape with glow -->
+    <path d="M 0,-58 L 42,-58 C 42,-58 42,-20 42,0 C 42,35 0,55 0,55 C 0,55 -42,35 -42,0 C -42,-20 -42,-58 -42,-58 Z" 
+          fill="white" 
+          opacity="0.95"
+          filter="url(#glow)"/>
+    
+    <!-- Ribbon at top -->
+    <rect x="-48" y="-62" width="96" height="12" rx="5" fill="white" opacity="0.95"/>
+    
+    <!-- Large checkmark -->
+    <path d="M -16,-6 L -6,12 L 24,-24 L 18,-30 L -6,0 L -12,-12 Z" 
+          fill="#24bfa5" 
+          stroke="#24bfa5" 
+          stroke-width="4"
+          stroke-linejoin="round"
+          stroke-linecap="round"
+          filter="url(#glow)"/>
+    
+    <!-- Decorative dots -->
+    <circle cx="0" cy="30" r="4" fill="#24bfa5" opacity="0.7"/>
+    <circle cx="-22" cy="22" r="4" fill="#24bfa5" opacity="0.7"/>
+    <circle cx="22" cy="22" r="4" fill="#24bfa5" opacity="0.7"/>
+  </g>
+</svg>
