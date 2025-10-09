@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import './App.css'
 
-type ConfigType = 'http' | 'docker' | 'local';
+type ConfigType = 'http' | 'docker' | 'local' | 'npx' | 'uvx';
 
 interface MCPConfig {
   name: string;
@@ -19,6 +19,9 @@ function App() {
   const [dockerImage, setDockerImage] = useState('')
   const [localCommand, setLocalCommand] = useState('node')
   const [localArgs, setLocalArgs] = useState('')
+  const [npxPackage, setNpxPackage] = useState('')
+  const [uvxPackage, setUvxPackage] = useState('')
+  const [uvxFrom, setUvxFrom] = useState('')
   const [includeVSCode, setIncludeVSCode] = useState(true)
   const [includeVSCodeInsiders, setIncludeVSCodeInsiders] = useState(true)
   const [includeVisualStudio, setIncludeVisualStudio] = useState(true)
@@ -35,6 +38,17 @@ function App() {
       case 'docker':
         config.command = 'docker';
         config.args = ['run', '-i', '--rm', dockerImage];
+        config.env = {};
+        break;
+      case 'npx':
+        config.command = 'npx';
+        config.args = ['-y', npxPackage];
+        config.env = {};
+        break;
+      case 'uvx':
+        config.command = 'uvx';
+        const uvxArgs = uvxFrom ? ['--from', uvxFrom, uvxPackage] : [uvxPackage];
+        config.args = uvxArgs;
         config.env = {};
         break;
       case 'local':
@@ -59,7 +73,7 @@ function App() {
     const badges: string[] = [];
 
     if (includeVSCode) {
-      const vscodeUrl = `https://insiders.vscode.dev/redirect/mcp/install?name=${encodeURIComponent(serverName)}&config=${encodedConfig}`;
+      const vscodeUrl = `https://vscode.dev/redirect/mcp/install?name=${encodeURIComponent(serverName)}&config=${encodedConfig}`;
       badges.push(`[![Install in VS Code](https://img.shields.io/badge/VS_Code-Install_Server-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](${vscodeUrl})`);
     }
 
@@ -119,6 +133,8 @@ function App() {
               onChange={(e) => setConfigType(e.target.value as ConfigType)}
             >
               <option value="http">Remote HTTP Server</option>
+              <option value="npx">NPX Package (Node.js)</option>
+              <option value="uvx">UVX Package (Python)</option>
               <option value="docker">Docker Container</option>
               <option value="local">Local Binary</option>
             </select>
@@ -134,7 +150,49 @@ function App() {
                 value={serverUrl}
                 onChange={(e) => setServerUrl(e.target.value)}
               />
+              <small className="field-hint">For remotely hosted MCP servers using HTTP/SSE transport</small>
             </div>
+          )}
+
+          {configType === 'npx' && (
+            <div className="form-group">
+              <label htmlFor="npxPackage">NPM Package Name *</label>
+              <input
+                id="npxPackage"
+                type="text"
+                placeholder="@modelcontextprotocol/server-filesystem"
+                value={npxPackage}
+                onChange={(e) => setNpxPackage(e.target.value)}
+              />
+              <small className="field-hint">Example: @modelcontextprotocol/server-filesystem</small>
+            </div>
+          )}
+
+          {configType === 'uvx' && (
+            <>
+              <div className="form-group">
+                <label htmlFor="uvxPackage">Package/Script Name *</label>
+                <input
+                  id="uvxPackage"
+                  type="text"
+                  placeholder="mcp-server-git"
+                  value={uvxPackage}
+                  onChange={(e) => setUvxPackage(e.target.value)}
+                />
+                <small className="field-hint">The script or entry point to run</small>
+              </div>
+              <div className="form-group">
+                <label htmlFor="uvxFrom">From Package (optional)</label>
+                <input
+                  id="uvxFrom"
+                  type="text"
+                  placeholder="mcp-server-git"
+                  value={uvxFrom}
+                  onChange={(e) => setUvxFrom(e.target.value)}
+                />
+                <small className="field-hint">Use --from flag for PyPI package name if different</small>
+              </div>
+            </>
           )}
 
           {configType === 'docker' && (
@@ -147,6 +205,7 @@ function App() {
                 value={dockerImage}
                 onChange={(e) => setDockerImage(e.target.value)}
               />
+              <small className="field-hint">Full image name including tag (e.g., username/image:latest)</small>
             </div>
           )}
 
@@ -161,6 +220,7 @@ function App() {
                   value={localCommand}
                   onChange={(e) => setLocalCommand(e.target.value)}
                 />
+                <small className="field-hint">The executable command (node, python, uv, etc.)</small>
               </div>
               <div className="form-group">
                 <label htmlFor="localArgs">Arguments (comma-separated)</label>
@@ -171,37 +231,67 @@ function App() {
                   value={localArgs}
                   onChange={(e) => setLocalArgs(e.target.value)}
                 />
+                <small className="field-hint">Command arguments separated by commas</small>
               </div>
             </>
           )}
 
           <div className="form-group">
             <label>Target IDEs</label>
-            <div className="checkbox-group">
-              <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  checked={includeVSCode}
-                  onChange={(e) => setIncludeVSCode(e.target.checked)}
-                />
-                VS Code
-              </label>
-              <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  checked={includeVSCodeInsiders}
-                  onChange={(e) => setIncludeVSCodeInsiders(e.target.checked)}
-                />
-                VS Code Insiders
-              </label>
-              <label className="checkbox-label">
-                <input
-                  type="checkbox"
-                  checked={includeVisualStudio}
-                  onChange={(e) => setIncludeVisualStudio(e.target.checked)}
-                />
-                Visual Studio
-              </label>
+            <div className="ide-cards">
+              <div 
+                className={`ide-card ${includeVSCode ? 'active' : ''}`}
+                onClick={() => setIncludeVSCode(!includeVSCode)}
+              >
+                <div className="ide-card-icon" style={{ backgroundColor: '#0098FF' }}>
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.5 0l-11 11-4.5-4.5-2 2 6.5 6.5 13-13z"/>
+                  </svg>
+                </div>
+                <div className="ide-card-content">
+                  <h4>VS Code</h4>
+                  <p>Visual Studio Code</p>
+                </div>
+                <div className={`ide-card-toggle ${includeVSCode ? 'checked' : ''}`}>
+                  <div className="toggle-dot"></div>
+                </div>
+              </div>
+
+              <div 
+                className={`ide-card ${includeVSCodeInsiders ? 'active' : ''}`}
+                onClick={() => setIncludeVSCodeInsiders(!includeVSCodeInsiders)}
+              >
+                <div className="ide-card-icon" style={{ backgroundColor: '#24bfa5' }}>
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.5 0l-11 11-4.5-4.5-2 2 6.5 6.5 13-13z"/>
+                  </svg>
+                </div>
+                <div className="ide-card-content">
+                  <h4>VS Code Insiders</h4>
+                  <p>Preview builds</p>
+                </div>
+                <div className={`ide-card-toggle ${includeVSCodeInsiders ? 'checked' : ''}`}>
+                  <div className="toggle-dot"></div>
+                </div>
+              </div>
+
+              <div 
+                className={`ide-card ${includeVisualStudio ? 'active' : ''}`}
+                onClick={() => setIncludeVisualStudio(!includeVisualStudio)}
+              >
+                <div className="ide-card-icon" style={{ backgroundColor: '#C16FDE' }}>
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.5 0l-11 11-4.5-4.5-2 2 6.5 6.5 13-13z"/>
+                  </svg>
+                </div>
+                <div className="ide-card-content">
+                  <h4>Visual Studio</h4>
+                  <p>Full IDE experience</p>
+                </div>
+                <div className={`ide-card-toggle ${includeVisualStudio ? 'checked' : ''}`}>
+                  <div className="toggle-dot"></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -254,6 +344,9 @@ function App() {
         </p>
         <p className="small">
           Based on <a href="https://github.com/jamesmontemagno/MonkeyMCP/blob/main/.github/prompts/add-mcp-install-badges.md" target="_blank" rel="noopener noreferrer">MCP Badge Documentation</a>
+        </p>
+        <p className="small">
+          Created with <a href="https://code.visualstudio.com/" target="_blank" rel="noopener noreferrer">VS Code</a> and <a href="https://github.com/features/copilot" target="_blank" rel="noopener noreferrer">GitHub Copilot</a> • <a href="https://github.com/jamesmontemagno/mcp-badge-creator" target="_blank" rel="noopener noreferrer">View on GitHub</a>
         </p>
       </footer>
     </div>

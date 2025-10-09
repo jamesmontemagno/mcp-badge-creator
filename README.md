@@ -8,10 +8,15 @@
 
 - ✅ **Easy to Use**: Simple form-based interface to generate badges
 - 🎨 **Multiple IDEs**: Support for VS Code, VS Code Insiders, and Visual Studio
-- 🔧 **Three Configuration Types**: Remote HTTP Server, Docker Container, and Local Binary
+- 🔧 **Five Configuration Types**: 
+  - Remote HTTP Server (HTTP/SSE transport)
+  - NPX Package (Node.js packages)
+  - UVX Package (Python packages with uv)
+  - Docker Container
+  - Local Binary (custom commands)
 - 📋 **Copy to Clipboard**: One-click copy of generated markdown
 - 👀 **Live Preview**: See your badges before copying
-- 🎨 **Beautiful Design**: Modern, responsive UI
+- 🎨 **Beautiful Design**: Modern, responsive UI with VS Code Insiders green theme
 
 ## 🚀 Live Demo
 
@@ -29,7 +34,7 @@ MCP badges provide a seamless way for users to install your Model Context Protoc
 ## 🛠️ Supported Configuration Types
 
 ### 1. Remote HTTP Server
-For MCP servers hosted remotely and accessible via HTTP/HTTPS.
+For MCP servers hosted remotely and accessible via HTTP/HTTPS with SSE transport.
 
 ```json
 {
@@ -39,7 +44,46 @@ For MCP servers hosted remotely and accessible via HTTP/HTTPS.
 }
 ```
 
-### 2. Docker Container
+### 2. NPX Package (Node.js)
+For MCP servers distributed as NPM packages, commonly used in the MCP ecosystem.
+
+```json
+{
+  "name": "filesystem",
+  "command": "npx",
+  "args": ["-y", "@modelcontextprotocol/server-filesystem"],
+  "env": {}
+}
+```
+
+**Common Examples:**
+- `@modelcontextprotocol/server-filesystem` - File system operations
+- `@modelcontextprotocol/server-github` - GitHub API integration
+- `@modelcontextprotocol/server-postgres` - PostgreSQL database access
+
+### 3. UVX Package (Python)
+For Python-based MCP servers using uv/uvx for fast, reliable Python package execution.
+
+```json
+{
+  "name": "git-server",
+  "command": "uvx",
+  "args": ["--from", "mcp-server-git", "mcp-server-git"],
+  "env": {}
+}
+```
+
+**Alternative without --from:**
+```json
+{
+  "name": "git-server",
+  "command": "uvx",
+  "args": ["mcp-server-git"],
+  "env": {}
+}
+```
+
+### 4. Docker Container
 For MCP servers packaged as Docker images.
 
 ```json
@@ -51,22 +95,27 @@ For MCP servers packaged as Docker images.
 }
 ```
 
-### 3. Local Binary
-For MCP servers running as local executables.
+### 5. Local Binary
+For MCP servers running as local executables with custom commands.
 
 ```json
 {
   "name": "your-server-name",
   "command": "node",
-  "args": ["path/to/your/server.js"],
+  "args": ["path/to/server.js"],
   "env": {}
 }
 ```
 
+**Other common commands:**
+- `python` - For Python scripts
+- `uv` - For uv-managed Python projects
+- Custom binaries in your PATH
+
 ## 🎯 How It Works
 
 1. **Fill in Server Details**: Enter your MCP server name and configuration
-2. **Choose Configuration Type**: Select between HTTP, Docker, or Local
+2. **Choose Configuration Type**: Select between HTTP, NPX, UVX, Docker, or Local
 3. **Select Target IDEs**: Choose which IDEs to generate badges for
 4. **Copy & Use**: Copy the generated markdown and add it to your README
 
