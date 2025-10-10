@@ -172,7 +172,6 @@ select {
 .ide-card:hover {
   border-color: #24bfa5;
   background: #f0faf8;
-  transform: translateY(-3px);
   box-shadow: 0 8px 24px rgba(36, 191, 165, 0.18);
 }
 
@@ -180,7 +179,6 @@ select {
   border-color: #24bfa5;
   background: linear-gradient(135deg, #e6f7f4 0%, #f0faf8 100%);
   box-shadow: 0 4px 16px rgba(36, 191, 165, 0.25);
-  transform: translateY(-1px);
 }
 
 .ide-card-icon {
@@ -198,7 +196,6 @@ select {
 }
 
 .ide-card:hover .ide-card-icon {
-  transform: scale(1.08) rotate(2deg);
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.12);
 }
 
@@ -486,7 +483,6 @@ footer a:hover {
 .select-all-toggle input[type="checkbox"]:hover {
   border-color: #24bfa5;
   box-shadow: 0 4px 12px rgba(36, 191, 165, 0.2), 0 0 0 3px rgba(36, 191, 165, 0.08);
-  transform: translateY(-1px) scale(1.05);
 }
 
 .select-all-toggle input[type="checkbox"]:checked {
@@ -580,13 +576,11 @@ footer a:hover {
 .platform-checkbox:hover {
   border-color: #24bfa5;
   background: linear-gradient(135deg, #f0faf8 0%, #e6f7f4 100%);
-  transform: translateY(-2px);
   box-shadow: 0 8px 24px rgba(36, 191, 165, 0.15), 0 2px 8px rgba(0, 0, 0, 0.08);
   color: #374151;
 }
 
 .platform-checkbox:active {
-  transform: translateY(-1px);
   box-shadow: 0 4px 12px rgba(36, 191, 165, 0.2);
 }
 
@@ -608,7 +602,6 @@ footer a:hover {
 .platform-checkbox input[type="checkbox"]:hover {
   border-color: #24bfa5;
   box-shadow: 0 4px 12px rgba(36, 191, 165, 0.15), 0 0 0 3px rgba(36, 191, 165, 0.1);
-  transform: translateY(-1px);
 }
 
 .platform-checkbox input[type="checkbox"]:checked {
