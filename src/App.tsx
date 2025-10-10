@@ -40,7 +40,7 @@ function App() {
   const [includeWarp, setIncludeWarp] = useState(false)
   const [includeWindsurf, setIncludeWindsurf] = useState(false)
   // Badge text customization
-  const [badgeText, setBadgeText] = useState('Install Server')
+  const [badgeText, setBadgeText] = useState('Install in')
   // Select all functionality
   const [selectAllBadges, setSelectAllBadges] = useState(false)
   const [selectAllReadme, setSelectAllReadme] = useState(false)
@@ -177,17 +177,17 @@ function App() {
 
     if (includeVSCode) {
       const vscodeUrl = `https://vscode.dev/redirect/mcp/install?name=${encodeURIComponent(serverName)}&config=${encodedConfig}`;
-      badges.push(`[![Install in VS Code](https://img.shields.io/badge/VS_Code-${customBadgeText}-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](${vscodeUrl})`);
+      badges.push(`[![Install in VS Code](https://img.shields.io/badge/${customBadgeText}-VS_Code-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](${vscodeUrl})`);
     }
 
     if (includeVSCodeInsiders) {
       const vscodeInsidersUrl = `https://insiders.vscode.dev/redirect/mcp/install?name=${encodeURIComponent(serverName)}&config=${encodedConfig}&quality=insiders`;
-      badges.push(`[![Install in VS Code Insiders](https://img.shields.io/badge/VS_Code_Insiders-${customBadgeText}-24bfa5?style=flat-square&logo=visualstudiocode&logoColor=white)](${vscodeInsidersUrl})`);
+      badges.push(`[![Install in VS Code Insiders](https://img.shields.io/badge/${customBadgeText}-VS_Code_Insiders-24bfa5?style=flat-square&logo=visualstudiocode&logoColor=white)](${vscodeInsidersUrl})`);
     }
 
     if (includeVisualStudio) {
       const vsUrl = `https://vs-open.link/mcp-install?${encodedConfig}`;
-      badges.push(`[![Install in Visual Studio](https://img.shields.io/badge/Visual_Studio-${customBadgeText}-C16FDE?logo=visualstudio&logoColor=white)](${vsUrl})`);
+      badges.push(`[![Install in Visual Studio](https://img.shields.io/badge/${customBadgeText}-Visual_Studio-C16FDE?style=flat-square&logo=visualstudio&logoColor=white)](${vsUrl})`);
     }
 
     if (includeCursor) {
@@ -195,7 +195,7 @@ function App() {
       const configWithName = { name: serverName, ...config };
       const base64Config = btoa(JSON.stringify(configWithName));
       const cursorUrl = `https://cursor.com/en/install-mcp?name=${encodeURIComponent(serverName)}&config=${base64Config}`;
-      badges.push(`[![Install in Cursor](https://img.shields.io/badge/Cursor-${customBadgeText}-000000?style=flat-square&logoColor=white)](${cursorUrl})`);
+      badges.push(`[![Install in Cursor](https://img.shields.io/badge/${customBadgeText}-Cursor-000000?style=flat-square&logoColor=white)](${cursorUrl})`);
     }
 
     if (includeGoose) {
@@ -250,7 +250,7 @@ function App() {
       readmeContent += `<details>\n<summary>VS Code</summary>\n\n`;
       readmeContent += `#### Click the button to install:\n\n`;
       const vscodeUrl = `https://vscode.dev/redirect/mcp/install?name=${encodeURIComponent(serverName)}&config=${encodeConfig(generateConfig())}`;
-      readmeContent += `[![Install in VS Code](https://img.shields.io/badge/VS_Code-${badgeText.replace(/\\s/g, '_')}-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](${vscodeUrl})\n\n`;
+      readmeContent += `[![Install in VS Code](https://img.shields.io/badge/${badgeText.replace(/\s/g, '_')}-VS_Code-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](${vscodeUrl})\n\n`;
       readmeContent += `#### Or install manually:\n\n`;
       readmeContent += `Follow the MCP install [guide](https://code.visualstudio.com/docs/copilot/chat/mcp-servers#_add-an-mcp-server), use the standard config above. You can also install the ${serverName} MCP server using the VS Code CLI:\n\n`;
       readmeContent += `\`\`\`bash\n${generateCliCommand(false)}\n\`\`\`\n\n`;
@@ -262,7 +262,7 @@ function App() {
       readmeContent += `<details>\n<summary>VS Code Insiders</summary>\n\n`;
       readmeContent += `#### Click the button to install:\n\n`;
       const vscodeInsidersUrl = `https://insiders.vscode.dev/redirect/mcp/install?name=${encodeURIComponent(serverName)}&config=${encodeConfig(generateConfig())}&quality=insiders`;
-      readmeContent += `[![Install in VS Code Insiders](https://img.shields.io/badge/VS_Code_Insiders-${badgeText.replace(/\\s/g, '_')}-24bfa5?style=flat-square&logo=visualstudiocode&logoColor=white)](${vscodeInsidersUrl})\n\n`;
+      readmeContent += `[![Install in VS Code Insiders](https://img.shields.io/badge/${badgeText.replace(/\s/g, '_')}-VS_Code_Insiders-24bfa5?style=flat-square&logo=visualstudiocode&logoColor=white)](${vscodeInsidersUrl})\n\n`;
       readmeContent += `#### Or install manually:\n\n`;
       readmeContent += `Follow the MCP install [guide](https://code.visualstudio.com/docs/copilot/chat/mcp-servers#_add-an-mcp-server), use the standard config above. You can also install the ${serverName} MCP server using the VS Code Insiders CLI:\n\n`;
       readmeContent += `\`\`\`bash\n${generateCliCommand(true)}\n\`\`\`\n\n`;
@@ -274,12 +274,27 @@ function App() {
       readmeContent += `<details>\n<summary>Visual Studio</summary>\n\n`;
       readmeContent += `#### Click the button to install:\n\n`;
       const vsUrl = `https://vs-open.link/mcp-install?${encodeConfig(generateConfig())}`;
-      readmeContent += `[![Install in Visual Studio](https://img.shields.io/badge/Visual_Studio-${badgeText.replace(/\\s/g, '_')}-C16FDE?logo=visualstudio&logoColor=white)](${vsUrl})\n\n`;
+      readmeContent += `[![Install in Visual Studio](https://img.shields.io/badge/${badgeText.replace(/\s/g, '_')}-Visual_Studio-C16FDE?style=flat-square&logo=visualstudio&logoColor=white)](${vsUrl})\n\n`;
       readmeContent += `#### Or install manually:\n\n`;
       readmeContent += `1. Open Visual Studio\n`;
-      readmeContent += `2. Navigate to Tools > Options > MCP Servers\n`;
-      readmeContent += `3. Click "Add Server" and enter the configuration:\n\n`;
-      readmeContent += `\`\`\`json\n${jsonConfig}\n\`\`\`\n</details>\n\n`;
+      readmeContent += `2. Navigate to the GitHub Copilot Chat window\n`;
+      readmeContent += `3. Click the tools icon (🛠️) in the chat toolbar\n`;
+      readmeContent += `4. Click the + "Add Server" button to open the "Configure MCP server" dialog\n`;
+      readmeContent += `5. Fill in the configuration:\n`;
+      readmeContent += `   - **Server ID**: \`${serverName}\`\n`;
+      const config = generateConfig();
+      if (config.type === 'http') {
+        readmeContent += `   - **Type**: Select \`http/sse\` from the dropdown\n`;
+        readmeContent += `   - **URL**: \`${config.url || ''}\`\n`;
+      } else {
+        readmeContent += `   - **Type**: Select \`stdio\` from the dropdown\n`;
+        readmeContent += `   - **Command**: \`${config.command || ''}\`\n`;
+        if (config.args && config.args.length > 0) {
+          readmeContent += `   - **Arguments**: \`${config.args.join(' ')}\`\n`;
+        }
+      }
+      readmeContent += `6. Click "Save" to add the server\n\n`;
+      readmeContent += `For detailed instructions, see the [Visual Studio MCP documentation](https://learn.microsoft.com/visualstudio/ide/mcp-servers).\n</details>\n\n`;
     }
     
     // Cursor section
@@ -290,7 +305,7 @@ function App() {
       const base64Config = btoa(JSON.stringify(configWithName));
       const cursorUrl = `https://cursor.com/en/install-mcp?name=${encodeURIComponent(serverName)}&config=${base64Config}`;
       // Use Cursor badge with same style as VS Code badges (no icon)
-      readmeContent += `[![Install in Cursor](https://img.shields.io/badge/Cursor-${badgeText.replace(/\\s/g, '_')}-000000?style=flat-square&logoColor=white)](${cursorUrl})\n\n`;
+      readmeContent += `[![Install in Cursor](https://img.shields.io/badge/${badgeText.replace(/\s/g, '_')}-Cursor-000000?style=flat-square&logoColor=white)](${cursorUrl})\n\n`;
       readmeContent += `#### Or install manually:\n\n`;
       readmeContent += `Go to \`Cursor Settings\` -> \`MCP\` -> \`Add new MCP Server\`. Name to your liking, use \`command\` type with the command from the standard config above. You can also verify config or add command like arguments via clicking \`Edit\`.\n</details>\n\n`;
     }
@@ -609,11 +624,11 @@ function App() {
             <input
               id="badgeText"
               type="text"
-              placeholder="Install Server"
+              placeholder="Install in"
               value={badgeText}
               onChange={(e) => setBadgeText(e.target.value)}
             />
-            <small className="field-hint">Customize the text that appears on the right side of badges</small>
+            <small className="field-hint">Customize the text that appears on the left side of badges</small>
           </div>
 
           <div className="form-group">
