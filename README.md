@@ -21,7 +21,7 @@
 
 ## 🚀 Live Demo
 
-Visit the live application: [MCP Badge Creator](https://jamesmontemagno.github.io/mcp-badge-creator/)
+Visit the live application: [MCP Badge Creator](https://mcpbadge.dev/)
 
 ## 📖 About MCP Badges
 

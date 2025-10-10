@@ -1,0 +1,55 @@
+<svg width="1200" height="630" viewBox="0 0 1200 630" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Background gradient -->
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#1a9667"/>
+      <stop offset="50%" style="stop-color:#24bfa5"/>
+      <stop offset="100%" style="stop-color:#0e7153"/>
+    </linearGradient>
+  </defs>
+  
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  
+  <!-- Main title -->
+  <text x="600" y="200" text-anchor="middle" fill="white" font-family="system-ui, -apple-system, sans-serif" font-size="64" font-weight="bold">
+    🎖️ MCP Badge Creator
+  </text>
+  
+  <!-- Subtitle -->
+  <text x="600" y="260" text-anchor="middle" fill="rgba(255,255,255,0.9)" font-family="system-ui, -apple-system, sans-serif" font-size="32" font-weight="normal">
+    Generate one-click install badges for your Model Context Protocol servers
+  </text>
+  
+  <!-- Sample badges -->
+  <g transform="translate(600, 350)">
+    <!-- VS Code badge mockup -->
+    <rect x="-400" y="0" width="180" height="35" rx="4" fill="#0098FF"/>
+    <text x="-310" y="23" text-anchor="middle" fill="white" font-family="system-ui" font-size="14" font-weight="500">
+      Install in VS Code
+    </text>
+    
+    <!-- VS Code Insiders badge mockup -->
+    <rect x="-200" y="0" width="200" height="35" rx="4" fill="#24bfa5"/>
+    <text x="-100" y="23" text-anchor="middle" fill="white" font-family="system-ui" font-size="14" font-weight="500">
+      Install in VS Code Insiders
+    </text>
+    
+    <!-- Cursor badge mockup -->
+    <rect x="20" y="0" width="160" height="35" rx="4" fill="#000000"/>
+    <text x="100" y="23" text-anchor="middle" fill="white" font-family="system-ui" font-size="14" font-weight="500">
+      Install in Cursor
+    </text>
+    
+    <!-- Visual Studio badge mockup -->
+    <rect x="200" y="0" width="200" height="35" rx="4" fill="#C16FDE"/>
+    <text x="300" y="23" text-anchor="middle" fill="white" font-family="system-ui" font-size="14" font-weight="500">
+      Install in Visual Studio
+    </text>
+  </g>
+  
+  <!-- Bottom text -->
+  <text x="600" y="520" text-anchor="middle" fill="rgba(255,255,255,0.8)" font-family="system-ui, -apple-system, sans-serif" font-size="24">
+    Support for VS Code • VS Code Insiders • Visual Studio • Cursor • Goose • LM Studio
+  </text>
+</svg>
