@@ -1,11 +1,11 @@
 # 🎖️ MCP Badge Creator
 
-> Create beautiful one-click install badges for your Model Context Protocol (MCP) servers that work with VS Code, VS Code Insiders, and Visual Studio.
+> Create beautiful one-click install badges for your Model Context Protocol (MCP) servers that work with VS Code, VS Code Insiders, Visual Studio, Cursor, Goose, and LM Studio.
 
 ## 🌟 Features
 
 - ✅ **Easy to Use**: Simple form-based interface to generate badges
-- 🎨 **Multiple IDEs**: Support for VS Code, VS Code Insiders, and Visual Studio
+- 🎨 **Multiple IDEs**: Support for VS Code, VS Code Insiders, Visual Studio, Cursor, Goose, and LM Studio
 - 🔧 **Six Configuration Types**: 
   - Remote HTTP Server (HTTP/SSE transport)
   - NPX Package (Node.js packages)
@@ -14,8 +14,9 @@
   - Docker Container
   - Local Binary (custom commands)
 - 📋 **Copy to Clipboard**: One-click copy of generated markdown
+- 📄 **README Export**: Generate complete "Getting Started" section for your README with installation instructions for all supported IDEs
 - 🖥️ **CLI Commands**: Generate cross-platform `code --add-mcp` commands for terminal installation
-- � **Live Preview**: See your badges before copying
+- 👁️ **Live Preview**: See your badges before copying
 - 🎨 **Beautiful Design**: Modern, responsive UI with VS Code Insiders green theme
 
 ## 🚀 Live Demo
@@ -125,12 +126,43 @@ For MCP servers running as local executables with custom commands.
 ## 🎯 How It Works
 
 1. **Fill in Server Details**: Enter your MCP server name and configuration
-2. **Choose Configuration Type**: Select between HTTP, NPX, UVX, Docker, or Local
+2. **Choose Configuration Type**: Select between HTTP, NPX, UVX, DNX, Docker, or Local
 3. **Select Target IDEs**: Choose which IDEs to generate badges for
 4. **Copy & Use**: 
    - Copy the generated markdown badges for your README
    - Copy the JSON configuration for manual setup
    - Copy the CLI commands for terminal installation
+   - Export a complete "Getting Started" README section with installation instructions for all IDEs
+
+## 🎨 Supported IDEs
+
+The badge creator supports one-click install badges for the following IDEs:
+
+- **VS Code** - Visual Studio Code stable release
+- **VS Code Insiders** - Visual Studio Code preview builds
+- **Visual Studio** - Full IDE experience with MCP support
+- **Cursor** - AI-powered code editor with MCP integration
+- **Goose** - AI coding assistant with MCP support
+- **LM Studio** - Local LLM platform with MCP server support
+
+Each IDE has its own deeplink protocol for seamless installation:
+- VS Code/Insiders: `vscode.dev/redirect/mcp/install`
+- Visual Studio: `vs-open.link/mcp-install`
+- Cursor: `cursor://anysphere.cursor-deeplink/mcp/install`
+- Goose: `goose://install-mcp`
+- LM Studio: `lmstudio://add_mcp`
+
+## 📄 README Export Feature
+
+The "Getting Started README" tab generates a complete, ready-to-use Getting Started section for your project's README that includes:
+
+- All one-click install badges for supported IDEs
+- Detailed manual installation instructions for each IDE
+- CLI commands for VS Code and VS Code Insiders
+- Configuration details and examples
+- Help section with links to MCP documentation
+
+Simply click the tab, copy the content, and paste it directly into your README.md file!
 
 ### 🖥️ CLI Command Installation
 
