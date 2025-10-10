@@ -1,7 +1,5 @@
 # 🎖️ MCP Badge Creator
 
-[![Deploy to GitHub Pages](https://github.com/YOUR_USERNAME/mcp-badge-creator/actions/workflows/deploy.yml/badge.svg)](https://github.com/YOUR_USERNAME/mcp-badge-creator/actions/workflows/deploy.yml)
-
 > Create beautiful one-click install badges for your Model Context Protocol (MCP) servers that work with VS Code, VS Code Insiders, and Visual Studio.
 
 ## 🌟 Features
@@ -22,7 +20,7 @@
 
 ## 🚀 Live Demo
 
-Visit the live application: [MCP Badge Creator](https://YOUR_USERNAME.github.io/mcp-badge-creator/)
+Visit the live application: [MCP Badge Creator](https://jamesmontemagno.github.io/mcp-badge-creator/)
 
 ## 📖 About MCP Badges
 
