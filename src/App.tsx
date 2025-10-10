@@ -26,10 +26,15 @@ function App() {
   const [includeVSCode, setIncludeVSCode] = useState(true)
   const [includeVSCodeInsiders, setIncludeVSCodeInsiders] = useState(true)
   const [includeVisualStudio, setIncludeVisualStudio] = useState(true)
+  const [includeCursor, setIncludeCursor] = useState(true)
+  const [includeGoose, setIncludeGoose] = useState(true)
+  const [includeLMStudio, setIncludeLMStudio] = useState(true)
   const [copied, setCopied] = useState(false)
   const [copiedJson, setCopiedJson] = useState(false)
   const [copiedCli, setCopiedCli] = useState(false)
   const [copiedCliInsiders, setCopiedCliInsiders] = useState(false)
+  const [copiedReadme, setCopiedReadme] = useState(false)
+  const [activeTab, setActiveTab] = useState<'badges' | 'readme'>('badges')
 
   const generateConfig = (): MCPConfig => {
     const config: MCPConfig = {};
@@ -127,6 +132,25 @@ function App() {
       badges.push(`[![Install in Visual Studio](https://img.shields.io/badge/Visual_Studio-Install_Server-C16FDE?logo=visualstudio&logoColor=white)](${vsUrl})`);
     }
 
+    if (includeCursor) {
+      const cursorUrl = `cursor://anysphere.cursor-deeplink/mcp/install?name=${encodeURIComponent(serverName)}&config=${encodedConfig}`;
+      badges.push(`[![Install in Cursor](https://img.shields.io/badge/Cursor-Install_Server-8B5CF6?style=flat-square&logo=cursor&logoColor=white)](${cursorUrl})`);
+    }
+
+    if (includeGoose) {
+      // Goose uses similar format as VSCode
+      const gooseUrl = `goose://install-mcp?name=${encodeURIComponent(serverName)}&config=${encodedConfig}`;
+      badges.push(`[![Install in Goose](https://img.shields.io/badge/Goose-Install_Server-10B981?style=flat-square&logo=goose&logoColor=white)](${gooseUrl})`);
+    }
+
+    if (includeLMStudio) {
+      // LM Studio uses base64 encoding instead of URL encoding
+      const configWithName = { name: serverName, ...config };
+      const base64Config = btoa(JSON.stringify(configWithName));
+      const lmstudioUrl = `lmstudio://add_mcp?name=${encodeURIComponent(serverName)}&config=${base64Config}`;
+      badges.push(`[![Install in LM Studio](https://img.shields.io/badge/LM_Studio-Install_Server-3B82F6?style=flat-square&logo=lmstudio&logoColor=white)](${lmstudioUrl})`);
+    }
+
     return badges.join('\n');
   }
 
@@ -136,6 +160,122 @@ function App() {
       await navigator.clipboard.writeText(markdown);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
+    }
+  }
+
+  const generateReadmeContent = (): string => {
+    if (!serverName) return '';
+    
+    const fullConfig = generateFullConfig();
+    const jsonConfig = JSON.stringify(fullConfig, null, 2);
+    
+    let readmeContent = `## Getting Started\n\n`;
+    readmeContent += `### Quick Install\n\n`;
+    readmeContent += `Click one of the buttons below to install the MCP server in your preferred IDE:\n\n`;
+    
+    // Add badges
+    readmeContent += generateMarkdown() + '\n\n';
+    
+    // Add manual installation section
+    readmeContent += `### Manual Installation\n\n`;
+    
+    // VS Code section
+    if (includeVSCode || includeVSCodeInsiders) {
+      readmeContent += `#### VS Code / VS Code Insiders\n\n`;
+      readmeContent += `1. Open VS Code or VS Code Insiders\n`;
+      readmeContent += `2. Open the Command Palette (Ctrl+Shift+P / Cmd+Shift+P)\n`;
+      readmeContent += `3. Search for "MCP: Add Server"\n`;
+      readmeContent += `4. Enter the following configuration:\n\n`;
+      readmeContent += `\`\`\`json\n${jsonConfig}\n\`\`\`\n\n`;
+      
+      if (includeVSCode) {
+        const cliCommand = generateCliCommand(false);
+        readmeContent += `**Or use the CLI:**\n\n\`\`\`bash\n${cliCommand}\n\`\`\`\n\n`;
+      }
+    }
+    
+    // Visual Studio section
+    if (includeVisualStudio) {
+      readmeContent += `#### Visual Studio\n\n`;
+      readmeContent += `1. Open Visual Studio\n`;
+      readmeContent += `2. Navigate to Tools > Options > MCP Servers\n`;
+      readmeContent += `3. Click "Add Server" and enter the configuration:\n\n`;
+      readmeContent += `\`\`\`json\n${jsonConfig}\n\`\`\`\n\n`;
+    }
+    
+    // Cursor section
+    if (includeCursor) {
+      readmeContent += `#### Cursor\n\n`;
+      readmeContent += `1. Open Cursor Settings (Ctrl+, / Cmd+,)\n`;
+      readmeContent += `2. Navigate to "MCP" section\n`;
+      readmeContent += `3. Add the following server configuration:\n\n`;
+      readmeContent += `\`\`\`json\n${jsonConfig}\n\`\`\`\n\n`;
+    }
+    
+    // Goose section
+    if (includeGoose) {
+      readmeContent += `#### Goose\n\n`;
+      readmeContent += `To install via npx:\n\n`;
+      readmeContent += `\`\`\`bash\nnpx --yes -p @dylibso/mcpx@latest install --client goose --url "${configType === 'http' ? serverUrl : 'local'}"\n\`\`\`\n\n`;
+      readmeContent += `Or add to your Goose configuration file:\n\n`;
+      readmeContent += `\`\`\`json\n${jsonConfig}\n\`\`\`\n\n`;
+    }
+    
+    // LM Studio section
+    if (includeLMStudio) {
+      readmeContent += `#### LM Studio\n\n`;
+      readmeContent += `1. Open LM Studio\n`;
+      readmeContent += `2. Navigate to the "Program" tab in the sidebar\n`;
+      readmeContent += `3. Edit the \`mcp.json\` file\n`;
+      readmeContent += `4. Add the following configuration:\n\n`;
+      readmeContent += `\`\`\`json\n${jsonConfig}\n\`\`\`\n\n`;
+    }
+    
+    // Additional notes
+    readmeContent += `### Configuration Details\n\n`;
+    readmeContent += `- **Server Name:** \`${serverName}\`\n`;
+    
+    switch (configType) {
+      case 'http':
+        readmeContent += `- **Type:** Remote HTTP Server\n`;
+        readmeContent += `- **URL:** \`${serverUrl}\`\n`;
+        break;
+      case 'npx':
+        readmeContent += `- **Type:** NPX Package\n`;
+        readmeContent += `- **Package:** \`${npxPackage}\`\n`;
+        break;
+      case 'uvx':
+        readmeContent += `- **Type:** UVX Package\n`;
+        readmeContent += `- **Package:** \`${uvxPackage}\`\n`;
+        if (uvxFrom) readmeContent += `- **From:** \`${uvxFrom}\`\n`;
+        break;
+      case 'dnx':
+        readmeContent += `- **Type:** DNX Package\n`;
+        readmeContent += `- **Package:** \`${dnxPackage}\`\n`;
+        break;
+      case 'docker':
+        readmeContent += `- **Type:** Docker Container\n`;
+        readmeContent += `- **Image:** \`${dockerImage}\`\n`;
+        break;
+      case 'local':
+        readmeContent += `- **Type:** Local Binary\n`;
+        readmeContent += `- **Command:** \`${localCommand}\`\n`;
+        if (localArgs) readmeContent += `- **Arguments:** \`${localArgs}\`\n`;
+        break;
+    }
+    
+    readmeContent += `\n### Need Help?\n\n`;
+    readmeContent += `For more information about the Model Context Protocol, visit [modelcontextprotocol.io](https://modelcontextprotocol.io).\n`;
+    
+    return readmeContent;
+  }
+
+  const copyReadmeToClipboard = async () => {
+    const readme = generateReadmeContent();
+    if (readme) {
+      await navigator.clipboard.writeText(readme);
+      setCopiedReadme(true);
+      setTimeout(() => setCopiedReadme(false), 2000);
     }
   }
 
@@ -347,85 +487,171 @@ function App() {
                   <div className="toggle-dot"></div>
                 </div>
               </div>
+
+              <div 
+                className={`ide-card ${includeCursor ? 'active' : ''}`}
+                onClick={() => setIncludeCursor(!includeCursor)}
+              >
+                <div className="ide-card-icon" style={{ backgroundColor: '#8B5CF6' }}>
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.5 0l-11 11-4.5-4.5-2 2 6.5 6.5 13-13z"/>
+                  </svg>
+                </div>
+                <div className="ide-card-content">
+                  <h4>Cursor</h4>
+                  <p>AI-powered IDE</p>
+                </div>
+                <div className={`ide-card-toggle ${includeCursor ? 'checked' : ''}`}>
+                  <div className="toggle-dot"></div>
+                </div>
+              </div>
+
+              <div 
+                className={`ide-card ${includeGoose ? 'active' : ''}`}
+                onClick={() => setIncludeGoose(!includeGoose)}
+              >
+                <div className="ide-card-icon" style={{ backgroundColor: '#10B981' }}>
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.5 0l-11 11-4.5-4.5-2 2 6.5 6.5 13-13z"/>
+                  </svg>
+                </div>
+                <div className="ide-card-content">
+                  <h4>Goose</h4>
+                  <p>AI coding assistant</p>
+                </div>
+                <div className={`ide-card-toggle ${includeGoose ? 'checked' : ''}`}>
+                  <div className="toggle-dot"></div>
+                </div>
+              </div>
+
+              <div 
+                className={`ide-card ${includeLMStudio ? 'active' : ''}`}
+                onClick={() => setIncludeLMStudio(!includeLMStudio)}
+              >
+                <div className="ide-card-icon" style={{ backgroundColor: '#3B82F6' }}>
+                  <svg viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M17.5 0l-11 11-4.5-4.5-2 2 6.5 6.5 13-13z"/>
+                  </svg>
+                </div>
+                <div className="ide-card-content">
+                  <h4>LM Studio</h4>
+                  <p>Local LLM platform</p>
+                </div>
+                <div className={`ide-card-toggle ${includeLMStudio ? 'checked' : ''}`}>
+                  <div className="toggle-dot"></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
 
         <div className="output-section">
-          <h2>Generated Badges</h2>
+          <h2>Generated Output</h2>
           
           {markdown ? (
             <>
-              <div className="preview">
-                <h3>Preview</h3>
-                <div className="badge-preview" dangerouslySetInnerHTML={{ 
-                  __html: markdown
-                    .split('\n')
-                    .map(line => {
-                      const match = line.match(/\[!\[.*?\]\((.*?)\)\]\((.*?)\)/);
-                      if (match) {
-                        return `<a href="${match[2]}" target="_blank"><img src="${match[1]}" alt="badge"></a>`;
-                      }
-                      return '';
-                    })
-                    .join(' ')
-                }} />
+              <div className="tabs">
+                <button 
+                  className={`tab ${activeTab === 'badges' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('badges')}
+                >
+                  Badges & Config
+                </button>
+                <button 
+                  className={`tab ${activeTab === 'readme' ? 'active' : ''}`}
+                  onClick={() => setActiveTab('readme')}
+                >
+                  Getting Started README
+                </button>
               </div>
 
-              <div className="markdown-output">
-                <div className="output-header">
-                  <h3>Markdown</h3>
-                  <button className="copy-btn" onClick={copyToClipboard}>
-                    {copied ? '✓ Copied!' : '📋 Copy'}
-                  </button>
-                </div>
-                <pre><code>{markdown}</code></pre>
-              </div>
-
-              <div className="config-output">
-                <div className="output-header">
-                  <h3>mcp.json Configuration</h3>
-                  <button 
-                    className="copy-btn" 
-                    onClick={() => copyToClipboardWithState(JSON.stringify(generateFullConfig(), null, 2), setCopiedJson)}
-                  >
-                    {copiedJson ? '✓ Copied!' : '📋 Copy'}
-                  </button>
-                </div>
-                <pre><code>{JSON.stringify(generateFullConfig(), null, 2)}</code></pre>
-                <small className="field-hint">Add this to your workspace or user mcp.json file</small>
-              </div>
-
-              {includeVSCode && (
-                <div className="config-output">
-                  <div className="output-header">
-                    <h3>VS Code CLI Command</h3>
-                    <button 
-                      className="copy-btn" 
-                      onClick={() => copyToClipboardWithState(generateCliCommand(false), setCopiedCli)}
-                    >
-                      {copiedCli ? '✓ Copied!' : '📋 Copy'}
-                    </button>
+              {activeTab === 'badges' ? (
+                <>
+                  <div className="preview">
+                    <h3>Preview</h3>
+                    <div className="badge-preview" dangerouslySetInnerHTML={{ 
+                      __html: markdown
+                        .split('\n')
+                        .map(line => {
+                          const match = line.match(/\[!\[.*?\]\((.*?)\)\]\((.*?)\)/);
+                          if (match) {
+                            return `<a href="${match[2]}" target="_blank"><img src="${match[1]}" alt="badge"></a>`;
+                          }
+                          return '';
+                        })
+                        .join(' ')
+                    }} />
                   </div>
-                  <pre><code>{generateCliCommand(false)}</code></pre>
-                  <small className="field-hint">Works in PowerShell, Bash, and Zsh</small>
-                </div>
-              )}
 
-              {includeVSCodeInsiders && (
-                <div className="config-output">
-                  <div className="output-header">
-                    <h3>VS Code Insiders CLI Command</h3>
-                    <button 
-                      className="copy-btn" 
-                      onClick={() => copyToClipboardWithState(generateCliCommand(true), setCopiedCliInsiders)}
-                    >
-                      {copiedCliInsiders ? '✓ Copied!' : '📋 Copy'}
-                    </button>
+                  <div className="markdown-output">
+                    <div className="output-header">
+                      <h3>Markdown</h3>
+                      <button className="copy-btn" onClick={copyToClipboard}>
+                        {copied ? '✓ Copied!' : '📋 Copy'}
+                      </button>
+                    </div>
+                    <pre><code>{markdown}</code></pre>
                   </div>
-                  <pre><code>{generateCliCommand(true)}</code></pre>
-                  <small className="field-hint">Works in PowerShell, Bash, and Zsh</small>
-                </div>
+
+                  <div className="config-output">
+                    <div className="output-header">
+                      <h3>mcp.json Configuration</h3>
+                      <button 
+                        className="copy-btn" 
+                        onClick={() => copyToClipboardWithState(JSON.stringify(generateFullConfig(), null, 2), setCopiedJson)}
+                      >
+                        {copiedJson ? '✓ Copied!' : '📋 Copy'}
+                      </button>
+                    </div>
+                    <pre><code>{JSON.stringify(generateFullConfig(), null, 2)}</code></pre>
+                    <small className="field-hint">Add this to your workspace or user mcp.json file</small>
+                  </div>
+
+                  {includeVSCode && (
+                    <div className="config-output">
+                      <div className="output-header">
+                        <h3>VS Code CLI Command</h3>
+                        <button 
+                          className="copy-btn" 
+                          onClick={() => copyToClipboardWithState(generateCliCommand(false), setCopiedCli)}
+                        >
+                          {copiedCli ? '✓ Copied!' : '📋 Copy'}
+                        </button>
+                      </div>
+                      <pre><code>{generateCliCommand(false)}</code></pre>
+                      <small className="field-hint">Works in PowerShell, Bash, and Zsh</small>
+                    </div>
+                  )}
+
+                  {includeVSCodeInsiders && (
+                    <div className="config-output">
+                      <div className="output-header">
+                        <h3>VS Code Insiders CLI Command</h3>
+                        <button 
+                          className="copy-btn" 
+                          onClick={() => copyToClipboardWithState(generateCliCommand(true), setCopiedCliInsiders)}
+                        >
+                          {copiedCliInsiders ? '✓ Copied!' : '📋 Copy'}
+                        </button>
+                      </div>
+                      <pre><code>{generateCliCommand(true)}</code></pre>
+                      <small className="field-hint">Works in PowerShell, Bash, and Zsh</small>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <>
+                  <div className="readme-preview">
+                    <div className="output-header">
+                      <h3>README Getting Started Section</h3>
+                      <button className="copy-btn" onClick={copyReadmeToClipboard}>
+                        {copiedReadme ? '✓ Copied!' : '📋 Copy'}
+                      </button>
+                    </div>
+                    <pre><code>{generateReadmeContent()}</code></pre>
+                    <small className="field-hint">Copy this section into your README.md file</small>
+                  </div>
+                </>
               )}
             </>
           ) : (
