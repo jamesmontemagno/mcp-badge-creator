@@ -191,11 +191,11 @@ function App() {
     }
 
     if (includeCursor) {
-      // Use Cursor's official badge from their repository
+      // Use Cursor badge with same style as VS Code badges but black background
       const configWithName = { name: serverName, ...config };
       const base64Config = btoa(JSON.stringify(configWithName));
       const cursorUrl = `https://cursor.com/en/install-mcp?name=${encodeURIComponent(serverName)}&config=${base64Config}`;
-      badges.push(`[<img src="https://cursor.com/deeplink/mcp-install-dark.svg" alt="Install in Cursor">](${cursorUrl})`);
+      badges.push(`[![Install in Cursor](https://img.shields.io/badge/Cursor-${customBadgeText}-000000?style=flat-square&logoColor=white)](${cursorUrl})`);
     }
 
     if (includeGoose) {
@@ -289,7 +289,8 @@ function App() {
       const configWithName = { name: serverName, ...generateConfig() };
       const base64Config = btoa(JSON.stringify(configWithName));
       const cursorUrl = `https://cursor.com/en/install-mcp?name=${encodeURIComponent(serverName)}&config=${base64Config}`;
-      readmeContent += `[<img src="https://cursor.com/deeplink/mcp-install-dark.svg" alt="Install in Cursor">](${cursorUrl})\n\n`;
+      // Use Cursor badge with same style as VS Code badges (no icon)
+      readmeContent += `[![Install in Cursor](https://img.shields.io/badge/Cursor-${badgeText.replace(/\\s/g, '_')}-000000?style=flat-square&logoColor=white)](${cursorUrl})\n\n`;
       readmeContent += `#### Or install manually:\n\n`;
       readmeContent += `Go to \`Cursor Settings\` -> \`MCP\` -> \`Add new MCP Server\`. Name to your liking, use \`command\` type with the command from the standard config above. You can also verify config or add command like arguments via clicking \`Edit\`.\n</details>\n\n`;
     }
