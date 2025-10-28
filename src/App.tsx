@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import './App.css'
 
 type ConfigType = 'http' | 'docker' | 'local' | 'npx' | 'uvx' | 'dnx';
+type ThemeType = 'system' | 'light' | 'dark' | 'green' | 'tron';
 
 interface MCPConfig {
   name?: string; // Only used for encoding in URL parameters, not in the actual config
@@ -13,6 +14,12 @@ interface MCPConfig {
 }
 
 function App() {
+  // Theme state
+  const [theme, setTheme] = useState<ThemeType>(() => {
+    const savedTheme = localStorage.getItem('mcp-badge-theme') as ThemeType;
+    return savedTheme || 'system';
+  });
+
   const [serverName, setServerName] = useState('')
   const [configType, setConfigType] = useState<ConfigType>('http')
   const [serverUrl, setServerUrl] = useState('')
@@ -165,6 +172,36 @@ function App() {
     const allReadmeSelected = includeVSCode && includeVSCodeInsiders && includeVisualStudio && includeCursor && includeGoose && includeLMStudio && includeAmp && includeClaudeCode && includeClaudeDesktop && includeCodex && includeGeminiCLI && includeOpenCode && includeQodoGen && includeWarp && includeWindsurf;
     setSelectAllReadme(allReadmeSelected);
   }, [includeVSCode, includeVSCodeInsiders, includeVisualStudio, includeCursor, includeGoose, includeLMStudio, includeAmp, includeClaudeCode, includeClaudeDesktop, includeCodex, includeGeminiCLI, includeOpenCode, includeQodoGen, includeWarp, includeWindsurf]);
+
+  // Apply theme to document
+  useEffect(() => {
+    const applyTheme = (themeName: ThemeType) => {
+      // Remove all theme classes
+      document.documentElement.classList.remove('theme-light', 'theme-dark', 'theme-green', 'theme-tron');
+      
+      if (themeName === 'system') {
+        // Use system preference
+        const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+        document.documentElement.classList.add(prefersDark ? 'theme-dark' : 'theme-light');
+      } else {
+        document.documentElement.classList.add(`theme-${themeName}`);
+      }
+    };
+
+    applyTheme(theme);
+    localStorage.setItem('mcp-badge-theme', theme);
+
+    // Listen for system theme changes
+    const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)');
+    const handleChange = () => {
+      if (theme === 'system') {
+        applyTheme('system');
+      }
+    };
+
+    mediaQuery.addEventListener('change', handleChange);
+    return () => mediaQuery.removeEventListener('change', handleChange);
+  }, [theme]);
 
   const generateMarkdown = (): string => {
     if (!serverName) return '';
@@ -472,10 +509,29 @@ function App() {
   return (
     <div className="container">
       <header>
-        <h1>🎖️ MCP Badge Creator</h1>
-        <p className="subtitle">
-          Generate one-click install badges for your Model Context Protocol servers
-        </p>
+        <div className="header-content">
+          <div>
+            <h1>🎖️ MCP Badge Creator</h1>
+            <p className="subtitle">
+              Generate one-click install badges for your Model Context Protocol servers
+            </p>
+          </div>
+          <div className="theme-switcher">
+            <label htmlFor="theme-select" className="theme-label">Theme:</label>
+            <select 
+              id="theme-select"
+              className="theme-select"
+              value={theme}
+              onChange={(e) => setTheme(e.target.value as ThemeType)}
+            >
+              <option value="system">System</option>
+              <option value="light">Light</option>
+              <option value="dark">Dark</option>
+              <option value="green">Green</option>
+              <option value="tron">Tron</option>
+            </select>
+          </div>
+        </div>
       </header>
 
       <div className="content">
