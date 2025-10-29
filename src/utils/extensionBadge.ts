@@ -20,7 +20,7 @@ const DISPLAY_PATTERNS = [
 const sanitizeSegment = (segment: string) => {
   return segment
     .trim()
-    .replace(/[()\[\]{}'"`]/g, '')
+    .replace(/[()[\]{}'"`]/g, '')
     .replace(/\s+/g, '-')
     .replace(/[^a-zA-Z0-9-]/g, '')
     .replace(/-{2,}/g, '-')
