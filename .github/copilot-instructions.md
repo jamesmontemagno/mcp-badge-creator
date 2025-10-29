@@ -159,6 +159,143 @@ Edit Shields.io URL parameters in `generateMarkdown()`:
 4. Update documentation if adding features
 5. Remember GitHub Actions will auto-deploy on push to main
 
+## CSS Theming Best Practices
+
+### Critical: Always Use CSS Variables for Theme-Dependent Styles
+
+**NEVER hardcode colors, backgrounds, or text colors directly in CSS.** Always use CSS custom properties (variables) defined in the theme sections.
+
+### Available CSS Variables
+
+All themes define these variables in `:root` and theme classes (`.theme-light`, `.theme-dark`, `.theme-green`, `.theme-tron`):
+
+```css
+--primary-color        /* Main accent color */
+--primary-dark         /* Darker shade of accent */
+--primary-darker       /* Even darker shade */
+--bg-gradient-start    /* Background gradient start */
+--bg-gradient-mid      /* Background gradient middle */
+--bg-gradient-end      /* Background gradient end */
+--text-color           /* Primary text color */
+--text-light           /* Secondary text color */
+--text-lighter         /* Tertiary text color */
+--bg-white             /* Main background for cards/sections */
+--bg-light             /* Secondary background */
+--border-color         /* Border colors */
+--border-light         /* Lighter border colors */
+--shadow-color         /* Shadow colors */
+--shadow-light         /* Lighter shadow colors */
+--header-text          /* Header/navigation text color */
+--footer-text          /* Footer text color */
+--footer-border        /* Footer border color */
+```
+
+### Correct Usage Examples
+
+✅ **DO THIS:**
+```css
+.nav-link {
+  color: var(--header-text);
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 4px 12px var(--shadow-light);
+}
+
+.card {
+  background: var(--bg-white);
+  color: var(--text-color);
+}
+
+.button {
+  background: var(--primary-color);
+  color: white;
+}
+```
+
+❌ **DON'T DO THIS:**
+```css
+.nav-link {
+  color: rgba(255, 255, 255, 0.9);  /* Hardcoded white */
+  background: #ffffff;               /* Hardcoded color */
+  border: 1px solid #e5e7eb;        /* Hardcoded border */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);  /* Hardcoded shadow */
+}
+```
+
+### Theme-Specific Overrides
+
+When you need different styles for specific themes, use theme-specific selectors:
+
+```css
+/* Base style using variables */
+.element {
+  background: var(--bg-white);
+  color: var(--text-color);
+}
+
+/* Light theme specific override if needed */
+.theme-light .element {
+  border: 2px solid var(--primary-color);
+}
+
+/* Dark theme specific override if needed */
+.theme-dark .element {
+  box-shadow: 0 0 20px var(--primary-color);
+}
+```
+
+### Common Pitfalls to Avoid
+
+1. **Hardcoded rgba() colors**: Replace with CSS variables
+2. **Fixed hex colors**: Use variables instead
+3. **White/black text assumptions**: Use `var(--text-color)` or `var(--header-text)`
+4. **Hardcoded shadows**: Use `var(--shadow-color)` or `var(--shadow-light)`
+5. **Background gradients**: Use `var(--bg-gradient-start/mid/end)`
+
+### Testing Themes
+
+After making CSS changes:
+1. Test with **all 5 themes**: System, Light, Dark, Green, Tron
+2. Check text visibility on all backgrounds
+3. Verify navigation elements are readable in all themes
+4. Check card/component visibility in all themes
+5. Test mobile responsive design in all themes
+
+### Adding New CSS
+
+When adding new CSS classes or components:
+1. **ALWAYS** use CSS variables for colors, backgrounds, borders, shadows
+2. Test the new component in all themes before committing
+3. If a component needs theme-specific behavior, use theme class selectors
+4. Document any new CSS variables if you need to add them
+
+### Opacity Best Practice
+
+When using opacity, prefer it on top of CSS variables rather than hardcoded colors:
+
+✅ **DO THIS:**
+```css
+.element {
+  color: var(--text-color);
+  opacity: 0.8;
+}
+```
+
+❌ **DON'T DO THIS:**
+```css
+.element {
+  color: rgba(31, 41, 55, 0.8);  /* Hardcoded color with opacity */
+}
+```
+
+### When to Use Hardcoded Colors
+
+The ONLY acceptable use of hardcoded colors:
+- Pure `white` or `black` when explicitly needed (e.g., white text on a colored button)
+- Logo or brand-specific colors that never change
+- Fixed accent colors in gradients that are intentionally theme-independent
+
 
 ## When documenting and creating memories at the end of a turn
 ALWAYS put the documents in the .vscode\memory folder
+
