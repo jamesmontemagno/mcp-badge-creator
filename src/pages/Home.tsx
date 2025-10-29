@@ -24,7 +24,7 @@ function Home() {
   return (
     <div className="home-page">
       <section className="home-hero">
-        <p className="home-overline">Model Context Protocol Toolkit</p>
+        <p className="home-overline">Badge Toolkit</p>
         <h1>Build beautiful badges in seconds</h1>
         <p className="home-subtitle">
           Choose a generator to craft rich badges, shareable markdown, and ready-to-run commands for your projects.
