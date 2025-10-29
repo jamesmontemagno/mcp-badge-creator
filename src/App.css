@@ -41,9 +41,9 @@
   --border-light: #c1ddd8;
   --shadow-color: rgba(0, 0, 0, 0.08);
   --shadow-light: rgba(0, 0, 0, 0.04);
-  --header-text: white;
-  --footer-text: white;
-  --footer-border: rgba(255, 255, 255, 0.2);
+  --header-text: #1f2937;
+  --footer-text: #4b5563;
+  --footer-border: rgba(0, 0, 0, 0.1);
 }
 
 /* Dark Theme */
@@ -137,18 +137,9 @@ header {
 
 .header-content {
   display: flex;
-  justify-content: space-between;
+  flex-direction: column;
   align-items: center;
-  gap: 2rem;
-  flex-wrap: wrap;
-}
-
-@media (max-width: 768px) {
-  .header-content {
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-  }
+  gap: 0.5rem;
 }
 
 header h1 {
@@ -179,6 +170,20 @@ header h1 {
   font-size: 0.95rem;
   font-weight: 600;
   color: var(--header-text);
+  margin: 0;
+}
+
+/* Theme Selector Component Container */
+.theme-selector-container {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.theme-selector-label {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--footer-text);
   margin: 0;
 }
 
@@ -589,6 +594,17 @@ footer {
   margin-top: 3rem;
   padding-top: 2rem;
   border-top: 1px solid var(--footer-border);
+}
+
+.footer-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+}
+
+.footer-links {
+  width: 100%;
 }
 
 footer p {

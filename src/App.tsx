@@ -13,6 +13,31 @@ interface MCPConfig {
   env?: Record<string, string>;
 }
 
+interface ThemeSelectorProps {
+  theme: ThemeType;
+  onThemeChange: (theme: ThemeType) => void;
+}
+
+function ThemeSelector({ theme, onThemeChange }: ThemeSelectorProps) {
+  return (
+    <div className="theme-selector-container">
+      <label htmlFor="theme-select" className="theme-selector-label">Theme:</label>
+      <select 
+        id="theme-select"
+        className="theme-select"
+        value={theme}
+        onChange={(e) => onThemeChange(e.target.value as ThemeType)}
+      >
+        <option value="system">System</option>
+        <option value="light">Light</option>
+        <option value="dark">Dark</option>
+        <option value="green">Green</option>
+        <option value="tron">Tron</option>
+      </select>
+    </div>
+  );
+}
+
 function App() {
   // Theme state
   const [theme, setTheme] = useState<ThemeType>(() => {
@@ -510,27 +535,10 @@ function App() {
     <div className="container">
       <header>
         <div className="header-content">
-          <div>
-            <h1>🎖️ MCP Badge Creator</h1>
-            <p className="subtitle">
-              Generate one-click install badges for your Model Context Protocol servers
-            </p>
-          </div>
-          <div className="theme-switcher">
-            <label htmlFor="theme-select" className="theme-label">Theme:</label>
-            <select 
-              id="theme-select"
-              className="theme-select"
-              value={theme}
-              onChange={(e) => setTheme(e.target.value as ThemeType)}
-            >
-              <option value="system">System</option>
-              <option value="light">Light</option>
-              <option value="dark">Dark</option>
-              <option value="green">Green</option>
-              <option value="tron">Tron</option>
-            </select>
-          </div>
+          <h1>🎖️ MCP Badge Creator</h1>
+          <p className="subtitle">
+            Generate one-click install badges for your Model Context Protocol servers
+          </p>
         </div>
       </header>
 
@@ -999,15 +1007,20 @@ function App() {
       </div>
 
       <footer>
-        <p>
-          Learn more about <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener noreferrer">Model Context Protocol</a>
-        </p>
-        <p className="small">
-          Based on <a href="https://github.com/jamesmontemagno/MonkeyMCP/blob/main/.github/prompts/add-mcp-install-badges.md" target="_blank" rel="noopener noreferrer">MCP Badge Documentation</a>
-        </p>
-        <p className="small">
-          Created with <a href="https://code.visualstudio.com/" target="_blank" rel="noopener noreferrer">VS Code</a> and <a href="https://github.com/features/copilot" target="_blank" rel="noopener noreferrer">GitHub Copilot</a> • <a href="https://github.com/jamesmontemagno/mcp-badge-creator" target="_blank" rel="noopener noreferrer">View on GitHub</a>
-        </p>
+        <div className="footer-content">
+          <div className="footer-links">
+            <p>
+              Learn more about <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener noreferrer">Model Context Protocol</a>
+            </p>
+            <p className="small">
+              Based on <a href="https://github.com/jamesmontemagno/MonkeyMCP/blob/main/.github/prompts/add-mcp-install-badges.md" target="_blank" rel="noopener noreferrer">MCP Badge Documentation</a>
+            </p>
+            <p className="small">
+              Created with <a href="https://code.visualstudio.com/" target="_blank" rel="noopener noreferrer">VS Code</a> and <a href="https://github.com/features/copilot" target="_blank" rel="noopener noreferrer">GitHub Copilot</a> • <a href="https://github.com/jamesmontemagno/mcp-badge-creator" target="_blank" rel="noopener noreferrer">View on GitHub</a>
+            </p>
+          </div>
+          <ThemeSelector theme={theme} onThemeChange={setTheme} />
+        </div>
       </footer>
     </div>
   )
