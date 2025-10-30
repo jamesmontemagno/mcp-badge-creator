@@ -1,0 +1,116 @@
+/* Form Component Module */
+
+.formGroup {
+  margin-bottom: var(--space-lg);
+}
+
+.label {
+  display: block;
+  margin-bottom: var(--space-sm);
+  font-weight: 600;
+  color: var(--text-light);
+  font-size: 0.95rem;
+}
+
+.input,
+.select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 2px solid var(--border-light);
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  background: var(--bg-white);
+  color: var(--text-color);
+  box-shadow: var(--shadow-sm);
+}
+
+.input:focus,
+.select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 4px 12px var(--shadow-light), 0 0 0 3px rgba(36, 191, 165, 0.1);
+}
+
+.select {
+  cursor: pointer;
+  appearance: none;
+  background-image: url('../../assets/icons/chevron-down.svg');
+  background-repeat: no-repeat;
+  background-position: right 0.75rem center;
+  background-size: 14px;
+  padding-right: 2.5rem;
+}
+
+.fieldHint {
+  display: block;
+  margin-top: var(--space-xs);
+  font-size: 0.85rem;
+  color: var(--text-light);
+  font-style: italic;
+}
+
+.checkboxGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.checkboxLabel {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  font-weight: normal;
+  color: var(--text-light);
+}
+
+.checkboxLabel input[type="checkbox"] {
+  margin-right: var(--space-sm);
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+.formRow {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: var(--space-lg);
+  align-items: end;
+}
+
+.formAlert {
+  border-radius: var(--radius-md);
+  padding: var(--space-md) 1.25rem;
+  font-weight: 500;
+  margin-bottom: var(--space-lg);
+}
+
+.formAlertError {
+  background: rgba(217, 45, 59, 0.12);
+  color: #dc2626;
+  border: 1px solid rgba(217, 45, 59, 0.3);
+}
+
+.theme-dark .formAlertError,
+.theme-tron .formAlertError {
+  background: rgba(217, 45, 59, 0.2);
+  color: #fca5a5;
+}
+
+.formAlertSuccess {
+  background: rgba(36, 191, 165, 0.12);
+  color: var(--primary-dark);
+  border: 1px solid var(--primary-color);
+}
+
+.theme-dark .formAlertSuccess,
+.theme-tron .formAlertSuccess {
+  background: rgba(36, 191, 165, 0.2);
+  color: var(--primary-color);
+}
+
+@media (max-width: 768px) {
+  .formRow {
+    grid-template-columns: 1fr;
+  }
+}

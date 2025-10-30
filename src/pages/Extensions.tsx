@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import '../App.css'
+import styles from './Extensions.module.css'
 import { generateExtensionBadges, parseExtensionInput } from '../utils/extensionBadge'
 
 type BadgeVariant = 'stable' | 'insiders' | 'combined'
@@ -56,17 +56,18 @@ function Extensions() {
   }
 
   return (
-    <div className="extensions-page container">
-      <header className="extensions-header">
-        <p className="eyebrow">VS Code Extensions</p>
+    <>
+      <header className={`${styles.extensionsHeader} extensions-header`}>
+        <p className={`${styles.eyebrow} eyebrow`}>VS Code Extensions</p>
         <h1>Create badges for Marketplace listings</h1>
-        <p className="subtitle">
+        <p className={`${styles.subtitle} subtitle`}>
           Paste an extension URL, identifier, or display name. We will detect the marketplace ID and craft badges
           for both VS Code and VS Code Insiders.
         </p>
       </header>
 
-      <form className="extensions-form" onSubmit={handleGenerate}>
+      <div className={`${styles.extensionsPage} extensions-page`}>
+      <form className={`${styles.extensionsForm} extensions-form`} onSubmit={handleGenerate}>
         <label htmlFor="extensionInput">Extension reference</label>
         <input
           id="extensionInput"
@@ -85,10 +86,10 @@ function Extensions() {
       {info && !error && <div className="form-alert success">{info}</div>}
 
       {badgeData && !error && (
-        <section className="extensions-output" aria-live="polite">
-          <div className="extensions-preview">
+        <section className={`${styles.extensionsOutput} extensions-output`} aria-live="polite">
+          <div className={`${styles.extensionsPreview} extensions-preview`}>
             <h2>Preview</h2>
-            <div className="extensions-preview-row">
+            <div className={`${styles.extensionsPreviewRow} extensions-preview-row`}>
               <a href={badgeData.stable.extensionUri} target="_blank" rel="noopener noreferrer">
                 <img src={badgeData.stable.badgeUrl} alt="Install in VS Code" />
               </a>
@@ -98,8 +99,8 @@ function Extensions() {
             </div>
           </div>
 
-          <div className="markdown-columns">
-            <article className="markdown-card">
+          <div className={`${styles.markdownColumns} markdown-columns`}>
+            <article className={`${styles.markdownCard} markdown-card`}>
               <header className="output-header">
                 <h3>VS Code Markdown</h3>
                 <button type="button" className="copy-btn" onClick={() => handleCopy('stable')}>
@@ -109,7 +110,7 @@ function Extensions() {
               <pre><code>{badgeData.stable.markdown}</code></pre>
             </article>
 
-            <article className="markdown-card">
+            <article className={`${styles.markdownCard} markdown-card`}>
               <header className="output-header">
                 <h3>VS Code Insiders Markdown</h3>
                 <button type="button" className="copy-btn" onClick={() => handleCopy('insiders')}>
@@ -120,7 +121,7 @@ function Extensions() {
             </article>
           </div>
 
-          <div className="combined-markdown">
+          <div className={`${styles.combinedMarkdown} combined-markdown`}>
             <header className="output-header">
               <h3>Combined Markdown</h3>
               <button type="button" className="copy-btn" onClick={() => handleCopy('combined')}>
@@ -131,7 +132,8 @@ function Extensions() {
           </div>
         </section>
       )}
-    </div>
+      </div>
+    </>
   )
 }
 

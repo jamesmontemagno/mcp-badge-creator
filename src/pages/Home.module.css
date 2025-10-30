@@ -1,0 +1,136 @@
+/* Home Page CSS Module */
+
+.homePage {
+  width: 100%;
+  max-width: 1100px;
+  color: var(--header-text);
+}
+
+.homeHero {
+  color: var(--header-text);
+  margin-bottom: 2.25rem;
+}
+
+.homeOverline {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin: 0 0 0.85rem 0;
+  display: inline-block;
+  padding: 0.4rem 0.75rem 0.35rem;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+  color: var(--header-text);
+}
+
+.homeHero h1 {
+  font-size: clamp(2.15rem, 6vw, 3.25rem);
+  line-height: 1.1;
+  margin: 0 0 1.2rem 0;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  text-shadow: 0 4px 28px rgba(0,0,0,0.25);
+  color: var(--header-text);
+}
+
+.homeSubtitle {
+  font-size: clamp(1rem, 1.85vw, 1.35rem);
+  max-width: 780px;
+  line-height: 1.45;
+  margin: 0;
+  font-weight: 500;
+  color: var(--header-text);
+}
+
+.homeCardGrid {
+  margin-top: 1rem;
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+}
+
+.homeCard {
+  text-decoration: none;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  position: relative;
+  color: var(--text-color);
+}
+
+.homeCard:focus-visible { outline: 2px solid var(--primary-color); outline-offset: 3px; }
+
+.homeCardIcon {
+  font-size: 2.35rem;
+  line-height: 1;
+  filter: drop-shadow(0 8px 24px rgba(0,0,0,0.18));
+}
+
+.homeCardContent h2 {
+  margin: 0 0 0.75rem 0;
+  font-size: 1.55rem;
+  letter-spacing: -0.01em;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+}
+
+.homeCardContent p {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  color: var(--text-light);
+}
+
+.cardCta {
+  color: var(--primary-dark);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.05em;
+}
+
+/* Variant Gradients */
+.cardMcp { border: 1px solid rgba(0,152,255,0.35); }
+.cardExtensions { border: 1px solid rgba(36,191,165,0.45); }
+.cardPackages { border: 1px solid rgba(193,111,222,0.45); }
+
+@media (max-width: 768px) {
+  .homeCard {
+    flex-direction: row;
+    padding: 1.75rem;
+  }
+}
+
+/* Footer Styles */
+.homeFooter {
+  margin-top: 3rem;
+  padding: 1.5rem 0;
+  border-top: 1px solid var(--border-color);
+  text-align: center;
+  color: var(--text-light);
+}
+
+.homeFooter p {
+  margin: 0.5rem 0;
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+.homeFooter a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 500;
+  transition: color 0.2s ease;
+}
+
+.homeFooter a:hover {
+  color: var(--primary-dark);
+  text-decoration: underline;
+}
+

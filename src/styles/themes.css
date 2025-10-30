@@ -1,0 +1,141 @@
+/* Theme Variables - 5 Color Themes */
+
+/* Default Theme (Green) */
+:root {
+  --primary-color: #24bfa5;
+  --primary-dark: #1a9667;
+  --primary-darker: #0e7153;
+  --bg-gradient-start: #1a9667;
+  --bg-gradient-mid: #24bfa5;
+  --bg-gradient-end: #0e7153;
+  --text-color: #333;
+  --text-light: #666;
+  --text-lighter: #999;
+  --bg-white: white;
+  --bg-light: #f8f9fa;
+  --border-color: #e9ecef;
+  --border-light: #e0e0e0;
+  --shadow-color: rgba(0, 0, 0, 0.2);
+  --shadow-light: rgba(0, 0, 0, 0.08);
+  --header-text: white;
+  --footer-text: rgba(255, 255, 255, 0.9);
+  --footer-border: rgba(255, 255, 255, 0.2);
+}
+
+/* Light Theme */
+.theme-light {
+  --primary-color: #24bfa5;
+  --primary-dark: #1a9667;
+  --primary-darker: #0e7153;
+  --bg-gradient-start: #f8f9fa;
+  --bg-gradient-mid: #ffffff;
+  --bg-gradient-end: #f0f1f3;
+  --text-color: #1f2937;
+  --text-light: #4b5563;
+  --text-lighter: #6b7280;
+  --bg-white: #ffffff;
+  --bg-light: #f8f9fa;
+  --border-color: #e5e7eb;
+  --border-light: #d1d5db;
+  --shadow-color: rgba(0, 0, 0, 0.08);
+  --shadow-light: rgba(0, 0, 0, 0.04);
+  --header-text: #1f2937;
+  --footer-text: #4b5563;
+  --footer-border: rgba(0, 0, 0, 0.1);
+}
+
+/* Light theme eyebrow styling */
+.theme-light .eyebrow,
+.theme-light [class*="eyebrow"],
+.theme-light [class*="Overline"] {
+  background: rgba(31, 41, 55, 0.9) !important;
+  color: white !important;
+}
+
+/* Dark Theme */
+.theme-dark {
+  --primary-color: #3b82f6;
+  --primary-dark: #2563eb;
+  --primary-darker: #1d4ed8;
+  --bg-gradient-start: #1e293b;
+  --bg-gradient-mid: #334155;
+  --bg-gradient-end: #0f172a;
+  --text-color: #e2e8f0;
+  --text-light: #cbd5e1;
+  --text-lighter: #94a3b8;
+  --bg-white: #1e293b;
+  --bg-light: #334155;
+  --border-color: #475569;
+  --border-light: #64748b;
+  --shadow-color: rgba(0, 0, 0, 0.5);
+  --shadow-light: rgba(0, 0, 0, 0.3);
+  --header-text: #e2e8f0;
+  --footer-text: #e2e8f0;
+  --footer-border: rgba(226, 232, 240, 0.2);
+}
+
+/* Green Theme (Explicit) */
+.theme-green {
+  --primary-color: #24bfa5;
+  --primary-dark: #1a9667;
+  --primary-darker: #0e7153;
+  --bg-gradient-start: #1a9667;
+  --bg-gradient-mid: #24bfa5;
+  --bg-gradient-end: #0e7153;
+  --text-color: #333;
+  --text-light: #666;
+  --text-lighter: #999;
+  --bg-white: white;
+  --bg-light: #f8f9fa;
+  --border-color: #e9ecef;
+  --border-light: #e0e0e0;
+  --shadow-color: rgba(0, 0, 0, 0.2);
+  --shadow-light: rgba(0, 0, 0, 0.08);
+  --header-text: white;
+  --footer-text: rgba(255, 255, 255, 0.9);
+  --footer-border: rgba(255, 255, 255, 0.2);
+}
+
+/* Tron Theme - Classic Tron blue/cyan neon aesthetic */
+.theme-tron {
+  --primary-color: #00d9ff;
+  --primary-dark: #00a8cc;
+  --primary-darker: #007799;
+  --bg-gradient-start: #001a1f;
+  --bg-gradient-mid: #002633;
+  --bg-gradient-end: #000d11;
+  --text-color: #00d9ff;
+  --text-light: #6dd5ed;
+  --text-lighter: #4facb8;
+  --bg-white: #001a1f;
+  --bg-light: #002633;
+  --border-color: #00a8cc;
+  --border-light: #007799;
+  --shadow-color: rgba(0, 217, 255, 0.3);
+  --shadow-light: rgba(0, 217, 255, 0.15);
+  --header-text: #00d9ff;
+  --footer-text: #6dd5ed;
+  --footer-border: rgba(0, 217, 255, 0.3);
+}
+
+/* Pink Theme - Vibrant pink/magenta aesthetic */
+.theme-pink {
+  --primary-color: #ec4899;
+  --primary-dark: #db2777;
+  --primary-darker: #be185d;
+  --bg-gradient-start: #db2777;
+  --bg-gradient-mid: #ec4899;
+  --bg-gradient-end: #be185d;
+  --text-color: #333;
+  --text-light: #666;
+  --text-lighter: #999;
+  --bg-white: white;
+  --bg-light: #fdf2f8;
+  --border-color: #fbcfe8;
+  --border-light: #f9a8d4;
+  --shadow-color: rgba(236, 72, 153, 0.2);
+  --shadow-light: rgba(236, 72, 153, 0.08);
+  --header-text: white;
+  --footer-text: rgba(255, 255, 255, 0.9);
+  --footer-border: rgba(255, 255, 255, 0.2);
+}

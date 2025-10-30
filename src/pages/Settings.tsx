@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useOutletContext } from 'react-router-dom'
-import '../App.css'
+import styles from './Settings.module.css'
 
 type ThemeType = 'system' | 'light' | 'dark' | 'green' | 'tron' | 'pink'
 
@@ -45,19 +45,21 @@ function Settings() {
   }
 
   return (
-    <div className="settings-page">
-      <header className="settings-header">
-        <h1>⚙️ Settings</h1>
-        <p className="subtitle">Customize your badge creator experience</p>
+    <>
+      <header className={`${styles.settingsHeader} settings-header`}>
+        <p className={`${styles.eyebrow} eyebrow`}>Preferences</p>
+        <h1>Settings</h1>
+        <p className={`${styles.subtitle} subtitle`}>Customize your badge creator experience</p>
       </header>
 
-      <div className="settings-grid">
+      <div className={`${styles.settingsPage} settings-page`}>
+      <div className={`${styles.settingsGrid} settings-grid`}>
         {/* Theme Settings Card */}
-        <div className="settings-card">
+        <div className={`${styles.settingsCard} settings-card`}>
           <h2>🎨 Theme</h2>
-          <p className="settings-description">Choose your preferred color scheme</p>
+          <p className={`${styles.settingsDescription} settings-description`}>Choose your preferred color scheme</p>
           
-          <div className="theme-options">
+          <div className={`${styles.themeOptions} theme-options`}>
             {[
               { value: 'system', label: 'System', description: 'Follow your OS theme' },
               { value: 'light', label: 'Light', description: 'Clean and bright' },
@@ -66,7 +68,7 @@ function Settings() {
               { value: 'tron', label: 'Tron', description: 'Neon cyberpunk' },
               { value: 'pink', label: 'Pink', description: 'Vibrant and fun' },
             ].map((option) => (
-              <label key={option.value} className="theme-option">
+              <label key={option.value} className={`${styles.themeOption} theme-option`}>
                 <input
                   type="radio"
                   name="theme"
@@ -84,11 +86,11 @@ function Settings() {
         </div>
 
         {/* Notification Settings Card */}
-        <div className="settings-card">
+        <div className={`${styles.settingsCard} settings-card`}>
           <h2>🔔 Notifications</h2>
-          <p className="settings-description">Control copy feedback messages</p>
+          <p className={`${styles.settingsDescription} settings-description`}>Control copy feedback messages</p>
           
-          <div className="setting-group">
+          <div className={`${styles.settingGroup} setting-group`}>
             <label className="setting-toggle">
               <input
                 type="checkbox"
@@ -96,14 +98,14 @@ function Settings() {
                 onChange={(e) => setShowCopyNotifications(e.target.checked)}
               />
               <span className="toggle-slider"></span>
-              <span className="setting-label">Show copy notifications</span>
+              <span className={`${styles.settingLabel} setting-label`}>Show copy notifications</span>
             </label>
-            <p className="setting-hint">Display "Copied!" message when copying to clipboard</p>
+            <p className={`${styles.settingHint} setting-hint`}>Display "Copied!" message when copying to clipboard</p>
           </div>
 
           {showCopyNotifications && (
-            <div className="setting-group">
-              <label htmlFor="duration" className="setting-label">Notification duration</label>
+            <div className={`${styles.settingGroup} setting-group`}>
+              <label htmlFor="duration" className={`${styles.settingLabel} setting-label`}>Notification duration</label>
               <div className="duration-control">
                 <input
                   id="duration"
@@ -121,12 +123,12 @@ function Settings() {
         </div>
 
         {/* Badge Settings Card */}
-        <div className="settings-card">
+        <div className={`${styles.settingsCard} settings-card`}>
           <h2>🎖️ Badge Defaults</h2>
-          <p className="settings-description">Set default values for badge generation</p>
+          <p className={`${styles.settingsDescription} settings-description`}>Set default values for badge generation</p>
           
-          <div className="setting-group">
-            <label htmlFor="badgeText" className="setting-label">Default badge text</label>
+          <div className={`${styles.settingGroup} setting-group`}>
+            <label htmlFor="badgeText" className={`${styles.settingLabel} setting-label`}>Default badge text</label>
             <input
               id="badgeText"
               type="text"
@@ -135,11 +137,11 @@ function Settings() {
               placeholder="Install in"
               className="setting-input"
             />
-            <p className="setting-hint">Default text shown on badges (e.g., "Install in")</p>
+            <p className={`${styles.settingHint} setting-hint`}>Default text shown on badges (e.g., "Install in")</p>
           </div>
 
-          <div className="badge-preview-sample">
-            <p className="preview-label">Preview:</p>
+          <div className={`${styles.badgePreviewSample} badge-preview-sample`}>
+            <p className={`${styles.previewLabel} preview-label`}>Preview:</p>
             <img 
               src={`https://img.shields.io/badge/${defaultBadgeText.replace(/\s/g, '_')}-VS_Code-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white`}
               alt="Badge preview"
@@ -148,28 +150,25 @@ function Settings() {
         </div>
 
         {/* About Card */}
-        <div className="settings-card settings-about">
+        <div className={`${styles.settingsCard} settings-card settings-about`}>
           <h2>ℹ️ About</h2>
-          <p className="settings-description">README Badge Creator</p>
           
-          <div className="about-info">
-            <p>Generate beautiful badges and installation instructions for Model Context Protocol servers and VS Code extensions.</p>
-            <div className="about-links">
-              <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener noreferrer">
-                Learn about MCP ↗
-              </a>
+          <div className={`${styles.aboutInfo} about-info`}>
+            <p>Created by <a href="https://github.com/jamesmontemagno" target="_blank" rel="noopener noreferrer">James Montemagno</a> using <a href="https://code.visualstudio.com/" target="_blank" rel="noopener noreferrer">VS Code</a> and <a href="https://github.com/features/copilot" target="_blank" rel="noopener noreferrer">GitHub Copilot</a>.</p>
+            <div className={`${styles.aboutLinks} about-links`}>
               <a href="https://github.com/jamesmontemagno/mcp-badge-creator" target="_blank" rel="noopener noreferrer">
                 View on GitHub ↗
               </a>
             </div>
           </div>
 
-          <button onClick={resetToDefaults} className="reset-button">
+          <button onClick={resetToDefaults} className={`${styles.resetButton} reset-button`}>
             Reset to Defaults
           </button>
         </div>
       </div>
-    </div>
+      </div>
+    </>
   )
 }
 

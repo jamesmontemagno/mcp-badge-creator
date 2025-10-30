@@ -1,0 +1,102 @@
+/* Extensions Page CSS Module */
+
+.extensionsPage {
+  background: var(--bg-white);
+  border-radius: 20px;
+  padding: 2.25rem 2rem 2.75rem;
+  box-shadow: 0 24px 45px var(--shadow-color);
+  border: 1px solid var(--border-color);
+  max-width: 1100px;
+  width: 100%;
+}
+
+.extensionsHeader {
+  color: var(--header-text);
+  margin-bottom: 2.25rem;
+  max-width: 1100px;
+  width: 100%;
+}
+
+.extensionsHeader h1 {
+  font-size: clamp(2rem, 5.5vw, 2.75rem);
+  line-height: 1.1;
+  margin: 0 0 1.25rem 0;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--header-text);
+}
+
+.eyebrow {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin: 0 0 0.85rem 0;
+  display: inline-block;
+  padding: 0.4rem 0.75rem 0.35rem;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+  color: var(--header-text);
+}
+
+.subtitle {
+  font-size: clamp(1rem, 1.85vw, 1.35rem);
+  max-width: 780px;
+  line-height: 1.45;
+  margin: 0;
+  font-weight: 500;
+  color: var(--header-text);
+}
+
+.extensionsForm {
+  display: grid;
+  gap: 0.9rem;
+  background: var(--bg-light);
+  border-radius: 14px;
+  padding: 1.5rem;
+  border: 1px solid var(--border-color);
+  margin-bottom: 1.5rem;
+}
+
+.extensionsForm button.primary {
+  justify-self: start;
+}
+
+.extensionsOutput {
+  display: grid;
+  gap: 2rem;
+}
+
+.markdownColumns {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.markdownCard,
+.combinedMarkdown,
+.extensionsPreview {
+  background: var(--bg-white);
+  border-radius: 16px;
+  padding: 1.75rem;
+  box-shadow: 0 12px 24px var(--shadow-color);
+  border: 1px solid var(--border-color);
+}
+
+.extensionsPreviewRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.extensionsPreviewRow img {
+  height: 36px;
+}
+
+@media (max-width: 768px) {
+  .extensionsPage {
+    padding: 1.75rem 1.25rem 2.25rem;
+  }
+}

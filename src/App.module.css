@@ -1,0 +1,203 @@
+/* App Layout CSS Module */
+
+.appShell {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, var(--bg-gradient-start), var(--bg-gradient-mid) 40%, var(--bg-gradient-end));
+}
+
+.appTopBar {
+  padding: 1.5rem 2rem 1rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1.5rem;
+  color: var(--header-text);
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-size: 0.9rem;
+  text-decoration: none;
+  color: var(--header-text);
+  transition: opacity 0.2s ease;
+}
+
+.brand:hover {
+  opacity: 0.8;
+}
+
+.brandMark {
+  background: rgba(255, 255, 255, 0.18);
+  padding: 0.35rem 0.65rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+}
+
+.brandText {
+  font-size: 1rem;
+  letter-spacing: 0.08em;
+}
+
+.hamburgerButton {
+  display: none;
+  flex-direction: column;
+  justify-content: space-around;
+  width: 2rem;
+  height: 2rem;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 0;
+  z-index: 10;
+}
+
+.hamburgerLine {
+  width: 2rem;
+  height: 0.25rem;
+  background: var(--header-text);
+  border-radius: 10px;
+  transition: all 0.3s ease;
+}
+
+.appNav {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.navLink {
+  color: var(--header-text);
+  opacity: 0.85;
+  text-decoration: none;
+  padding: 0.5rem 1.1rem;
+  border-radius: 999px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  transition: all 0.25s ease;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.navLink:hover,
+.navLink:focus-visible {
+  background: rgba(255, 255, 255, 0.2);
+  opacity: 1;
+  outline: none;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.18);
+}
+
+.navLinkActive {
+  background: rgba(255, 255, 255, 0.32);
+  opacity: 1;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.2);
+}
+
+:global(.theme-light) .navLinkActive {
+  background: var(--primary-color);
+  color: white;
+}
+
+.settingsLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  position: relative;
+}
+
+.settingsIcon {
+  font-size: 1.2rem;
+  line-height: 1;
+}
+
+.settingsLabel {
+  font-size: 0.8rem;
+  letter-spacing: 0.06em;
+  display: none;
+}
+
+/* On desktop, show only the icon */
+@media (min-width: 769px) {
+  .settingsLabel {
+    display: none;
+  }
+  
+  .settingsLink {
+    padding: 0.5rem 0.75rem;
+  }
+}
+
+.appMain {
+  width: 100%;
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 2rem 2rem 4rem;
+  flex: 1;
+}
+
+@media (max-width: 768px) {
+  .appTopBar {
+    padding: 1.25rem 1.25rem 0.75rem;
+    gap: 1rem;
+    position: relative;
+  }
+
+  /* Show hamburger button on mobile */
+  .hamburgerButton {
+    display: flex;
+    order: 3;
+  }
+
+  /* Mobile navigation styles */
+  .appNav {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    flex-direction: column;
+    background: var(--bg-gradient-start);
+    backdrop-filter: blur(10px);
+    padding: 1rem;
+    gap: 0.5rem;
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    z-index: 100;
+  }
+  .appNav.mobileOpen {
+    max-height: 500px;
+    opacity: 1;
+    padding: 1rem;
+  }
+  .navLink {
+    width: 100%;
+    text-align: left;
+    padding: 0.75rem 1rem;
+    border-radius: 10px;
+  }
+
+  /* Show settings label on mobile */
+  .settingsLink .settingsLabel {
+    display: inline;
+  }
+
+  .settingsLink {
+    padding: 0.75rem 1rem;
+  }
+
+  .appMain {
+    padding: 1.5rem 1rem 3rem;
+  }
+}

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
-import { NavLink, Outlet, Route, BrowserRouter, Routes, useLocation } from 'react-router-dom'
-import './App.css'
+import { NavLink, Link, Outlet, Route, BrowserRouter, Routes, useLocation } from 'react-router-dom'
+import styles from './App.module.css'
 import Home from './pages/Home'
 import MCP from './pages/MCP'
 import Extensions from './pages/Extensions'
@@ -61,31 +61,36 @@ function Layout() {
   }, [location.pathname])
 
   return (
-    <div className="app-shell">
-      <div className="app-top-bar">
-        <div className="brand">
-          <span className="brand-mark">README</span>
-          <span className="brand-text">Badge Creator</span>
-        </div>
-        
-        <button 
-          className="hamburger-button"
+    <div className={`${styles.appShell} app-shell`}>
+      <div className={`${styles.appTopBar} app-top-bar`}>
+        <Link to="/" className={`${styles.brand} brand`}>
+          <span className={`${styles.brandMark} brand-mark`}>README</span>
+          <span className={`${styles.brandText} brand-text`}>Badge Creator</span>
+        </Link>
+        <button
+          className={`${styles.hamburgerButton} hamburger-button`}
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
           aria-label="Toggle menu"
           aria-expanded={mobileMenuOpen}
         >
-          <span className="hamburger-line"></span>
-          <span className="hamburger-line"></span>
-          <span className="hamburger-line"></span>
+          <span className={`${styles.hamburgerLine} hamburger-line`}></span>
+          <span className={`${styles.hamburgerLine} hamburger-line`}></span>
+          <span className={`${styles.hamburgerLine} hamburger-line`}></span>
         </button>
-
-        <nav className={`app-nav ${mobileMenuOpen ? 'mobile-open' : ''}`} aria-label="Primary">
+        <nav
+          className={`${styles.appNav} app-nav ${mobileMenuOpen ? `${styles.mobileOpen} mobile-open` : ''}`}
+          aria-label="Primary"
+        >
           {navItems.map(item => (
             <NavLink
               key={item.to}
               to={item.to}
               end={item.end}
-              className={({ isActive }) => (isActive ? 'nav-link active' : 'nav-link')}
+              className={({ isActive }) =>
+                isActive
+                  ? `${styles.navLink} nav-link ${styles.navLinkActive} active`
+                  : `${styles.navLink} nav-link`
+              }
               onClick={() => setMobileMenuOpen(false)}
             >
               {item.label}
@@ -93,15 +98,19 @@ function Layout() {
           ))}
           <NavLink
             to="/settings"
-            className={({ isActive }) => (isActive ? 'nav-link settings-link active' : 'nav-link settings-link')}
+            className={({ isActive }) =>
+              isActive
+                ? `${styles.navLink} nav-link ${styles.settingsLink} settings-link ${styles.navLinkActive} active`
+                : `${styles.navLink} nav-link ${styles.settingsLink} settings-link`
+            }
             onClick={() => setMobileMenuOpen(false)}
           >
-            <span className="settings-icon">⚙️</span>
-            <span className="settings-label">Settings</span>
+            <span className={`${styles.settingsIcon} settings-icon`}>⚙️</span>
+            <span className={`${styles.settingsLabel} settings-label`}>Settings</span>
           </NavLink>
         </nav>
       </div>
-      <main className="app-main">
+      <main className={`${styles.appMain} app-main`}>
         <Outlet context={{ theme, setTheme }} />
       </main>
     </div>

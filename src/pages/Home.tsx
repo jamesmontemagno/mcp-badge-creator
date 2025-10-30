@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
-import '../App.css'
+import styles from './Home.module.css'
+import cardStyles from '../styles/components/Card.module.css'
 
 const navigationCards = [
   {
@@ -30,33 +31,49 @@ const navigationCards = [
 
 function Home() {
   return (
-    <div className="home-page">
-      <section className="home-hero">
-        <p className="home-overline">Badge Toolkit</p>
+    <div className={`${styles.homePage} home-page`}>
+      <section className={`${styles.homeHero} home-hero`}>
+        <p className={`${styles.homeOverline} home-overline`}>Badge Toolkit</p>
         <h1>Build beautiful badges in seconds</h1>
-        <p className="home-subtitle">
+        <p className={`${styles.homeSubtitle} home-subtitle`}>
           Choose a generator to craft rich badges, shareable markdown, and ready-to-run commands for your projects.
         </p>
       </section>
 
-      <div className="home-card-grid" role="navigation" aria-label="Primary destinations">
-        {navigationCards.map(card => (
-          <Link
-            key={card.id}
-            to={card.to}
-            className={`home-card ${card.className}`}
-          >
-            <span className="home-card-icon" aria-hidden="true">
-              {card.icon}
-            </span>
-            <div className="home-card-content">
-              <h2>{card.title}</h2>
-              <p>{card.description}</p>
-              <span className="card-cta">Open generator →</span>
-            </div>
-          </Link>
-        ))}
+      <div className={`${styles.homeCardGrid} home-card-grid`} role="navigation" aria-label="Primary destinations">
+        {navigationCards.map(card => {
+          const variantClass =
+            card.className === 'card-mcp'
+              ? styles.cardMcp
+              : card.className === 'card-extensions'
+              ? styles.cardExtensions
+              : card.className === 'card-packages'
+              ? styles.cardPackages
+              : ''
+          return (
+            <Link
+              key={card.id}
+              to={card.to}
+              className={`${cardStyles.card} ${cardStyles.cardHover} ${styles.homeCard} home-card ${variantClass} ${card.className}`}
+            >
+              <span className={`${styles.homeCardIcon} home-card-icon`} aria-hidden="true">
+                {card.icon}
+              </span>
+              <div className={`${styles.homeCardContent} home-card-content`}>
+                <h2>{card.title}</h2>
+                <p>{card.description}</p>
+                <span className={`${styles.cardCta} card-cta`}>Open generator →</span>
+              </div>
+            </Link>
+          )
+        })}
       </div>
+
+      <footer className={`${styles.homeFooter} home-footer`}>
+        <p>
+          Created with <a href="https://code.visualstudio.com/" target="_blank" rel="noopener noreferrer">VS Code</a> and <a href="https://github.com/features/copilot" target="_blank" rel="noopener noreferrer">GitHub Copilot</a> • <a href="https://github.com/jamesmontemagno/mcp-badge-creator" target="_blank" rel="noopener noreferrer">View on GitHub</a>
+        </p>
+      </footer>
     </div>
   )
 }
