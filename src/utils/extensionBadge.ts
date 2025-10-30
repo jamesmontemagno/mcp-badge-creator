@@ -102,22 +102,20 @@ export const parseExtensionInput = (value: string): ExtensionParseResult => {
   }
 }
 
-const MARKETPLACE_URL = 'https://marketplace.visualstudio.com/items'
-
-const badgeMarkdown = (label: string, color: string, extensionId: string) => {
+const badgeMarkdown = (label: string, color: string, extensionId: string, uriScheme: string) => {
   const encodedLabel = encodeURIComponent(label)
   const badgeUrl = `https://img.shields.io/badge/${encodedLabel}-Install-${color}?logo=visualstudiocode&logoColor=white`
-  const marketplaceUrl = `${MARKETPLACE_URL}?itemName=${extensionId}`
+  const extensionUri = `${uriScheme}:extension/${extensionId}`
   return {
-    markdown: `[![Install in ${label}](${badgeUrl})](${marketplaceUrl})`,
+    markdown: `[![Install in ${label}](${badgeUrl})](${extensionUri})`,
     badgeUrl,
-    marketplaceUrl,
+    extensionUri,
   }
 }
 
 export const generateExtensionBadges = (extensionId: string) => {
-  const stable = badgeMarkdown('VS Code', '0098FF', extensionId)
-  const insiders = badgeMarkdown('VS Code Insiders', '24bfa5', extensionId)
+  const stable = badgeMarkdown('VS Code', '0098FF', extensionId, 'vscode')
+  const insiders = badgeMarkdown('VS Code Insiders', '24bfa5', extensionId, 'vscode-insiders')
 
   return {
     extensionId,
