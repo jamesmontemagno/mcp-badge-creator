@@ -112,6 +112,28 @@
   --footer-border: rgba(0, 217, 255, 0.3);
 }
 
+/* Pink Theme - Vibrant pink/magenta aesthetic */
+.theme-pink {
+  --primary-color: #ec4899;
+  --primary-dark: #db2777;
+  --primary-darker: #be185d;
+  --bg-gradient-start: #db2777;
+  --bg-gradient-mid: #ec4899;
+  --bg-gradient-end: #be185d;
+  --text-color: #333;
+  --text-light: #666;
+  --text-lighter: #999;
+  --bg-white: white;
+  --bg-light: #fdf2f8;
+  --border-color: #fbcfe8;
+  --border-light: #f9a8d4;
+  --shadow-color: rgba(236, 72, 153, 0.2);
+  --shadow-light: rgba(236, 72, 153, 0.08);
+  --header-text: white;
+  --footer-text: white;
+  --footer-border: rgba(255, 255, 255, 0.2);
+}
+
 body {
   margin: 0;
   padding: 0;

@@ -6,7 +6,7 @@ import MCP from './pages/MCP'
 import Extensions from './pages/Extensions'
 import Settings from './pages/Settings'
 
-type ThemeType = 'system' | 'light' | 'dark' | 'green' | 'tron'
+type ThemeType = 'system' | 'light' | 'dark' | 'green' | 'tron' | 'pink'
 
 const navItems = [
   { to: '/', label: 'Home', end: true },
@@ -26,7 +26,7 @@ function Layout() {
   useEffect(() => {
     const applyTheme = (themeName: ThemeType) => {
       // Remove all theme classes
-      document.documentElement.classList.remove('theme-light', 'theme-dark', 'theme-green', 'theme-tron')
+      document.documentElement.classList.remove('theme-light', 'theme-dark', 'theme-green', 'theme-tron', 'theme-pink')
       
       if (themeName === 'system') {
         // Use system preference
