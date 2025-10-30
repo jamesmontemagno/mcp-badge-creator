@@ -89,10 +89,10 @@ function Extensions() {
           <div className="extensions-preview">
             <h2>Preview</h2>
             <div className="extensions-preview-row">
-              <a href={badgeData.stable.marketplaceUrl} target="_blank" rel="noopener noreferrer">
+              <a href={badgeData.stable.extensionUri} target="_blank" rel="noopener noreferrer">
                 <img src={badgeData.stable.badgeUrl} alt="Install in VS Code" />
               </a>
-              <a href={badgeData.insiders.marketplaceUrl} target="_blank" rel="noopener noreferrer">
+              <a href={badgeData.insiders.extensionUri} target="_blank" rel="noopener noreferrer">
                 <img src={badgeData.insiders.badgeUrl} alt="Install in VS Code Insiders" />
               </a>
             </div>
