@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { NavLink, Outlet, Route, BrowserRouter, Routes } from 'react-router-dom'
+import { NavLink, Outlet, Route, BrowserRouter, Routes, useLocation } from 'react-router-dom'
 import './App.css'
 import Home from './pages/Home'
 import MCP from './pages/MCP'
@@ -15,6 +15,7 @@ const navItems = [
 ]
 
 function Layout() {
+  const location = useLocation()
   const [theme, setTheme] = useState<ThemeType>(() => {
     const savedTheme = localStorage.getItem('readme-badge-theme') as ThemeType
     return savedTheme || 'system'
