@@ -18,6 +18,14 @@ const navigationCards = [
     icon: '🧩',
     className: 'card-extensions',
   },
+  {
+    id: 'packages',
+    title: 'Package Badges',
+    description: 'Generate version and download badges for NPM, NuGet, PyPI, Maven, RubyGems, and Crates.io packages.',
+    to: '/packages',
+    icon: '📦',
+    className: 'card-packages',
+  },
 ]
 
 function Home() {

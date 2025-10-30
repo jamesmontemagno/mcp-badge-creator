@@ -4,14 +4,16 @@ import './App.css'
 import Home from './pages/Home'
 import MCP from './pages/MCP'
 import Extensions from './pages/Extensions'
+import Packages from './pages/Packages'
 import Settings from './pages/Settings'
 
 type ThemeType = 'system' | 'light' | 'dark' | 'green' | 'tron'
 
 const navItems = [
   { to: '/', label: 'Home', end: true },
-  { to: '/mcp', label: 'MCP Badges' },
-  { to: '/extensions', label: 'VS Code Extensions' },
+  { to: '/mcp', label: 'MCP' },
+  { to: '/extensions', label: 'Extensions' },
+  { to: '/packages', label: 'Packages' },
 ]
 
 function Layout() {
@@ -113,6 +115,7 @@ function App() {
           <Route index element={<Home />} />
           <Route path="mcp" element={<MCP />} />
           <Route path="extensions" element={<Extensions />} />
+          <Route path="packages" element={<Packages />} />
           <Route path="settings" element={<Settings />} />
         </Route>
       </Routes>
