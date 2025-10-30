@@ -34,32 +34,32 @@ export interface BadgeSet {
 const urlPatterns = [
   {
     manager: 'npm' as PackageManager,
-    regex: /npmjs\.com\/package\/(@?[^\/]+(?:\/[^\/]+)?)/,
+    regex: /npmjs\.com\/package\/(@?[^/]+(?:\/[^/]+)?)/,
     extract: (match: RegExpMatchArray) => ({ packageId: match[1] })
   },
   {
     manager: 'nuget' as PackageManager,
-    regex: /nuget\.org\/packages\/([^\/]+)/,
+    regex: /nuget\.org\/packages\/([^/]+)/,
     extract: (match: RegExpMatchArray) => ({ packageId: match[1] })
   },
   {
     manager: 'pypi' as PackageManager,
-    regex: /pypi\.org\/project\/([^\/]+)/,
+    regex: /pypi\.org\/project\/([^/]+)/,
     extract: (match: RegExpMatchArray) => ({ packageId: match[1] })
   },
   {
     manager: 'maven' as PackageManager,
-    regex: /central\.sonatype\.com\/artifact\/([^\/]+)\/([^\/]+)/,
+    regex: /central\.sonatype\.com\/artifact\/([^/]+)\/([^/]+)/,
     extract: (match: RegExpMatchArray) => ({ groupId: match[1], artifactId: match[2] })
   },
   {
     manager: 'rubygems' as PackageManager,
-    regex: /rubygems\.org\/gems\/([^\/]+)/,
+    regex: /rubygems\.org\/gems\/([^/]+)/,
     extract: (match: RegExpMatchArray) => ({ packageId: match[1] })
   },
   {
     manager: 'crates' as PackageManager,
-    regex: /crates\.io\/crates\/([^\/]+)/,
+    regex: /crates\.io\/crates\/([^/]+)/,
     extract: (match: RegExpMatchArray) => ({ packageId: match[1] })
   }
 ];
