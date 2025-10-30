@@ -415,16 +415,6 @@ body {
   gap: 0.35rem;
 }
 
-.card-mcp {
-  background: linear-gradient(135deg, rgba(0, 152, 255, 0.18) 0%, rgba(255, 255, 255, 0.95) 100%);
-  border: 1px solid rgba(0, 152, 255, 0.3);
-}
-
-.card-extensions {
-  background: linear-gradient(135deg, rgba(36, 191, 165, 0.18) 0%, rgba(255, 255, 255, 0.95) 100%);
-  border: 1px solid rgba(36, 191, 165, 0.35);
-}
-
 @media (max-width: 768px) {
   .home-card {
     flex-direction: row;
@@ -1671,5 +1661,287 @@ footer a:hover {
   .badge-preview-sample {
     flex-direction: column;
     align-items: flex-start;
+  }
+}
+
+/* =============================================
+   Packages Page
+   ============================================= */
+
+.packages-page {
+  animation: fadeIn 0.5s ease-in-out;
+}
+
+.packages-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.packages-header .eyebrow {
+  color: var(--primary-color);
+}
+
+.packages-header h1 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  margin: 0.5rem 0 1rem;
+  color: var(--header-text);
+  line-height: 1.2;
+}
+
+.packages-header .subtitle {
+  font-size: 1.125rem;
+  color: var(--text-light);
+  max-width: 800px;
+  margin: 0 auto;
+  line-height: 1.6;
+}
+
+/* Packages Form */
+
+.packages-form {
+  background: var(--bg-white);
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px var(--shadow-light);
+}
+
+.form-row {
+  display: flex;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  align-items: flex-start;
+}
+
+.form-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.form-group.flex-grow {
+  flex: 1;
+}
+
+.packages-form label {
+  font-weight: 600;
+  color: var(--text-color);
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.packages-form input[type="text"],
+.packages-form select {
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  transition: all 0.2s ease;
+  background: var(--bg-white);
+  color: var(--text-color);
+  width: 100%;
+}
+
+.packages-form input[type="text"]:focus,
+.packages-form select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(36, 191, 165, 0.1);
+}
+
+.packages-form select {
+  cursor: pointer;
+  min-width: 200px;
+}
+
+.field-hint {
+  font-size: 0.875rem;
+  color: var(--text-lighter);
+  line-height: 1.4;
+}
+
+.maven-fields {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
+  padding: 1.5rem;
+  background: var(--bg-light);
+  border-radius: 8px;
+  border: 2px dashed var(--border-color);
+}
+
+.packages-form button.primary {
+  width: 100%;
+  padding: 0.875rem 2rem;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: inherit;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.packages-form button.primary:hover {
+  background: var(--primary-dark);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+.packages-form button.primary:active {
+  transform: translateY(0);
+}
+
+/* Packages Output */
+
+.packages-output {
+  margin-top: 2rem;
+}
+
+.packages-preview {
+  background: var(--bg-white);
+  border-radius: 12px;
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px var(--shadow-light);
+}
+
+.packages-preview h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 1.5rem 0;
+  color: var(--text-color);
+}
+
+.badge-preview-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.badge-preview-grid img {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.badge-preview-grid a:hover img {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px var(--shadow-light);
+}
+
+.preview-link {
+  margin-top: 1rem;
+  font-size: 0.875rem;
+}
+
+.preview-link a {
+  color: var(--primary-color);
+  text-decoration: none;
+  font-weight: 600;
+  transition: color 0.2s ease;
+}
+
+.preview-link a:hover {
+  color: var(--primary-dark);
+}
+
+.combined-section {
+  margin-bottom: 1.5rem;
+}
+
+.combined-section .markdown-card {
+  width: 100%;
+}
+
+.installation-section {
+  background: var(--bg-white);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 12px var(--shadow-light);
+}
+
+.installation-section .output-header {
+  margin-bottom: 1.5rem;
+}
+
+.command-blocks {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.command-blocks pre {
+  background: var(--bg-light);
+  border: 1px solid var(--border-color);
+  border-left: 4px solid var(--primary-color);
+  border-radius: 8px;
+  padding: 1rem;
+  margin: 0;
+  overflow-x: auto;
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', 'Consolas', 'source-code-pro', monospace;
+  font-size: 0.875rem;
+  line-height: 1.5;
+}
+
+.command-blocks code {
+  color: var(--text-color);
+  font-family: inherit;
+  white-space: pre;
+}
+
+/* Responsive Packages */
+@media (max-width: 768px) {
+  .packages-header h1 {
+    font-size: 2rem;
+  }
+
+  .packages-header .subtitle {
+    font-size: 1rem;
+  }
+
+  .form-row {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .packages-form select {
+    min-width: 100%;
+  }
+
+  .maven-fields {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+
+  .packages-form,
+  .packages-preview,
+  .installation-section {
+    padding: 1.5rem;
+  }
+
+  .badge-preview-grid {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+}
+
+@media (max-width: 480px) {
+  .packages-header h1 {
+    font-size: 1.75rem;
+  }
+
+  .packages-form,
+  .packages-preview,
+  .installation-section {
+    padding: 1rem;
   }
 }

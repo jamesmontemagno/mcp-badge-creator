@@ -112,7 +112,7 @@ export function parsePackageInput(value: string): PackageParseResult {
   }
 
   // Check for Maven coordinate format (groupId:artifactId)
-  const mavenCoordMatch = trimmedValue.match(/^([a-z0-9.-]+):([a-z0-9._-]+)$/i);
+  const mavenCoordMatch = trimmedValue.match(/^([a-zA-Z0-9.-]+):([a-zA-Z0-9._-]+)$/);
   if (mavenCoordMatch) {
     return {
       manager: 'maven',

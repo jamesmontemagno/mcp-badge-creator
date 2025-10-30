@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import './Packages.css'
+import '../App.css'
 import { parsePackageInput, generatePackageBadges, getInstallCommands, type PackageManager } from '../utils/packageBadge'
 
 type CopyTarget = 'version' | 'downloads' | 'downloadsMonthly' | 'downloadsRecent' | 'combined' | 'commands'
@@ -25,8 +25,21 @@ function Packages() {
   }
 
   const copyMarkdown = async (value: string, target: CopyTarget) => {
-    await navigator.clipboard.writeText(value)
-    showCopyState(target)
+    try {
+      await navigator.clipboard.writeText(value)
+      showCopyState(target)
+    } catch (err) {
+      console.error('Failed to copy to clipboard:', err)
+    }
+  }
+
+  // Helper to clear badge-related state
+  const clearBadgeState = (opts?: { info?: boolean; error?: boolean }) => {
+    setBadgeData(null)
+    setCommands([])
+    setCurrentManager(null)
+    if (opts?.info) setInfo(null)
+    if (opts?.error) setError(null)
   }
 
   const handleGenerate = (event: FormEvent<HTMLFormElement>) => {
@@ -44,6 +57,9 @@ function Packages() {
         setBadgeData(badges)
         setCommands(cmds)
         setCurrentManager('maven')
+      } else {
+        clearBadgeState({ info: true })
+        setError('Unable to generate badges for this package.')
       }
       return
     }
@@ -55,9 +71,7 @@ function Packages() {
     const effectiveManager = manualManager || parsed.manager
 
     if (!effectiveManager) {
-      setBadgeData(null)
-      setCommands([])
-      setCurrentManager(null)
+      clearBadgeState()
       setInfo(parsed.message ?? null)
       setError(parsed.error ?? 'Please select a package manager or provide a package URL.')
       return
@@ -66,18 +80,12 @@ function Packages() {
     // For Maven, ensure we have both fields
     if (effectiveManager === 'maven') {
       if (!parsed.groupId || !parsed.artifactId) {
-        setBadgeData(null)
-        setCommands([])
-        setCurrentManager(null)
-        setInfo(null)
+        clearBadgeState({ info: true })
         setError('Maven packages require both Group ID and Artifact ID. Use format: groupId:artifactId')
         return
       }
     } else if (!parsed.packageId) {
-      setBadgeData(null)
-      setCommands([])
-      setCurrentManager(null)
-      setInfo(null)
+      clearBadgeState({ info: true })
       setError('Please enter a valid package identifier.')
       return
     }
@@ -103,10 +111,8 @@ function Packages() {
       setCommands(cmds)
       setCurrentManager(effectiveManager)
     } else {
+      clearBadgeState({ info: true })
       setError('Unable to generate badges for this package.')
-      setBadgeData(null)
-      setCommands([])
-      setCurrentManager(null)
     }
   }
 
