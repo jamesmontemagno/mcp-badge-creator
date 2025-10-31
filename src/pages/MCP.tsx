@@ -10,6 +10,41 @@ interface MCPConfig {
   command?: string;
   args?: string[];
   env?: Record<string, string>;
+  headers?: Record<string, string>;
+}
+
+interface MCPInput {
+  type: 'promptString';
+  id: string;
+  description: string;
+  password?: boolean;
+}
+
+interface DynamicArgument {
+  flag: string;
+  value: string;
+}
+
+interface DynamicEnvVar {
+  key: string;
+  value: string;
+  password?: boolean;
+  inputName?: string;
+  inputDescription?: string;
+}
+
+interface DynamicHeader {
+  key: string;
+  value: string;
+  password?: boolean;
+  inputName?: string;
+  inputDescription?: string;
+}
+
+interface StandaloneInput {
+  id: string;
+  description: string;
+  password?: boolean;
 }
 
 function MCP() {
@@ -54,43 +89,165 @@ function MCP() {
   const [copiedCliInsiders, setCopiedCliInsiders] = useState(false)
   const [copiedReadme, setCopiedReadme] = useState(false)
   const [activeTab, setActiveTab] = useState<'badges' | 'readme'>('badges')
+  
+  // Dynamic arguments and environment variables (per config type)
+  const [dynamicArgs, setDynamicArgs] = useState<Record<ConfigType, DynamicArgument[]>>({
+    http: [],
+    docker: [],
+    local: [],
+    npx: [],
+    uvx: [],
+    dnx: []
+  })
+  const [dynamicEnv, setDynamicEnv] = useState<Record<ConfigType, DynamicEnvVar[]>>({
+    http: [],
+    docker: [],
+    local: [],
+    npx: [],
+    uvx: [],
+    dnx: []
+  })
+  
+  // HTTP headers (only for http config type)
+  const [httpHeaders, setHttpHeaders] = useState<DynamicHeader[]>([])
+  
+  // Standalone inputs (not tied to headers or env vars)
+  const [standaloneInputs, setStandaloneInputs] = useState<StandaloneInput[]>([])
+  
+  // Import modal state
+  const [showImportModal, setShowImportModal] = useState(false)
+  const [importJsonText, setImportJsonText] = useState('')
 
   const generateConfig = (): MCPConfig => {
     const config: MCPConfig = {};
+    const currentDynamicArgs = dynamicArgs[configType] || [];
+    const currentDynamicEnv = dynamicEnv[configType] || [];
+    
+    // Helper function to get input ID for password fields
+    const getInputId = (key: string, customName?: string) => {
+      return customName || key.toLowerCase().replace(/[^a-z0-9_]/g, '_');
+    };
     
     switch (configType) {
       case 'http':
-        // HTTP servers only have type and url (no name in the actual config)
+        // HTTP servers only have type, url, and headers (no env)
         config.type = 'http';
         config.url = serverUrl;
+        // Add HTTP headers
+        if (httpHeaders.length > 0) {
+          const headers: Record<string, string> = {};
+          httpHeaders.forEach(header => {
+            const inputId = getInputId(header.key, header.inputName);
+            const headerValue = header.password ? `\${input:${inputId}}` : header.value;
+            headers[header.key] = headerValue;
+          });
+          if (Object.keys(headers).length > 0) {
+            config.headers = headers;
+          }
+        }
         break;
       case 'docker':
         // STDIO servers have command, args, and env (no name or type)
         config.command = 'docker';
         config.args = ['run', '-i', '--rm', dockerImage];
+        // Add dynamic args
+        if (currentDynamicArgs.length > 0) {
+          currentDynamicArgs.forEach(arg => {
+            config.args!.push(arg.flag);
+            if (arg.value) config.args!.push(arg.value);
+          });
+        }
+        // Add dynamic env vars
         config.env = {};
+        if (currentDynamicEnv.length > 0) {
+          currentDynamicEnv.forEach(envVar => {
+            const inputId = getInputId(envVar.key, envVar.inputName);
+            const envValue = envVar.password ? `\${input:${inputId}}` : envVar.value;
+            config.env![envVar.key] = envValue;
+          });
+        }
         break;
       case 'npx':
         config.command = 'npx';
         config.args = ['-y', npxPackage];
+        // Add dynamic args
+        if (currentDynamicArgs.length > 0) {
+          currentDynamicArgs.forEach(arg => {
+            config.args!.push(arg.flag);
+            if (arg.value) config.args!.push(arg.value);
+          });
+        }
+        // Add dynamic env vars
         config.env = {};
+        if (currentDynamicEnv.length > 0) {
+          currentDynamicEnv.forEach(envVar => {
+            const inputId = getInputId(envVar.key, envVar.inputName);
+            const envValue = envVar.password ? `\${input:${inputId}}` : envVar.value;
+            config.env![envVar.key] = envValue;
+          });
+        }
         break;
       case 'uvx': {
         config.command = 'uvx';
         const uvxArgs = uvxFrom ? ['--from', uvxFrom, uvxPackage] : [uvxPackage];
         config.args = uvxArgs;
+        // Add dynamic args
+        if (currentDynamicArgs.length > 0) {
+          currentDynamicArgs.forEach(arg => {
+            config.args!.push(arg.flag);
+            if (arg.value) config.args!.push(arg.value);
+          });
+        }
+        // Add dynamic env vars
         config.env = {};
+        if (currentDynamicEnv.length > 0) {
+          currentDynamicEnv.forEach(envVar => {
+            const inputId = getInputId(envVar.key, envVar.inputName);
+            const envValue = envVar.password ? `\${input:${inputId}}` : envVar.value;
+            config.env![envVar.key] = envValue;
+          });
+        }
         break;
       }
       case 'dnx':
         config.command = 'dnx';
         config.args = [dnxPackage, '--yes'];
+        // Add dynamic args
+        if (currentDynamicArgs.length > 0) {
+          currentDynamicArgs.forEach(arg => {
+            config.args!.push(arg.flag);
+            if (arg.value) config.args!.push(arg.value);
+          });
+        }
+        // Add dynamic env vars
         config.env = {};
+        if (currentDynamicEnv.length > 0) {
+          currentDynamicEnv.forEach(envVar => {
+            const inputId = getInputId(envVar.key, envVar.inputName);
+            const envValue = envVar.password ? `\${input:${inputId}}` : envVar.value;
+            config.env![envVar.key] = envValue;
+          });
+        }
         break;
       case 'local':
         config.command = localCommand;
         config.args = localArgs.split(',').map(arg => arg.trim()).filter(arg => arg);
+        // Add dynamic args
+        if (currentDynamicArgs.length > 0) {
+          currentDynamicArgs.forEach(arg => {
+            config.args!.push(arg.flag);
+            if (arg.value) config.args!.push(arg.value);
+          });
+        }
+        // Add dynamic env vars
         config.env = {};
+        if (currentDynamicEnv.length > 0) {
+          currentDynamicEnv.forEach(envVar => {
+            const inputId = getInputId(envVar.key, envVar.inputName);
+            const envValue = envVar.password ? `\${input:${inputId}}` : envVar.value;
+            config.env![envVar.key] = envValue;
+          });
+        }
         break;
     }
     
@@ -114,11 +271,317 @@ function MCP() {
 
   const generateFullConfig = () => {
     const config = generateConfig();
-    return {
-      servers: {
-        [serverName]: config
+    const currentDynamicEnv = dynamicEnv[configType] || [];
+    
+    // Helper function to get input ID for password fields
+    const getInputId = (key: string, customName?: string) => {
+      return customName || key.toLowerCase().replace(/[^a-z0-9_]/g, '_');
+    };
+    
+    // Check if any env vars or HTTP headers have password flag
+    const envPasswordInputs = currentDynamicEnv.filter(env => env.password);
+    const headerPasswordInputs = configType === 'http' ? httpHeaders.filter(header => header.password) : [];
+    const hasPasswordInputs = envPasswordInputs.length > 0 || headerPasswordInputs.length > 0 || standaloneInputs.length > 0;
+    
+    if (hasPasswordInputs) {
+      // Build full config with inputs array
+      const inputs: MCPInput[] = [
+        ...envPasswordInputs.map(env => ({
+          type: 'promptString' as const,
+          id: getInputId(env.key, env.inputName),
+          description: env.inputDescription || `Enter ${env.key}`,
+          password: true
+        })),
+        ...headerPasswordInputs.map(header => ({
+          type: 'promptString' as const,
+          id: getInputId(header.key, header.inputName),
+          description: header.inputDescription || `Enter ${header.key}`,
+          password: true
+        })),
+        ...standaloneInputs.map(input => ({
+          type: 'promptString' as const,
+          id: input.id,
+          description: input.description,
+          password: input.password
+        }))
+      ];
+      
+      return {
+        inputs,
+        servers: {
+          [serverName]: config
+        }
+      };
+    } else {
+      // Standard config without inputs
+      return {
+        servers: {
+          [serverName]: config
+        }
+      };
+    }
+  }
+
+  const addDynamicArg = () => {
+    setDynamicArgs(prev => ({
+      ...prev,
+      [configType]: [...(prev[configType] || []), { flag: '', value: '' }]
+    }));
+  }
+
+  const removeDynamicArg = (index: number) => {
+    setDynamicArgs(prev => ({
+      ...prev,
+      [configType]: (prev[configType] || []).filter((_, i) => i !== index)
+    }));
+  }
+
+  const updateDynamicArg = (index: number, flag: string, value: string) => {
+    setDynamicArgs(prev => ({
+      ...prev,
+      [configType]: (prev[configType] || []).map((arg, i) =>
+        i === index ? { flag, value } : arg
+      )
+    }));
+  }
+
+  const addDynamicEnvVar = () => {
+    setDynamicEnv(prev => ({
+      ...prev,
+      [configType]: [...(prev[configType] || []), { key: '', value: '', password: false }]
+    }));
+  }
+
+  const removeDynamicEnvVar = (index: number) => {
+    setDynamicEnv(prev => ({
+      ...prev,
+      [configType]: (prev[configType] || []).filter((_, i) => i !== index)
+    }));
+  }
+
+  const updateDynamicEnvVar = (index: number, key: string, value: string, password: boolean, inputName?: string, inputDescription?: string) => {
+    setDynamicEnv(prev => ({
+      ...prev,
+      [configType]: (prev[configType] || []).map((env, i) =>
+        i === index ? { key, value, password, inputName, inputDescription } : env
+      )
+    }));
+  }
+
+  const addHttpHeader = () => {
+    setHttpHeaders(prev => [...prev, { key: '', value: '', password: false }]);
+  }
+
+  const removeHttpHeader = (index: number) => {
+    setHttpHeaders(prev => prev.filter((_, i) => i !== index));
+  }
+
+  const updateHttpHeader = (index: number, key: string, value: string, password: boolean, inputName?: string, inputDescription?: string) => {
+    setHttpHeaders(prev =>
+      prev.map((header, i) =>
+        i === index ? { key, value, password, inputName, inputDescription } : header
+      )
+    );
+  }
+
+  const addStandaloneInput = () => {
+    setStandaloneInputs(prev => [...prev, { id: '', description: '', password: true }]);
+  }
+
+  const removeStandaloneInput = (index: number) => {
+    setStandaloneInputs(prev => prev.filter((_, i) => i !== index));
+  }
+
+  const updateStandaloneInput = (index: number, id: string, description: string, password: boolean) => {
+    setStandaloneInputs(prev =>
+      prev.map((input, i) =>
+        i === index ? { id, description, password } : input
+      )
+    );
+  }
+
+  const parseAndImportConfig = (content: string) => {
+    try {
+      const parsed = JSON.parse(content);
+      
+      // Extract server configuration
+      let serverConfig: MCPConfig | null = null;
+      let extractedServerName = '';
+      let inputs: MCPInput[] = [];
+      
+      // Handle different formats
+      if (parsed.mcpServers) {
+        // Format: { "mcpServers": { "server-name": {...} } }
+        const firstServer = Object.keys(parsed.mcpServers)[0];
+        extractedServerName = firstServer;
+        serverConfig = parsed.mcpServers[firstServer];
+      } else if (parsed.servers) {
+        // Format: { "servers": { "server-name": {...} }, "inputs": [...] }
+        const firstServer = Object.keys(parsed.servers)[0];
+        extractedServerName = firstServer;
+        serverConfig = parsed.servers[firstServer];
+        inputs = parsed.inputs || [];
+      } else {
+        // Direct server config
+        serverConfig = parsed;
+      }
+
+      if (!serverConfig) {
+        alert('Could not parse configuration. Please check the file format.');
+        return false;
+      }
+
+      // Set server name
+      setServerName(extractedServerName || 'imported-server');
+
+      // Detect configuration type and populate fields
+      if (serverConfig.type === 'http') {
+        setConfigType('http');
+        setServerUrl(serverConfig.url || '');
+        
+        // Parse headers
+        if (serverConfig.headers) {
+          const headersList: DynamicHeader[] = [];
+          Object.entries(serverConfig.headers).forEach(([key, value]) => {
+            const isPassword = typeof value === 'string' && value.includes('${input:');
+            const inputMatch = isPassword ? (value as string).match(/\$\{input:([^}]+)\}/) : null;
+            const inputId = inputMatch ? inputMatch[1] : '';
+            const inputObj = inputs.find(inp => inp.id === inputId);
+            
+            headersList.push({
+              key,
+              value: isPassword ? '' : value as string,
+              password: isPassword,
+              inputName: inputId,
+              inputDescription: inputObj?.description || ''
+            });
+          });
+          setHttpHeaders(headersList);
+        }
+      } else if (serverConfig.command) {
+        // STDIO server
+        const cmd = serverConfig.command;
+        
+        // Detect type based on command
+        if (cmd === 'npx') {
+          setConfigType('npx');
+          setNpxPackage(serverConfig.args?.[1] || '');
+        } else if (cmd === 'uvx') {
+          setConfigType('uvx');
+          const args = serverConfig.args || [];
+          const fromIndex = args.indexOf('--from');
+          if (fromIndex !== -1 && args[fromIndex + 1]) {
+            setUvxFrom(args[fromIndex + 1]);
+            setUvxPackage(args[fromIndex + 2] || '');
+          } else {
+            setUvxPackage(args[0] || '');
+          }
+        } else if (cmd === 'dnx') {
+          setConfigType('dnx');
+          setDnxPackage(serverConfig.args?.[0] || '');
+        } else if (cmd === 'docker') {
+          setConfigType('docker');
+          const args = serverConfig.args || [];
+          const imageIndex = args.findIndex((arg: string) => !arg.startsWith('-') && arg !== 'run' && arg !== '-i' && arg !== '--rm');
+          setDockerImage(args[imageIndex] || '');
+        } else {
+          setConfigType('local');
+          setLocalCommand(cmd);
+          setLocalArgs(serverConfig.args?.join(', ') || '');
+        }
+        
+        // Parse environment variables
+        if (serverConfig.env) {
+          const envList: DynamicEnvVar[] = [];
+          Object.entries(serverConfig.env).forEach(([key, value]) => {
+            const isPassword = typeof value === 'string' && value.includes('${input:');
+            const inputMatch = isPassword ? (value as string).match(/\$\{input:([^}]+)\}/) : null;
+            const inputId = inputMatch ? inputMatch[1] : '';
+            const inputObj = inputs.find(inp => inp.id === inputId);
+            
+            envList.push({
+              key,
+              value: isPassword ? '' : value as string,
+              password: isPassword,
+              inputName: inputId,
+              inputDescription: inputObj?.description || ''
+            });
+          });
+          setDynamicEnv(prev => ({
+            ...prev,
+            [configType]: envList
+          }));
+        }
+      }
+      
+      // Parse standalone inputs (inputs not referenced in headers or env)
+      if (inputs.length > 0) {
+        const referencedInputIds = new Set<string>();
+        
+        // Collect all referenced input IDs from headers and env vars
+        if (serverConfig.headers) {
+          Object.values(serverConfig.headers).forEach(value => {
+            const match = typeof value === 'string' ? value.match(/\$\{input:([^}]+)\}/) : null;
+            if (match) referencedInputIds.add(match[1]);
+          });
+        }
+        if (serverConfig.env) {
+          Object.values(serverConfig.env).forEach(value => {
+            const match = typeof value === 'string' ? value.match(/\$\{input:([^}]+)\}/) : null;
+            if (match) referencedInputIds.add(match[1]);
+          });
+        }
+        
+        // Add unreferenced inputs as standalone
+        const standalone = inputs
+          .filter(input => !referencedInputIds.has(input.id))
+          .map(input => ({
+            id: input.id,
+            description: input.description,
+            password: input.password !== false
+          }));
+        
+        if (standalone.length > 0) {
+          setStandaloneInputs(standalone);
+        }
+      }
+
+      return true;
+      
+    } catch (error) {
+      console.error('Error parsing config:', error);
+      alert('Error parsing configuration. Please check the JSON format.');
+      return false;
+    }
+  }
+
+  const handleImportConfig = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const content = e.target?.result as string;
+      if (parseAndImportConfig(content)) {
+        alert('Configuration imported successfully!');
       }
     };
+
+    reader.readAsText(file);
+    event.target.value = ''; // Reset input
+  }
+
+  const handleImportFromText = () => {
+    if (!importJsonText.trim()) {
+      alert('Please paste your JSON configuration.');
+      return;
+    }
+
+    if (parseAndImportConfig(importJsonText)) {
+      alert('Configuration imported successfully!');
+      setShowImportModal(false);
+      setImportJsonText('');
+    }
   }
 
   const copyToClipboardWithState = async (text: string, setStateFn: (value: boolean) => void) => {
@@ -196,6 +659,9 @@ function MCP() {
     const fullConfig = generateFullConfig();
     const jsonConfig = JSON.stringify(fullConfig, null, 2);
     
+    // Check if we have password inputs
+    const hasPasswordInputs = fullConfig.inputs && fullConfig.inputs.length > 0;
+    
     let readmeContent = `## Getting Started\n\n`;
     readmeContent += `### Quick Install\n\n`;
     readmeContent += `Click one of the buttons below to install the MCP server in your preferred IDE:\n\n`;
@@ -205,6 +671,17 @@ function MCP() {
     
     // Add manual installation section
     readmeContent += `### Manual Installation\n\n`;
+    
+    // Add note about password inputs if present
+    if (hasPasswordInputs) {
+      readmeContent += `> **Note:** This configuration includes secure password prompts. When you install the MCP server, you'll be prompted to enter the following:\n`;
+      fullConfig.inputs?.forEach(input => {
+        readmeContent += `> - **${input.id}**: ${input.description}\n`;
+      });
+      readmeContent += `>\n`;
+      readmeContent += `> These values are stored securely and never hardcoded in your configuration.\n\n`;
+    }
+    
     readmeContent += `**Standard config** works in most tools:\n\n`;
     readmeContent += `\`\`\`js\n${jsonConfig}\n\`\`\`\n\n`;
     
@@ -249,12 +726,21 @@ function MCP() {
       if (config.type === 'http') {
         readmeContent += `   - **Type**: Select \`http/sse\` from the dropdown\n`;
         readmeContent += `   - **URL**: \`${config.url || ''}\`\n`;
+        if (config.headers && Object.keys(config.headers).length > 0) {
+          readmeContent += `   - **Headers**: Configure custom headers as needed\n`;
+        }
       } else {
         readmeContent += `   - **Type**: Select \`stdio\` from the dropdown\n`;
         readmeContent += `   - **Command**: \`${config.command || ''}\`\n`;
         if (config.args && config.args.length > 0) {
           readmeContent += `   - **Arguments**: \`${config.args.join(' ')}\`\n`;
         }
+        if (config.env && Object.keys(config.env).length > 0) {
+          readmeContent += `   - **Environment Variables**: Configure as needed\n`;
+        }
+      }
+      if (hasPasswordInputs) {
+        readmeContent += `   - **Note**: You'll be prompted for secure values during installation\n`;
       }
       readmeContent += `6. Click "Save" to add the server\n\n`;
       readmeContent += `For detailed instructions, see the [Visual Studio MCP documentation](https://learn.microsoft.com/visualstudio/ide/mcp-servers).\n</details>\n\n`;
@@ -448,6 +934,35 @@ function MCP() {
         <div className="form-section">
           <h2>Configure Your MCP Server</h2>
           
+          <div className={styles.sectionSpacer}></div>
+          
+          <div className="form-group">
+            <div className={styles.sectionHeader}>
+              <label>Import Configuration</label>
+            </div>
+            <p className="section-description">Have an existing mcp.json? Import it to auto-fill the form:</p>
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+              <label htmlFor="import-config" className={styles.importBtn}>
+                <span>📄</span> Upload File
+                <input
+                  id="import-config"
+                  type="file"
+                  accept=".json,application/json"
+                  onChange={handleImportConfig}
+                  style={{ display: 'none' }}
+                />
+              </label>
+              <button
+                type="button"
+                className={styles.importBtn}
+                onClick={() => setShowImportModal(true)}
+              >
+                <span>📋</span> Paste JSON
+              </button>
+            </div>
+            <small className="field-hint">Supports standard MCP configuration formats</small>
+          </div>
+          
           <div className="form-group">
             <label htmlFor="serverName">Server Name *</label>
             <input
@@ -584,6 +1099,244 @@ function MCP() {
               </div>
             </>
           )}
+
+          {configType === 'http' && (
+            <div className="form-group">
+              <div className={styles.sectionHeader}>
+                <label>HTTP Headers</label>
+              </div>
+              <p className="section-description">Add custom HTTP headers for your server (e.g., Authorization, Custom-Header):</p>
+              {httpHeaders.map((header, index) => (
+                <div key={index} className={styles.headerCard}>
+                  <div className={styles.dynamicEnvRow}>
+                    <input
+                      type="text"
+                      placeholder="Header-Name"
+                      value={header.key}
+                      onChange={(e) => updateHttpHeader(index, e.target.value, header.value, header.password || false, header.inputName, header.inputDescription)}
+                      className={styles.keyInput}
+                    />
+                    <input
+                      type={header.password ? 'password' : 'text'}
+                      placeholder="value or leave empty if using password"
+                      value={header.value}
+                      onChange={(e) => updateHttpHeader(index, header.key, e.target.value, header.password || false, header.inputName, header.inputDescription)}
+                      className={styles.valueInput}
+                      disabled={header.password}
+                    />
+                    <label className={`${styles.passwordToggle} password-toggle`}>
+                      <input
+                        type="checkbox"
+                        checked={header.password}
+                        onChange={(e) => updateHttpHeader(index, header.key, header.value, e.target.checked, header.inputName, header.inputDescription)}
+                      />
+                      <span>Password</span>
+                    </label>
+                    <button
+                      type="button"
+                      className={styles.deleteBtn}
+                      onClick={() => removeHttpHeader(index)}
+                      aria-label="Remove header"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  {header.password && (
+                    <div className={styles.inputDetailsRow}>
+                      <input
+                        type="text"
+                        placeholder="Input ID (optional, e.g., github_token)"
+                        value={header.inputName || ''}
+                        onChange={(e) => updateHttpHeader(index, header.key, header.value, header.password || false, e.target.value, header.inputDescription)}
+                        className={styles.inputNameField}
+                      />
+                      <input
+                        type="text"
+                        placeholder="Input Description (optional, e.g., GitHub Personal Access Token)"
+                        value={header.inputDescription || ''}
+                        onChange={(e) => updateHttpHeader(index, header.key, header.value, header.password || false, header.inputName, e.target.value)}
+                        className={styles.inputDescField}
+                      />
+                    </div>
+                  )}
+                </div>
+              ))}
+              <button
+                type="button"
+                className={styles.addBtn}
+                onClick={addHttpHeader}
+              >
+                <span>+</span> Add Header
+              </button>
+              <small className="field-hint">Headers marked as "Password" will prompt users during installation.</small>
+            </div>
+          )}
+
+          {configType !== 'http' && (
+            <div className="form-group">
+              <div className={styles.sectionHeader}>
+                <label>Custom Command Arguments</label>
+              </div>
+              <p className="section-description">Add additional arguments for your configuration (e.g., --token, -v):</p>
+              {(dynamicArgs[configType] || []).map((arg, index) => (
+                <div key={index} className={`${styles.dynamicItemRow} dynamic-item-row`}>
+                  <input
+                    type="text"
+                    placeholder="--flag or -f"
+                    value={arg.flag}
+                    onChange={(e) => updateDynamicArg(index, e.target.value, arg.value)}
+                    className={styles.flagInput}
+                  />
+                  <input
+                    type="text"
+                    placeholder="value (optional)"
+                    value={arg.value}
+                    onChange={(e) => updateDynamicArg(index, arg.flag, e.target.value)}
+                    className={styles.valueInput}
+                  />
+                  <button
+                    type="button"
+                    className={styles.deleteBtn}
+                    onClick={() => removeDynamicArg(index)}
+                    aria-label="Remove argument"
+                  >
+                    ✕
+                  </button>
+                </div>
+              ))}
+              <button
+                type="button"
+                className={styles.addBtn}
+                onClick={addDynamicArg}
+              >
+                <span>+</span> Add Argument
+              </button>
+            </div>
+          )}
+
+          {configType !== 'http' && (
+            <div className="form-group">
+              <div className={styles.sectionHeader}>
+                <label>Environment Variables</label>
+              </div>
+              <p className="section-description">Add environment variables (mark as password for secure prompts):</p>
+              {(dynamicEnv[configType] || []).map((env, index) => (
+                <div key={index} className={styles.headerCard}>
+                  <div className={styles.dynamicEnvRow}>
+                    <input
+                      type="text"
+                      placeholder="VARIABLE_NAME"
+                      value={env.key}
+                      onChange={(e) => updateDynamicEnvVar(index, e.target.value, env.value, env.password || false, env.inputName, env.inputDescription)}
+                      className={styles.keyInput}
+                    />
+                    <input
+                      type={env.password ? 'password' : 'text'}
+                      placeholder="value or leave empty if using password"
+                      value={env.value}
+                      onChange={(e) => updateDynamicEnvVar(index, env.key, e.target.value, env.password || false, env.inputName, env.inputDescription)}
+                      className={styles.valueInput}
+                      disabled={env.password}
+                    />
+                    <label className={`${styles.passwordToggle} password-toggle`}>
+                      <input
+                        type="checkbox"
+                        checked={env.password}
+                        onChange={(e) => updateDynamicEnvVar(index, env.key, env.value, e.target.checked, env.inputName, env.inputDescription)}
+                      />
+                      <span>Password</span>
+                    </label>
+                    <button
+                      type="button"
+                      className={styles.deleteBtn}
+                      onClick={() => removeDynamicEnvVar(index)}
+                      aria-label="Remove environment variable"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                  {env.password && (
+                    <div className={styles.inputDetailsRow}>
+                      <input
+                        type="text"
+                        placeholder="Input ID (optional, e.g., api_key)"
+                        value={env.inputName || ''}
+                        onChange={(e) => updateDynamicEnvVar(index, env.key, env.value, env.password || false, e.target.value, env.inputDescription)}
+                        className={styles.inputNameField}
+                      />
+                      <input
+                        type="text"
+                        placeholder="Input Description (optional, e.g., API Key for service)"
+                        value={env.inputDescription || ''}
+                        onChange={(e) => updateDynamicEnvVar(index, env.key, env.value, env.password || false, env.inputName, e.target.value)}
+                        className={styles.inputDescField}
+                      />
+                    </div>
+                  )}
+                </div>
+              ))}
+              <button
+                type="button"
+                className={styles.addBtn}
+                onClick={addDynamicEnvVar}
+              >
+                <span>+</span> Add Environment Variable
+              </button>
+              <small className="field-hint">Variables marked as "Password" will prompt users during installation and won't be hardcoded in config.</small>
+            </div>
+          )}
+
+          <div className="form-group">
+            <div className={styles.sectionHeader}>
+              <label>Additional Inputs</label>
+            </div>
+            <p className="section-description">Add standalone password prompts that can be referenced in your configuration with ${'{'}input:id{'}'}:</p>
+            {standaloneInputs.map((input, index) => (
+              <div key={index} className={styles.headerCard}>
+                <div className={styles.dynamicEnvRow}>
+                  <input
+                    type="text"
+                    placeholder="Input ID (e.g., api_token)"
+                    value={input.id}
+                    onChange={(e) => updateStandaloneInput(index, e.target.value, input.description, input.password || true)}
+                    className={styles.inputNameField}
+                    style={{ flex: '0 0 35%' }}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Description (e.g., API Token for authentication)"
+                    value={input.description}
+                    onChange={(e) => updateStandaloneInput(index, input.id, e.target.value, input.password || true)}
+                    className={styles.inputDescField}
+                  />
+                  <label className={`${styles.passwordToggle} password-toggle`}>
+                    <input
+                      type="checkbox"
+                      checked={input.password !== false}
+                      onChange={(e) => updateStandaloneInput(index, input.id, input.description, e.target.checked)}
+                    />
+                    <span>Password</span>
+                  </label>
+                  <button
+                    type="button"
+                    className={styles.deleteBtn}
+                    onClick={() => removeStandaloneInput(index)}
+                    aria-label="Remove input"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+            ))}
+            <button
+              type="button"
+              className={styles.addBtn}
+              onClick={addStandaloneInput}
+            >
+              <span>+</span> Add Input
+            </button>
+            <small className="field-hint">These inputs will be included in the root inputs array and can be referenced anywhere in your config.</small>
+          </div>
 
           <div className="form-group">
             <label htmlFor="badgeText">Badge Text</label>
@@ -920,17 +1673,19 @@ function MCP() {
         <div className="output-section">
           <h2>Generated Output</h2>
           
+          <div className={styles.outputSectionSpacer}></div>
+          
           {markdown ? (
             <>
-              <div className="tabs">
+              <div className={styles.tabs}>
                 <button 
-                  className={`tab ${activeTab === 'badges' ? 'active' : ''}`}
+                  className={`${styles.tab} ${activeTab === 'badges' ? styles.active : ''}`}
                   onClick={() => setActiveTab('badges')}
                 >
                   Badges & Config
                 </button>
                 <button 
-                  className={`tab ${activeTab === 'readme' ? 'active' : ''}`}
+                  className={`${styles.tab} ${activeTab === 'readme' ? styles.active : ''}`}
                   onClick={() => setActiveTab('readme')}
                 >
                   Getting Started README
@@ -1032,6 +1787,53 @@ function MCP() {
         </div>
       </div>
       </div>
+      
+      {/* Import JSON Modal */}
+      {showImportModal && (
+        <div className={styles.modalOverlay} onClick={() => setShowImportModal(false)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h3>Import Configuration</h3>
+              <button 
+                className={styles.modalCloseBtn}
+                onClick={() => setShowImportModal(false)}
+                aria-label="Close"
+              >
+                ✕
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              <p>Paste your MCP JSON configuration below:</p>
+              <textarea
+                className={styles.jsonTextarea}
+                value={importJsonText}
+                onChange={(e) => setImportJsonText(e.target.value)}
+                placeholder={`{\n  "servers": {\n    "my-server": {\n      "command": "npx",\n      "args": ["-y", "package-name"]\n    }\n  }\n}`}
+                rows={12}
+              />
+            </div>
+            <div className={styles.modalFooter}>
+              <button
+                type="button"
+                className={styles.modalCancelBtn}
+                onClick={() => {
+                  setShowImportModal(false);
+                  setImportJsonText('');
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className={styles.modalImportBtn}
+                onClick={handleImportFromText}
+              >
+                Import
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }

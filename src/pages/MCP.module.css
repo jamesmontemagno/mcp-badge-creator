@@ -2,13 +2,13 @@
 
 .mcpPage {
   width: 100%;
-  max-width: 1250px;
+  max-width: 1400px;
 }
 
 .mcpHeader {
   color: var(--header-text);
   margin-bottom: 2.25rem;
-  max-width: 1250px;
+  max-width: 1400px;
   width: 100%;
 }
 
@@ -49,6 +49,14 @@
   align-items: center;
   justify-content: space-between;
   margin-bottom: 0.75rem;
+}
+
+.sectionSpacer {
+  height: 2.5rem;
+}
+
+.outputSectionSpacer {
+  height: 3rem;
 }
 
 .sectionDescription {
@@ -147,26 +155,46 @@
 
 .tabs {
   display: flex;
-  gap: 0.75rem;
-  margin-bottom: 1.25rem;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+  padding: 0.25rem;
+  background: var(--bg-light);
+  border-radius: 10px;
+  border: 1px solid var(--border-color);
+  width: fit-content;
 }
 
 .tab {
-  background: var(--bg-light);
-  border: 1px solid var(--border-color);
-  padding: 0.6rem 1rem;
+  background: transparent;
+  border: none;
+  padding: 0.65rem 1.25rem;
   border-radius: 8px;
   cursor: pointer;
-  font-size: 0.85rem;
+  font-size: 0.9rem;
   font-weight: 600;
-  transition: all 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  color: var(--text-light);
+  position: relative;
+  white-space: nowrap;
+}
+
+.tab:hover {
+  background: rgba(0, 152, 255, 0.08);
+  color: var(--text-color);
 }
 
 .tab.active {
   background: var(--primary-color);
   color: white;
-  border-color: var(--primary-color);
-  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+  box-shadow: 0 4px 12px rgba(0, 152, 255, 0.25), 
+              0 2px 4px rgba(0, 152, 255, 0.15);
+  transform: translateY(-1px);
+}
+
+.tab.active:hover {
+  background: var(--primary-dark);
+  box-shadow: 0 6px 16px rgba(0, 152, 255, 0.3), 
+              0 2px 4px rgba(0, 152, 255, 0.2);
 }
 
 .readmePreview {
@@ -178,6 +206,613 @@
   margin-top: 1rem;
 }
 
+.dynamicItemRow {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+  align-items: center;
+  width: 100%;
+}
+
+.flagInput {
+  flex: 0 0 40%;
+  padding: 0.6rem 0.85rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  background: var(--bg-white);
+  color: var(--text-color);
+}
+
+.valueInput {
+  flex: 1;
+  padding: 0.6rem 0.85rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  background: var(--bg-white);
+  color: var(--text-color);
+}
+
+.flagInput::placeholder,
+.valueInput::placeholder {
+  color: var(--text-light);
+  opacity: 0.6;
+}
+
+.flagInput:focus,
+.valueInput:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+.deleteBtn {
+  flex: 0 0 auto;
+  padding: 0.6rem 0.8rem;
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.08) 0%, rgba(239, 68, 68, 0.05) 100%);
+  border: 1.5px solid rgba(220, 38, 38, 0.25);
+  border-radius: 8px;
+  color: #dc2626;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  overflow: hidden;
+  line-height: 1;
+  width: 36px;
+  height: 36px;
+  min-width: 36px;
+  padding: 0;
+}
+
+.deleteBtn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: #dc2626;
+  opacity: 0.15;
+  transform: translate(-50%, -50%);
+  transition: width 0.4s, height 0.4s;
+  z-index: 0;
+}
+
+.deleteBtn:hover::before {
+  width: 180px;
+  height: 180px;
+}
+
+.deleteBtn:hover {
+  background: linear-gradient(135deg, rgba(220, 38, 38, 0.15) 0%, rgba(239, 68, 68, 0.1) 100%);
+  color: #b91c1c;
+  border-color: rgba(220, 38, 38, 0.4);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+  transform: translateY(-2px);
+}
+
+.deleteBtn:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 6px rgba(220, 38, 38, 0.15);
+}
+
+.dynamicEnvRow {
+  display: flex;
+  gap: 0.75rem;
+  align-items: center;
+  width: 100%;
+  flex-wrap: wrap;
+}
+
+.headerCard {
+  background: var(--bg-light);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1rem;
+  margin-bottom: 1rem;
+  transition: all 0.2s ease;
+}
+
+.headerCard:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 2px 8px var(--shadow-light);
+}
+
+.inputDetailsRow {
+  display: flex;
+  gap: 0.75rem;
+  margin-top: 0.75rem;
+  padding-top: 0.75rem;
+  border-top: 1px dashed var(--border-light);
+}
+
+.inputNameField {
+  flex: 0 0 35%;
+  padding: 0.6rem 0.85rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  background: var(--bg-white);
+  color: var(--text-color);
+  font-family: 'Consolas', 'Monaco', monospace;
+}
+
+.inputDescField {
+  flex: 1;
+  padding: 0.6rem 0.85rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  background: var(--bg-white);
+  color: var(--text-color);
+}
+
+.inputNameField::placeholder,
+.inputDescField::placeholder {
+  color: var(--text-light);
+  opacity: 0.6;
+}
+
+.inputNameField:focus,
+.inputDescField:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+.keyInput {
+  flex: 0 0 28%;
+  padding: 0.6rem 0.85rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  background: var(--bg-white);
+  color: var(--text-color);
+}
+
+.keyInput::placeholder {
+  color: var(--text-light);
+  opacity: 0.6;
+}
+
+.keyInput:focus {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+.passwordToggle {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-color);
+  cursor: pointer;
+  user-select: none;
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  transition: all 0.2s ease;
+  background: transparent;
+}
+
+.passwordToggle:hover {
+  background: rgba(0, 152, 255, 0.05);
+}
+
+.passwordToggle input[type="checkbox"] {
+  width: 20px;
+  height: 20px;
+  cursor: pointer;
+  accent-color: var(--primary-color);
+  transition: all 0.2s ease;
+  position: relative;
+}
+
+.passwordToggle input[type="checkbox"]:hover {
+  transform: scale(1.1);
+}
+
+.passwordToggle input[type="checkbox"]:checked {
+  box-shadow: 0 0 8px rgba(0, 152, 255, 0.4);
+}
+
+.passwordToggle input[type="checkbox"]:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
+.importBtn {
+  padding: 0.75rem 1.25rem;
+  background: linear-gradient(135deg, rgba(147, 51, 234, 0.1) 0%, rgba(139, 92, 246, 0.05) 100%);
+  border: 2px solid #9333ea;
+  border-radius: 10px;
+  color: #9333ea;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-bottom: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 2px 8px rgba(147, 51, 234, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.importBtn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: #9333ea;
+  opacity: 0.1;
+  transform: translate(-50%, -50%);
+  transition: width 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+              height 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  z-index: 0;
+}
+
+.importBtn:hover::before {
+  width: 400px;
+  height: 400px;
+}
+
+.importBtn:hover {
+  background: linear-gradient(135deg, #9333ea 0%, #a855f7 100%);
+  color: white;
+  border-color: #9333ea;
+  box-shadow: 0 8px 20px rgba(147, 51, 234, 0.3);
+  transform: translateY(-2px);
+}
+
+.importBtn:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(147, 51, 234, 0.2);
+}
+
+.importBtn:focus-visible {
+  outline: 2px solid #9333ea;
+  outline-offset: 2px;
+}
+
+.addBtn {
+  padding: 0.75rem 1.25rem;
+  background: linear-gradient(135deg, var(--bg-light) 0%, var(--bg-white) 100%);
+  border: 2px solid var(--primary-color);
+  border-radius: 10px;
+  color: var(--primary-color);
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-bottom: 1rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  position: relative;
+  overflow: hidden;
+}
+
+.addBtn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: var(--primary-color);
+  opacity: 0.1;
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+  z-index: 0;
+}
+
+.addBtn:hover::before {
+  width: 300px;
+  height: 300px;
+}
+
+.addBtn:hover {
+  background: linear-gradient(135deg, var(--primary-color) 0%, rgba(0, 152, 255, 0.9) 100%);
+  color: white;
+  border-color: var(--primary-color);
+  box-shadow: 0 8px 20px rgba(0, 152, 255, 0.3);
+  transform: translateY(-2px);
+}
+
+.addBtn:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(0, 152, 255, 0.2);
+}
+
+.addBtn:focus-visible {
+  outline: 2px solid var(--primary-color);
+  outline-offset: 2px;
+}
+
 @media (max-width: 768px) {
   .ideCardsGrid { grid-template-columns: 1fr; }
+  
+  .dynamicItemRow {
+    flex-wrap: wrap;
+  }
+  
+  .flagInput {
+    flex: 0 0 45%;
+  }
+  
+  .dynamicEnvRow {
+    flex-wrap: wrap;
+  }
+  
+  .keyInput {
+    flex: 0 0 40%;
+  }
+  
+  .inputDetailsRow {
+    flex-direction: column;
+  }
+  
+  .inputNameField,
+  .inputDescField {
+    flex: 1 1 100%;
+  }
+  
+  .addBtn {
+    width: 100%;
+    justify-content: center;
+    padding: 0.8rem 1rem;
+  }
+  
+  .importBtn {
+    width: 100%;
+    justify-content: center;
+  }
 }
+
+/* Theme support for import button */
+.theme-dark .importBtn {
+  background: linear-gradient(135deg, rgba(168, 85, 247, 0.15) 0%, rgba(168, 85, 247, 0.08) 100%);
+  border-color: #a855f7;
+  color: #a855f7;
+}
+
+.theme-dark .importBtn:hover {
+  background: linear-gradient(135deg, #a855f7 0%, #c084fc 100%);
+  border-color: #a855f7;
+}
+
+.theme-light .importBtn {
+  background: linear-gradient(135deg, rgba(147, 51, 234, 0.08) 0%, rgba(139, 92, 246, 0.04) 100%);
+  border-color: #9333ea;
+  color: #9333ea;
+}
+
+.theme-light .importBtn:hover {
+  background: linear-gradient(135deg, #9333ea 0%, #a855f7 100%);
+  border-color: #9333ea;
+}
+
+/* Theme support for add buttons */
+.theme-dark .addBtn {
+  background: linear-gradient(135deg, rgba(36, 191, 165, 0.15) 0%, rgba(36, 191, 165, 0.08) 100%);
+}
+
+.theme-dark .addBtn:hover {
+  background: linear-gradient(135deg, #24bfa5 0%, rgba(36, 191, 165, 0.9) 100%);
+}
+
+.theme-light .addBtn {
+  background: linear-gradient(135deg, rgba(0, 152, 255, 0.08) 0%, rgba(0, 152, 255, 0.04) 100%);
+}
+
+.theme-light .addBtn:hover {
+  background: linear-gradient(135deg, #0098FF 0%, rgba(0, 152, 255, 0.9) 100%);
+}
+
+/* Theme support for tabs */
+.theme-dark .tab.active {
+  background: #24bfa5;
+  box-shadow: 0 4px 12px rgba(36, 191, 165, 0.3), 
+              0 2px 4px rgba(36, 191, 165, 0.2);
+}
+
+.theme-dark .tab.active:hover {
+  background: #1a9667;
+  box-shadow: 0 6px 16px rgba(36, 191, 165, 0.35), 
+              0 2px 4px rgba(36, 191, 165, 0.25);
+}
+
+.theme-light .tab.active {
+  background: #0098FF;
+  box-shadow: 0 4px 12px rgba(0, 152, 255, 0.25), 
+              0 2px 4px rgba(0, 152, 255, 0.15);
+}
+
+.theme-light .tab.active:hover {
+  background: #0077CC;
+  box-shadow: 0 6px 16px rgba(0, 152, 255, 0.3), 
+              0 2px 4px rgba(0, 152, 255, 0.2);
+}
+
+/* Modal Styles */
+.modalOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.7);
+  backdrop-filter: blur(4px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+  padding: 1rem;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.modalContent {
+  background: var(--bg-white);
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  max-width: 600px;
+  width: 100%;
+  max-height: 90vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  animation: slideUp 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes slideUp {
+  from {
+    transform: translateY(20px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.modalHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modalHeader h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.modalCloseBtn {
+  background: transparent;
+  border: none;
+  font-size: 1.5rem;
+  color: var(--text-light);
+  cursor: pointer;
+  padding: 0.25rem;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.modalCloseBtn:hover {
+  background: var(--bg-light);
+  color: var(--text-color);
+}
+
+.modalBody {
+  padding: 1.5rem;
+  overflow-y: auto;
+  flex: 1;
+}
+
+.modalBody p {
+  margin: 0 0 1rem 0;
+  color: var(--text-light);
+  font-size: 0.9rem;
+}
+
+.jsonTextarea {
+  width: 100%;
+  min-height: 300px;
+  padding: 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: 10px;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  background: var(--bg-light);
+  color: var(--text-color);
+  resize: vertical;
+  transition: border-color 0.2s ease;
+}
+
+.jsonTextarea:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(0, 152, 255, 0.1);
+}
+
+.jsonTextarea::placeholder {
+  color: var(--text-light);
+  opacity: 0.5;
+}
+
+.modalFooter {
+  display: flex;
+  gap: 0.75rem;
+  padding: 1.5rem;
+  border-top: 1px solid var(--border-color);
+  justify-content: flex-end;
+}
+
+.modalCancelBtn {
+  padding: 0.75rem 1.5rem;
+  background: var(--bg-light);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  color: var(--text-color);
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.modalCancelBtn:hover {
+  background: var(--bg-white);
+  border-color: var(--text-light);
+}
+
+.modalImportBtn {
+  padding: 0.75rem 1.5rem;
+  background: linear-gradient(135deg, #9333ea 0%, #a855f7 100%);
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 2px 8px rgba(147, 51, 234, 0.3);
+}
+
+.modalImportBtn:hover {
+  background: linear-gradient(135deg, #7e22ce 0%, #9333ea 100%);
+  box-shadow: 0 4px 12px rgba(147, 51, 234, 0.4);
+  transform: translateY(-1px);
+}
+
+.modalImportBtn:active {
+  transform: translateY(0);
+}
+

@@ -103,6 +103,29 @@ const encodeConfig = (config: MCPConfig): string => {
 - **`MCP_GUIDE.md`**: Educational content about MCP protocol (not used by app logic)
 - **`QUICKSTART.md`**: Quick setup guide
 - **`ICON-DESIGN.md`**: Custom icon design specifications
+- **`specs/`**: Technical specifications and implementation notes
+  - **`IMPLEMENTATION_NOTES.md`**: Detailed implementation details, recent updates, testing scenarios
+  - **`CSS_MODULES_MIGRATION_PLAN.md`**: CSS architecture migration documentation
+  - **`MULTI_PAGE_MIGRATION_PLAN.md`**: Multi-page app structure plans
+  - **`PACKAGES_PAGE_PLAN.md`**: Package badge page specifications
+  - **`SETTINGS_PAGE_PLAN.md`**: Settings page specifications
+
+## Implementation Documentation Guidelines
+When implementing significant features or changes:
+1. **Optional but Recommended**: Document implementation details in `specs/IMPLEMENTATION_NOTES.md`
+2. **What to Include**:
+   - Overview of changes and motivation
+   - New interfaces, types, or functions
+   - Configuration examples
+   - Testing scenarios
+   - Files modified
+   - Browser behavior notes
+3. **When to Document**:
+   - New features that change core functionality
+   - Complex implementations requiring context
+   - Breaking changes or major refactors
+   - Features that affect multiple files
+4. **Keep Updated**: Maintain the file with latest changes rather than creating separate docs
 
 ## Custom Branding
 - Custom SVG icons in `public/` (favicon.svg, icon.svg, icon-192.svg)

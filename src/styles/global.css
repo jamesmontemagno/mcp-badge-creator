@@ -534,4 +534,22 @@ footer {
 .copy-btn:active {
   transform: translateY(0);
 }
-.badge-preview { display: flex; flex-wrap: wrap; }
+.badge-preview { 
+  display: flex; 
+  flex-wrap: wrap; 
+  gap: 1rem;
+}
+
+.preview {
+  margin-bottom: 2rem;
+}
+
+.markdown-output,
+.json-output,
+.cli-output {
+  margin-bottom: 2rem;
+}
+
+.readme-preview {
+  margin-bottom: 2rem;
+}
