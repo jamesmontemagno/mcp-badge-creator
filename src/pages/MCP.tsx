@@ -113,6 +113,10 @@ function MCP() {
   
   // Standalone inputs (not tied to headers or env vars)
   const [standaloneInputs, setStandaloneInputs] = useState<StandaloneInput[]>([])
+  
+  // Import modal state
+  const [showImportModal, setShowImportModal] = useState(false)
+  const [importJsonText, setImportJsonText] = useState('')
 
   const generateConfig = (): MCPConfig => {
     const config: MCPConfig = {};
@@ -394,6 +398,190 @@ function MCP() {
         i === index ? { id, description, password } : input
       )
     );
+  }
+
+  const parseAndImportConfig = (content: string) => {
+    try {
+      const parsed = JSON.parse(content);
+      
+      // Extract server configuration
+      let serverConfig: any = null;
+      let extractedServerName = '';
+      let inputs: MCPInput[] = [];
+      
+      // Handle different formats
+      if (parsed.mcpServers) {
+        // Format: { "mcpServers": { "server-name": {...} } }
+        const firstServer = Object.keys(parsed.mcpServers)[0];
+        extractedServerName = firstServer;
+        serverConfig = parsed.mcpServers[firstServer];
+      } else if (parsed.servers) {
+        // Format: { "servers": { "server-name": {...} }, "inputs": [...] }
+        const firstServer = Object.keys(parsed.servers)[0];
+        extractedServerName = firstServer;
+        serverConfig = parsed.servers[firstServer];
+        inputs = parsed.inputs || [];
+      } else {
+        // Direct server config
+        serverConfig = parsed;
+      }
+
+      if (!serverConfig) {
+        alert('Could not parse configuration. Please check the file format.');
+        return false;
+      }
+
+      // Set server name
+      setServerName(extractedServerName || 'imported-server');
+
+      // Detect configuration type and populate fields
+      if (serverConfig.type === 'http') {
+        setConfigType('http');
+        setServerUrl(serverConfig.url || '');
+        
+        // Parse headers
+        if (serverConfig.headers) {
+          const headersList: DynamicHeader[] = [];
+          Object.entries(serverConfig.headers).forEach(([key, value]) => {
+            const isPassword = typeof value === 'string' && value.includes('${input:');
+            const inputMatch = isPassword ? (value as string).match(/\$\{input:([^}]+)\}/) : null;
+            const inputId = inputMatch ? inputMatch[1] : '';
+            const inputObj = inputs.find(inp => inp.id === inputId);
+            
+            headersList.push({
+              key,
+              value: isPassword ? '' : value as string,
+              password: isPassword,
+              inputName: inputId,
+              inputDescription: inputObj?.description || ''
+            });
+          });
+          setHttpHeaders(headersList);
+        }
+      } else if (serverConfig.command) {
+        // STDIO server
+        const cmd = serverConfig.command;
+        
+        // Detect type based on command
+        if (cmd === 'npx') {
+          setConfigType('npx');
+          setNpxPackage(serverConfig.args?.[1] || '');
+        } else if (cmd === 'uvx') {
+          setConfigType('uvx');
+          const args = serverConfig.args || [];
+          const fromIndex = args.indexOf('--from');
+          if (fromIndex !== -1 && args[fromIndex + 1]) {
+            setUvxFrom(args[fromIndex + 1]);
+            setUvxPackage(args[fromIndex + 2] || '');
+          } else {
+            setUvxPackage(args[0] || '');
+          }
+        } else if (cmd === 'dnx') {
+          setConfigType('dnx');
+          setDnxPackage(serverConfig.args?.[0] || '');
+        } else if (cmd === 'docker') {
+          setConfigType('docker');
+          const args = serverConfig.args || [];
+          const imageIndex = args.findIndex((arg: string) => !arg.startsWith('-') && arg !== 'run' && arg !== '-i' && arg !== '--rm');
+          setDockerImage(args[imageIndex] || '');
+        } else {
+          setConfigType('local');
+          setLocalCommand(cmd);
+          setLocalArgs(serverConfig.args?.join(', ') || '');
+        }
+        
+        // Parse environment variables
+        if (serverConfig.env) {
+          const envList: DynamicEnvVar[] = [];
+          Object.entries(serverConfig.env).forEach(([key, value]) => {
+            const isPassword = typeof value === 'string' && value.includes('${input:');
+            const inputMatch = isPassword ? (value as string).match(/\$\{input:([^}]+)\}/) : null;
+            const inputId = inputMatch ? inputMatch[1] : '';
+            const inputObj = inputs.find(inp => inp.id === inputId);
+            
+            envList.push({
+              key,
+              value: isPassword ? '' : value as string,
+              password: isPassword,
+              inputName: inputId,
+              inputDescription: inputObj?.description || ''
+            });
+          });
+          setDynamicEnv(prev => ({
+            ...prev,
+            [configType]: envList
+          }));
+        }
+      }
+      
+      // Parse standalone inputs (inputs not referenced in headers or env)
+      if (inputs.length > 0) {
+        const referencedInputIds = new Set<string>();
+        
+        // Collect all referenced input IDs from headers and env vars
+        if (serverConfig.headers) {
+          Object.values(serverConfig.headers).forEach(value => {
+            const match = typeof value === 'string' ? value.match(/\$\{input:([^}]+)\}/) : null;
+            if (match) referencedInputIds.add(match[1]);
+          });
+        }
+        if (serverConfig.env) {
+          Object.values(serverConfig.env).forEach(value => {
+            const match = typeof value === 'string' ? value.match(/\$\{input:([^}]+)\}/) : null;
+            if (match) referencedInputIds.add(match[1]);
+          });
+        }
+        
+        // Add unreferenced inputs as standalone
+        const standalone = inputs
+          .filter(input => !referencedInputIds.has(input.id))
+          .map(input => ({
+            id: input.id,
+            description: input.description,
+            password: input.password !== false
+          }));
+        
+        if (standalone.length > 0) {
+          setStandaloneInputs(standalone);
+        }
+      }
+
+      return true;
+      
+    } catch (error) {
+      console.error('Error parsing config:', error);
+      alert('Error parsing configuration. Please check the JSON format.');
+      return false;
+    }
+  }
+
+  const handleImportConfig = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const content = e.target?.result as string;
+      if (parseAndImportConfig(content)) {
+        alert('Configuration imported successfully!');
+      }
+    };
+
+    reader.readAsText(file);
+    event.target.value = ''; // Reset input
+  }
+
+  const handleImportFromText = () => {
+    if (!importJsonText.trim()) {
+      alert('Please paste your JSON configuration.');
+      return;
+    }
+
+    if (parseAndImportConfig(importJsonText)) {
+      alert('Configuration imported successfully!');
+      setShowImportModal(false);
+      setImportJsonText('');
+    }
   }
 
   const copyToClipboardWithState = async (text: string, setStateFn: (value: boolean) => void) => {
@@ -747,6 +935,33 @@ function MCP() {
           <h2>Configure Your MCP Server</h2>
           
           <div className={styles.sectionSpacer}></div>
+          
+          <div className="form-group">
+            <div className={styles.sectionHeader}>
+              <label>Import Configuration</label>
+            </div>
+            <p className="section-description">Have an existing mcp.json? Import it to auto-fill the form:</p>
+            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+              <label htmlFor="import-config" className={styles.importBtn}>
+                <span>📄</span> Upload File
+                <input
+                  id="import-config"
+                  type="file"
+                  accept=".json,application/json"
+                  onChange={handleImportConfig}
+                  style={{ display: 'none' }}
+                />
+              </label>
+              <button
+                type="button"
+                className={styles.importBtn}
+                onClick={() => setShowImportModal(true)}
+              >
+                <span>📋</span> Paste JSON
+              </button>
+            </div>
+            <small className="field-hint">Supports standard MCP configuration formats</small>
+          </div>
           
           <div className="form-group">
             <label htmlFor="serverName">Server Name *</label>
@@ -1572,6 +1787,53 @@ function MCP() {
         </div>
       </div>
       </div>
+      
+      {/* Import JSON Modal */}
+      {showImportModal && (
+        <div className={styles.modalOverlay} onClick={() => setShowImportModal(false)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h3>Import Configuration</h3>
+              <button 
+                className={styles.modalCloseBtn}
+                onClick={() => setShowImportModal(false)}
+                aria-label="Close"
+              >
+                ✕
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              <p>Paste your MCP JSON configuration below:</p>
+              <textarea
+                className={styles.jsonTextarea}
+                value={importJsonText}
+                onChange={(e) => setImportJsonText(e.target.value)}
+                placeholder={`{\n  "servers": {\n    "my-server": {\n      "command": "npx",\n      "args": ["-y", "package-name"]\n    }\n  }\n}`}
+                rows={12}
+              />
+            </div>
+            <div className={styles.modalFooter}>
+              <button
+                type="button"
+                className={styles.modalCancelBtn}
+                onClick={() => {
+                  setShowImportModal(false);
+                  setImportJsonText('');
+                }}
+              >
+                Cancel
+              </button>
+              <button
+                type="button"
+                className={styles.modalImportBtn}
+                onClick={handleImportFromText}
+              >
+                Import
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </>
   )
 }
