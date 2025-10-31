@@ -1,0 +1,183 @@
+/* MCP Page CSS Module */
+
+.mcpPage {
+  width: 100%;
+  max-width: 1250px;
+}
+
+.mcpHeader {
+  color: var(--header-text);
+  margin-bottom: 2.25rem;
+  max-width: 1250px;
+  width: 100%;
+}
+
+.mcpHeader h1 {
+  font-size: clamp(2rem, 5.5vw, 2.75rem);
+  line-height: 1.1;
+  margin: 0 0 1.25rem 0;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--header-text);
+}
+
+.eyebrow {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin: 0 0 0.85rem 0;
+  display: inline-block;
+  padding: 0.4rem 0.75rem 0.35rem;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+  color: var(--header-text);
+}
+
+.subtitle {
+  font-size: clamp(1rem, 1.85vw, 1.35rem);
+  max-width: 780px;
+  line-height: 1.45;
+  margin: 0;
+  font-weight: 500;
+  color: var(--header-text);
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 0.75rem;
+}
+
+.sectionDescription {
+  font-size: 0.85rem;
+  color: var(--text-light);
+  margin: 0 0 1rem 0;
+}
+
+.ideCardsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.ideCard { /* base defined in Card.module.css but duplicating for scope */
+  display: flex;
+  align-items: center;
+  padding: 1.25rem;
+  background: var(--bg-light);
+  border: 2px solid var(--border-color);
+  border-radius: 16px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+}
+
+.ideCard.active {
+  border-color: var(--primary-color);
+  box-shadow: 0 4px 16px var(--shadow-light);
+}
+
+.ideCardIcon {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 1.25rem;
+  flex-shrink: 0;
+  transition: all 0.3s ease;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  color: white;
+}
+
+.ideCardIconVscode { background: var(--vscode-blue); }
+.ideCardIconInsiders { background: var(--vscode-insiders-green); }
+.ideCardIconVs { background: var(--visual-studio-purple); }
+.ideCardIconCursor { background: #8B5CF6; }
+.ideCardIconGoose { background: var(--goose-green); }
+.ideCardIconLmStudio { background: #3B82F6; }
+
+.ideCardToggle {
+  width: 42px;
+  height: 26px;
+  border-radius: 20px;
+  background: var(--border-light);
+  display: flex;
+  align-items: center;
+  padding: 3px;
+  transition: all 0.3s ease;
+  margin-left: auto;
+}
+
+.ideCardToggle.checked {
+  background: var(--primary-color);
+}
+
+.toggleDot {
+  width: 20px;
+  height: 20px;
+  background: var(--bg-white);
+  border-radius: 50%;
+  transition: transform 0.3s ease;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+}
+
+.ideCardToggle.checked .toggleDot {
+  transform: translateX(16px);
+}
+
+.readmePlatformsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.75rem;
+}
+
+.platformCheckbox {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  color: var(--text-light);
+}
+
+.tabs {
+  display: flex;
+  gap: 0.75rem;
+  margin-bottom: 1.25rem;
+}
+
+.tab {
+  background: var(--bg-light);
+  border: 1px solid var(--border-color);
+  padding: 0.6rem 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 600;
+  transition: all 0.3s ease;
+}
+
+.tab.active {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+  box-shadow: 0 6px 18px rgba(0,0,0,0.15);
+}
+
+.readmePreview {
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 1.5rem;
+  box-shadow: 0 12px 30px var(--shadow-light);
+  margin-top: 1rem;
+}
+
+@media (max-width: 768px) {
+  .ideCardsGrid { grid-template-columns: 1fr; }
+}

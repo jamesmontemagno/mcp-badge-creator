@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react'
-import '../App.css'
+import { useState } from 'react'
+import styles from './MCP.module.css'
 
 type ConfigType = 'http' | 'docker' | 'local' | 'npx' | 'uvx' | 'dnx';
 
@@ -23,27 +23,31 @@ function MCP() {
   const [uvxPackage, setUvxPackage] = useState('')
   const [uvxFrom, setUvxFrom] = useState('')
   const [dnxPackage, setDnxPackage] = useState('')
+  // Badge generation platforms
   const [includeVSCode, setIncludeVSCode] = useState(true)
   const [includeVSCodeInsiders, setIncludeVSCodeInsiders] = useState(true)
   const [includeVisualStudio, setIncludeVisualStudio] = useState(true)
   const [includeCursor, setIncludeCursor] = useState(false)
   const [includeGoose, setIncludeGoose] = useState(false)
   const [includeLMStudio, setIncludeLMStudio] = useState(false)
-  // Additional platforms for README inclusion
-  const [includeAmp, setIncludeAmp] = useState(false)
-  const [includeClaudeCode, setIncludeClaudeCode] = useState(false)
-  const [includeClaudeDesktop, setIncludeClaudeDesktop] = useState(false)
-  const [includeCodex, setIncludeCodex] = useState(false)
-  const [includeGeminiCLI, setIncludeGeminiCLI] = useState(false)
-  const [includeOpenCode, setIncludeOpenCode] = useState(false)
-  const [includeQodoGen, setIncludeQodoGen] = useState(false)
-  const [includeWarp, setIncludeWarp] = useState(false)
-  const [includeWindsurf, setIncludeWindsurf] = useState(false)
+  // README inclusion platforms (separate from badge generation)
+  const [readmeVSCode, setReadmeVSCode] = useState(true)
+  const [readmeVSCodeInsiders, setReadmeVSCodeInsiders] = useState(true)
+  const [readmeVisualStudio, setReadmeVisualStudio] = useState(true)
+  const [readmeCursor, setReadmeCursor] = useState(false)
+  const [readmeGoose, setReadmeGoose] = useState(false)
+  const [readmeLMStudio, setReadmeLMStudio] = useState(false)
+  const [readmeAmp, setReadmeAmp] = useState(false)
+  const [readmeClaudeCode, setReadmeClaudeCode] = useState(false)
+  const [readmeClaudeDesktop, setReadmeClaudeDesktop] = useState(false)
+  const [readmeCodex, setReadmeCodex] = useState(false)
+  const [readmeGeminiCLI, setReadmeGeminiCLI] = useState(false)
+  const [readmeOpenCode, setReadmeOpenCode] = useState(false)
+  const [readmeQodoGen, setReadmeQodoGen] = useState(false)
+  const [readmeWarp, setReadmeWarp] = useState(false)
+  const [readmeWindsurf, setReadmeWindsurf] = useState(false)
   // Badge text customization
   const [badgeText, setBadgeText] = useState('Install in')
-  // Select all functionality
-  const [selectAllBadges, setSelectAllBadges] = useState(false)
-  const [selectAllReadme, setSelectAllReadme] = useState(false)
   const [copied, setCopied] = useState(false)
   const [copiedJson, setCopiedJson] = useState(false)
   const [copiedCli, setCopiedCli] = useState(false)
@@ -125,47 +129,6 @@ function MCP() {
     }
   }
 
-  const handleSelectAllBadges = (checked: boolean) => {
-    setSelectAllBadges(checked);
-    setIncludeVSCode(checked);
-    setIncludeVSCodeInsiders(checked);
-    setIncludeVisualStudio(checked);
-    setIncludeCursor(checked);
-    setIncludeGoose(checked);
-    setIncludeLMStudio(checked);
-  }
-
-  const handleSelectAllReadme = (checked: boolean) => {
-    setSelectAllReadme(checked);
-    setIncludeVSCode(checked);
-    setIncludeVSCodeInsiders(checked);
-    setIncludeVisualStudio(checked);
-    setIncludeCursor(checked);
-    setIncludeGoose(checked);
-    setIncludeLMStudio(checked);
-    setIncludeAmp(checked);
-    setIncludeClaudeCode(checked);
-    setIncludeClaudeDesktop(checked);
-    setIncludeCodex(checked);
-    setIncludeGeminiCLI(checked);
-    setIncludeOpenCode(checked);
-    setIncludeQodoGen(checked);
-    setIncludeWarp(checked);
-    setIncludeWindsurf(checked);
-  }
-
-  // Sync select all badges state with individual badge states
-  useEffect(() => {
-    const allBadgesSelected = includeVSCode && includeVSCodeInsiders && includeVisualStudio && includeCursor && includeGoose && includeLMStudio;
-    setSelectAllBadges(allBadgesSelected);
-  }, [includeVSCode, includeVSCodeInsiders, includeVisualStudio, includeCursor, includeGoose, includeLMStudio]);
-
-  // Sync select all readme state with individual readme states
-  useEffect(() => {
-    const allReadmeSelected = includeVSCode && includeVSCodeInsiders && includeVisualStudio && includeCursor && includeGoose && includeLMStudio && includeAmp && includeClaudeCode && includeClaudeDesktop && includeCodex && includeGeminiCLI && includeOpenCode && includeQodoGen && includeWarp && includeWindsurf;
-    setSelectAllReadme(allReadmeSelected);
-  }, [includeVSCode, includeVSCodeInsiders, includeVisualStudio, includeCursor, includeGoose, includeLMStudio, includeAmp, includeClaudeCode, includeClaudeDesktop, includeCodex, includeGeminiCLI, includeOpenCode, includeQodoGen, includeWarp, includeWindsurf]);
-
   const generateMarkdown = (): string => {
     if (!serverName) return '';
     
@@ -246,7 +209,7 @@ function MCP() {
     readmeContent += `\`\`\`js\n${jsonConfig}\n\`\`\`\n\n`;
     
     // VS Code section
-    if (includeVSCode) {
+    if (readmeVSCode) {
       readmeContent += `<details>\n<summary>VS Code</summary>\n\n`;
       readmeContent += `#### Click the button to install:\n\n`;
       const vscodeUrl = `https://vscode.dev/redirect/mcp/install?name=${encodeURIComponent(serverName)}&config=${encodeConfig(generateConfig())}`;
@@ -258,7 +221,7 @@ function MCP() {
     }
     
     // VS Code Insiders section
-    if (includeVSCodeInsiders) {
+    if (readmeVSCodeInsiders) {
       readmeContent += `<details>\n<summary>VS Code Insiders</summary>\n\n`;
       readmeContent += `#### Click the button to install:\n\n`;
       const vscodeInsidersUrl = `https://insiders.vscode.dev/redirect/mcp/install?name=${encodeURIComponent(serverName)}&config=${encodeConfig(generateConfig())}&quality=insiders`;
@@ -270,7 +233,7 @@ function MCP() {
     }
     
     // Visual Studio section
-    if (includeVisualStudio) {
+    if (readmeVisualStudio) {
       readmeContent += `<details>\n<summary>Visual Studio</summary>\n\n`;
       readmeContent += `#### Click the button to install:\n\n`;
       const vsUrl = `https://vs-open.link/mcp-install?${encodeConfig(generateConfig())}`;
@@ -298,7 +261,7 @@ function MCP() {
     }
     
     // Cursor section
-    if (includeCursor) {
+    if (readmeCursor) {
       readmeContent += `<details>\n<summary>Cursor</summary>\n\n`;
       readmeContent += `#### Click the button to install:\n\n`;
       const configWithName = { name: serverName, ...generateConfig() };
@@ -311,7 +274,7 @@ function MCP() {
     }
     
     // Goose section
-    if (includeGoose) {
+    if (readmeGoose) {
       readmeContent += `<details>\n<summary>Goose</summary>\n\n`;
       readmeContent += `#### Click the button to install:\n\n`;
       const configWithName = { name: serverName, ...generateConfig() };
@@ -324,7 +287,7 @@ function MCP() {
     }
     
     // LM Studio section
-    if (includeLMStudio) {
+    if (readmeLMStudio) {
       readmeContent += `<details>\n<summary>LM Studio</summary>\n\n`;
       readmeContent += `#### Click the button to install:\n\n`;
       const configWithName = { name: serverName, ...generateConfig() };
@@ -336,7 +299,7 @@ function MCP() {
     }
 
     // Additional platform sections
-    if (includeAmp) {
+    if (readmeAmp) {
       readmeContent += `<details>\n<summary>Amp</summary>\n\n`;
       readmeContent += `Add via the Amp VS Code extension settings screen or by updating your settings.json file:\n\n`;
       readmeContent += `\`\`\`json\n"amp.mcpServers": ${JSON.stringify({ [serverName]: generateConfig() }, null, 2).replace(/^{/, '').replace(/}$/, '')}\n\`\`\`\n\n`;
@@ -348,7 +311,7 @@ function MCP() {
       readmeContent += `</details>\n\n`;
     }
 
-    if (includeClaudeCode) {
+    if (readmeClaudeCode) {
       readmeContent += `<details>\n<summary>Claude Code</summary>\n\n`;
       readmeContent += `Use the Claude Code CLI to add the ${serverName} MCP server:\n\n`;
       const config = generateConfig();
@@ -360,12 +323,12 @@ function MCP() {
       readmeContent += `</details>\n\n`;
     }
 
-    if (includeClaudeDesktop) {
+    if (readmeClaudeDesktop) {
       readmeContent += `<details>\n<summary>Claude Desktop</summary>\n\n`;
       readmeContent += `Follow the MCP install [guide](https://modelcontextprotocol.io/quickstart/user), use the standard config above.\n</details>\n\n`;
     }
 
-    if (includeCodex) {
+    if (readmeCodex) {
       readmeContent += `<details>\n<summary>Codex</summary>\n\n`;
       readmeContent += `Create or edit the configuration file \`~/.codex/config.toml\` and add:\n\n`;
       const config = generateConfig();
@@ -382,12 +345,12 @@ function MCP() {
       readmeContent += `For more information, see the [Codex MCP documentation](https://github.com/openai/codex/blob/main/codex-rs/config.md#mcp_servers).\n</details>\n\n`;
     }
 
-    if (includeGeminiCLI) {
+    if (readmeGeminiCLI) {
       readmeContent += `<details>\n<summary>Gemini CLI</summary>\n\n`;
       readmeContent += `Follow the MCP install [guide](https://github.com/google-gemini/gemini-cli/blob/main/docs/tools/mcp-server.md#configure-the-mcp-server-in-settingsjson), use the standard config above.\n</details>\n\n`;
     }
 
-    if (includeOpenCode) {
+    if (readmeOpenCode) {
       readmeContent += `<details>\n<summary>OpenCode</summary>\n\n`;
       readmeContent += `Follow the MCP Servers [documentation](https://opencode.ai/docs/mcp-servers/). For example in \`~/.config/opencode/opencode.json\`:\n\n`;
       readmeContent += `\`\`\`json\n{\n  "$schema": "https://opencode.ai/config.json",\n  "mcp": {\n    "${serverName}": {\n      "type": "local",\n      "command": [\n`;
@@ -403,18 +366,18 @@ function MCP() {
       readmeContent += `\n      ],\n      "enabled": true\n    }\n  }\n}\n\`\`\`\n</details>\n\n`;
     }
 
-    if (includeQodoGen) {
+    if (readmeQodoGen) {
       readmeContent += `<details>\n<summary>Qodo Gen</summary>\n\n`;
       readmeContent += `Open [Qodo Gen](https://docs.qodo.ai/qodo-documentation/qodo-gen) chat panel in VSCode or IntelliJ → Connect more tools → + Add new MCP → Paste the standard config above.\n\nClick Save.\n</details>\n\n`;
     }
 
-    if (includeWarp) {
+    if (readmeWarp) {
       readmeContent += `<details>\n<summary>Warp</summary>\n\n`;
       readmeContent += `Go to \`Settings\` -> \`AI\` -> \`Manage MCP Servers\` -> \`+ Add\` to [add an MCP Server](https://docs.warp.dev/knowledge-and-collaboration/mcp#adding-an-mcp-server). Use the standard config above.\n\n`;
       readmeContent += `Alternatively, use the slash command \`/add-mcp\` in the Warp prompt and paste the standard config from above.\n</details>\n\n`;
     }
 
-    if (includeWindsurf) {
+    if (readmeWindsurf) {
       readmeContent += `<details>\n<summary>Windsurf</summary>\n\n`;
       readmeContent += `Follow Windsurf MCP [documentation](https://docs.windsurf.com/windsurf/cascade/mcp). Use the standard config above.\n</details>\n\n`;
     }
@@ -470,13 +433,16 @@ function MCP() {
   const markdown = generateMarkdown();
 
   return (
-    <div className="mcp-page container">
-      <header>
-        <h1>🎖️ MCP Badge Creator</h1>
-        <p className="subtitle">
+    <>
+      <header className={`${styles.mcpHeader} mcp-header`}>
+        <p className={`${styles.eyebrow} eyebrow`}>Model Context Protocol</p>
+        <h1>MCP Badge Creator</h1>
+        <p className={`${styles.subtitle} subtitle`}>
           Generate one-click install badges for your Model Context Protocol servers
         </p>
       </header>
+
+      <div className={`${styles.mcpPage} mcp-page container`}>
 
       <div className="content">
         <div className="form-section">
@@ -632,117 +598,97 @@ function MCP() {
           </div>
 
           <div className="form-group">
-            <div className="section-header">
+            <div className={styles.sectionHeader}>
               <label>Badge Generation</label>
-              <label className="select-all-toggle">
-                <input
-                  type="checkbox"
-                  checked={selectAllBadges}
-                  onChange={(e) => handleSelectAllBadges(e.target.checked)}
-                />
-                <span>Select All</span>
-              </label>
+              <button 
+                type="button"
+                className="copy-btn"
+                onClick={() => {
+                  const allSelected = includeVSCode && includeVSCodeInsiders && includeVisualStudio && 
+                                      includeCursor && includeGoose && includeLMStudio
+                  const newValue = !allSelected
+                  setIncludeVSCode(newValue)
+                  setIncludeVSCodeInsiders(newValue)
+                  setIncludeVisualStudio(newValue)
+                  setIncludeCursor(newValue)
+                  setIncludeGoose(newValue)
+                  setIncludeLMStudio(newValue)
+                }}
+              >
+                {includeVSCode && includeVSCodeInsiders && includeVisualStudio && 
+                 includeCursor && includeGoose && includeLMStudio ? 'Deselect All' : 'Select All'}
+              </button>
             </div>
             <p className="section-description">Select which platforms to generate one-click install badges for:</p>
-            <div className="ide-cards-grid">
+            <div className={`${styles.ideCardsGrid} ide-cards-grid`}>
               <div 
-                className={`ide-card ${includeVSCode ? 'active' : ''}`}
+                className={`${styles.ideCard} ide-card ${includeVSCode ? 'active' : ''}`}
                 onClick={() => setIncludeVSCode(!includeVSCode)}
               >
-                <div className="ide-card-icon" style={{ backgroundColor: '#0098FF' }}>
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M17.5 0l-11 11-4.5-4.5-2 2 6.5 6.5 13-13z"/>
-                  </svg>
-                </div>
                 <div className="ide-card-content">
                   <h4>VS Code</h4>
                 </div>
-                <div className={`ide-card-toggle ${includeVSCode ? 'checked' : ''}`}>
+                <div className={`${styles.ideCardToggle} ide-card-toggle ${includeVSCode ? 'checked' : ''}`}>
                   <div className="toggle-dot"></div>
                 </div>
               </div>
 
               <div 
-                className={`ide-card ${includeVSCodeInsiders ? 'active' : ''}`}
+                className={`${styles.ideCard} ide-card ${includeVSCodeInsiders ? 'active' : ''}`}
                 onClick={() => setIncludeVSCodeInsiders(!includeVSCodeInsiders)}
               >
-                <div className="ide-card-icon" style={{ backgroundColor: '#24bfa5' }}>
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M17.5 0l-11 11-4.5-4.5-2 2 6.5 6.5 13-13z"/>
-                  </svg>
-                </div>
                 <div className="ide-card-content">
                   <h4>VS Code Insiders</h4>
                 </div>
-                <div className={`ide-card-toggle ${includeVSCodeInsiders ? 'checked' : ''}`}>
+                <div className={`${styles.ideCardToggle} ide-card-toggle ${includeVSCodeInsiders ? 'checked' : ''}`}>
                   <div className="toggle-dot"></div>
                 </div>
               </div>
 
               <div 
-                className={`ide-card ${includeVisualStudio ? 'active' : ''}`}
+                className={`${styles.ideCard} ide-card ${includeVisualStudio ? 'active' : ''}`}
                 onClick={() => setIncludeVisualStudio(!includeVisualStudio)}
               >
-                <div className="ide-card-icon" style={{ backgroundColor: '#C16FDE' }}>
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M17.5 0l-11 11-4.5-4.5-2 2 6.5 6.5 13-13z"/>
-                  </svg>
-                </div>
                 <div className="ide-card-content">
                   <h4>Visual Studio</h4>
                 </div>
-                <div className={`ide-card-toggle ${includeVisualStudio ? 'checked' : ''}`}>
+                <div className={`${styles.ideCardToggle} ide-card-toggle ${includeVisualStudio ? 'checked' : ''}`}>
                   <div className="toggle-dot"></div>
                 </div>
               </div>
 
               <div 
-                className={`ide-card ${includeCursor ? 'active' : ''}`}
+                className={`${styles.ideCard} ide-card ${includeCursor ? 'active' : ''}`}
                 onClick={() => setIncludeCursor(!includeCursor)}
               >
-                <div className="ide-card-icon" style={{ backgroundColor: '#8B5CF6' }}>
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M17.5 0l-11 11-4.5-4.5-2 2 6.5 6.5 13-13z"/>
-                  </svg>
-                </div>
                 <div className="ide-card-content">
                   <h4>Cursor</h4>
                 </div>
-                <div className={`ide-card-toggle ${includeCursor ? 'checked' : ''}`}>
+                <div className={`${styles.ideCardToggle} ide-card-toggle ${includeCursor ? 'checked' : ''}`}>
                   <div className="toggle-dot"></div>
                 </div>
               </div>
 
               <div 
-                className={`ide-card ${includeGoose ? 'active' : ''}`}
+                className={`${styles.ideCard} ide-card ${includeGoose ? 'active' : ''}`}
                 onClick={() => setIncludeGoose(!includeGoose)}
               >
-                <div className="ide-card-icon" style={{ backgroundColor: '#10B981' }}>
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M17.5 0l-11 11-4.5-4.5-2 2 6.5 6.5 13-13z"/>
-                  </svg>
-                </div>
                 <div className="ide-card-content">
                   <h4>Goose</h4>
                 </div>
-                <div className={`ide-card-toggle ${includeGoose ? 'checked' : ''}`}>
+                <div className={`${styles.ideCardToggle} ide-card-toggle ${includeGoose ? 'checked' : ''}`}>
                   <div className="toggle-dot"></div>
                 </div>
               </div>
 
               <div 
-                className={`ide-card ${includeLMStudio ? 'active' : ''}`}
+                className={`${styles.ideCard} ide-card ${includeLMStudio ? 'active' : ''}`}
                 onClick={() => setIncludeLMStudio(!includeLMStudio)}
               >
-                <div className="ide-card-icon" style={{ backgroundColor: '#3B82F6' }}>
-                  <svg viewBox="0 0 24 24" fill="currentColor">
-                    <path d="M17.5 0l-11 11-4.5-4.5-2 2 6.5 6.5 13-13z"/>
-                  </svg>
-                </div>
                 <div className="ide-card-content">
                   <h4>LM Studio</h4>
                 </div>
-                <div className={`ide-card-toggle ${includeLMStudio ? 'checked' : ''}`}>
+                <div className={`${styles.ideCardToggle} ide-card-toggle ${includeLMStudio ? 'checked' : ''}`}>
                   <div className="toggle-dot"></div>
                 </div>
               </div>
@@ -750,79 +696,223 @@ function MCP() {
           </div>
 
           <div className="form-group">
-            <div className="section-header">
+            <div className={styles.sectionHeader}>
               <label>Include in README</label>
-              <label className="select-all-toggle">
-                <input
-                  type="checkbox"
-                  checked={selectAllReadme}
-                  onChange={(e) => handleSelectAllReadme(e.target.checked)}
-                />
-                <span>Select All</span>
-              </label>
+              <button 
+                type="button"
+                className="copy-btn"
+                onClick={() => {
+                  const allSelected = readmeVSCode && readmeVSCodeInsiders && readmeVisualStudio && 
+                                      readmeCursor && readmeGoose && readmeLMStudio &&
+                                      readmeAmp && readmeClaudeCode && readmeClaudeDesktop &&
+                                      readmeCodex && readmeGeminiCLI && readmeOpenCode &&
+                                      readmeQodoGen && readmeWarp && readmeWindsurf
+                  const newValue = !allSelected
+                  setReadmeVSCode(newValue)
+                  setReadmeVSCodeInsiders(newValue)
+                  setReadmeVisualStudio(newValue)
+                  setReadmeCursor(newValue)
+                  setReadmeGoose(newValue)
+                  setReadmeLMStudio(newValue)
+                  setReadmeAmp(newValue)
+                  setReadmeClaudeCode(newValue)
+                  setReadmeClaudeDesktop(newValue)
+                  setReadmeCodex(newValue)
+                  setReadmeGeminiCLI(newValue)
+                  setReadmeOpenCode(newValue)
+                  setReadmeQodoGen(newValue)
+                  setReadmeWarp(newValue)
+                  setReadmeWindsurf(newValue)
+                }}
+              >
+                {readmeVSCode && readmeVSCodeInsiders && readmeVisualStudio && 
+                 readmeCursor && readmeGoose && readmeLMStudio &&
+                 readmeAmp && readmeClaudeCode && readmeClaudeDesktop &&
+                 readmeCodex && readmeGeminiCLI && readmeOpenCode &&
+                 readmeQodoGen && readmeWarp && readmeWindsurf ? 'Deselect All' : 'Select All'}
+              </button>
             </div>
             <p className="section-description">Select platforms to include manual installation instructions in the README:</p>
-            <div className="readme-platforms-grid">
-              <label className="platform-checkbox">
-                <input type="checkbox" checked={includeVSCode} onChange={(e) => setIncludeVSCode(e.target.checked)} />
-                <span>VS Code</span>
-              </label>
-              <label className="platform-checkbox">
-                <input type="checkbox" checked={includeVSCodeInsiders} onChange={(e) => setIncludeVSCodeInsiders(e.target.checked)} />
-                <span>VS Code Insiders</span>
-              </label>
-              <label className="platform-checkbox">
-                <input type="checkbox" checked={includeVisualStudio} onChange={(e) => setIncludeVisualStudio(e.target.checked)} />
-                <span>Visual Studio</span>
-              </label>
-              <label className="platform-checkbox">
-                <input type="checkbox" checked={includeCursor} onChange={(e) => setIncludeCursor(e.target.checked)} />
-                <span>Cursor</span>
-              </label>
-              <label className="platform-checkbox">
-                <input type="checkbox" checked={includeGoose} onChange={(e) => setIncludeGoose(e.target.checked)} />
-                <span>Goose</span>
-              </label>
-              <label className="platform-checkbox">
-                <input type="checkbox" checked={includeLMStudio} onChange={(e) => setIncludeLMStudio(e.target.checked)} />
-                <span>LM Studio</span>
-              </label>
-              <label className="platform-checkbox">
-                <input type="checkbox" checked={includeAmp} onChange={(e) => setIncludeAmp(e.target.checked)} />
-                <span>Amp</span>
-              </label>
-              <label className="platform-checkbox">
-                <input type="checkbox" checked={includeClaudeCode} onChange={(e) => setIncludeClaudeCode(e.target.checked)} />
-                <span>Claude Code</span>
-              </label>
-              <label className="platform-checkbox">
-                <input type="checkbox" checked={includeClaudeDesktop} onChange={(e) => setIncludeClaudeDesktop(e.target.checked)} />
-                <span>Claude Desktop</span>
-              </label>
-              <label className="platform-checkbox">
-                <input type="checkbox" checked={includeCodex} onChange={(e) => setIncludeCodex(e.target.checked)} />
-                <span>Codex</span>
-              </label>
-              <label className="platform-checkbox">
-                <input type="checkbox" checked={includeGeminiCLI} onChange={(e) => setIncludeGeminiCLI(e.target.checked)} />
-                <span>Gemini CLI</span>
-              </label>
-              <label className="platform-checkbox">
-                <input type="checkbox" checked={includeOpenCode} onChange={(e) => setIncludeOpenCode(e.target.checked)} />
-                <span>OpenCode</span>
-              </label>
-              <label className="platform-checkbox">
-                <input type="checkbox" checked={includeQodoGen} onChange={(e) => setIncludeQodoGen(e.target.checked)} />
-                <span>Qodo Gen</span>
-              </label>
-              <label className="platform-checkbox">
-                <input type="checkbox" checked={includeWarp} onChange={(e) => setIncludeWarp(e.target.checked)} />
-                <span>Warp</span>
-              </label>
-              <label className="platform-checkbox">
-                <input type="checkbox" checked={includeWindsurf} onChange={(e) => setIncludeWindsurf(e.target.checked)} />
-                <span>Windsurf</span>
-              </label>
+            <div className={`${styles.ideCardsGrid} ide-cards-grid`}>
+              <div 
+                className={`${styles.ideCard} ide-card ${readmeVSCode ? 'active' : ''}`}
+                onClick={() => setReadmeVSCode(!readmeVSCode)}
+              >
+                <div className="ide-card-content">
+                  <h4>VS Code</h4>
+                </div>
+                <div className={`${styles.ideCardToggle} ide-card-toggle ${readmeVSCode ? 'checked' : ''}`}>
+                  <div className="toggle-dot"></div>
+                </div>
+              </div>
+
+              <div 
+                className={`${styles.ideCard} ide-card ${readmeVSCodeInsiders ? 'active' : ''}`}
+                onClick={() => setReadmeVSCodeInsiders(!readmeVSCodeInsiders)}
+              >
+                <div className="ide-card-content">
+                  <h4>VS Code Insiders</h4>
+                </div>
+                <div className={`${styles.ideCardToggle} ide-card-toggle ${readmeVSCodeInsiders ? 'checked' : ''}`}>
+                  <div className="toggle-dot"></div>
+                </div>
+              </div>
+
+              <div 
+                className={`${styles.ideCard} ide-card ${readmeVisualStudio ? 'active' : ''}`}
+                onClick={() => setReadmeVisualStudio(!readmeVisualStudio)}
+              >
+                <div className="ide-card-content">
+                  <h4>Visual Studio</h4>
+                </div>
+                <div className={`${styles.ideCardToggle} ide-card-toggle ${readmeVisualStudio ? 'checked' : ''}`}>
+                  <div className="toggle-dot"></div>
+                </div>
+              </div>
+
+              <div 
+                className={`${styles.ideCard} ide-card ${readmeCursor ? 'active' : ''}`}
+                onClick={() => setReadmeCursor(!readmeCursor)}
+              >
+                <div className="ide-card-content">
+                  <h4>Cursor</h4>
+                </div>
+                <div className={`${styles.ideCardToggle} ide-card-toggle ${readmeCursor ? 'checked' : ''}`}>
+                  <div className="toggle-dot"></div>
+                </div>
+              </div>
+
+              <div 
+                className={`${styles.ideCard} ide-card ${readmeGoose ? 'active' : ''}`}
+                onClick={() => setReadmeGoose(!readmeGoose)}
+              >
+                <div className="ide-card-content">
+                  <h4>Goose</h4>
+                </div>
+                <div className={`${styles.ideCardToggle} ide-card-toggle ${readmeGoose ? 'checked' : ''}`}>
+                  <div className="toggle-dot"></div>
+                </div>
+              </div>
+
+              <div 
+                className={`${styles.ideCard} ide-card ${readmeLMStudio ? 'active' : ''}`}
+                onClick={() => setReadmeLMStudio(!readmeLMStudio)}
+              >
+                <div className="ide-card-content">
+                  <h4>LM Studio</h4>
+                </div>
+                <div className={`${styles.ideCardToggle} ide-card-toggle ${readmeLMStudio ? 'checked' : ''}`}>
+                  <div className="toggle-dot"></div>
+                </div>
+              </div>
+
+              <div 
+                className={`${styles.ideCard} ide-card ${readmeAmp ? 'active' : ''}`}
+                onClick={() => setReadmeAmp(!readmeAmp)}
+              >
+                <div className="ide-card-content">
+                  <h4>Amp</h4>
+                </div>
+                <div className={`${styles.ideCardToggle} ide-card-toggle ${readmeAmp ? 'checked' : ''}`}>
+                  <div className="toggle-dot"></div>
+                </div>
+              </div>
+
+              <div 
+                className={`${styles.ideCard} ide-card ${readmeClaudeCode ? 'active' : ''}`}
+                onClick={() => setReadmeClaudeCode(!readmeClaudeCode)}
+              >
+                <div className="ide-card-content">
+                  <h4>Claude Code</h4>
+                </div>
+                <div className={`${styles.ideCardToggle} ide-card-toggle ${readmeClaudeCode ? 'checked' : ''}`}>
+                  <div className="toggle-dot"></div>
+                </div>
+              </div>
+
+              <div 
+                className={`${styles.ideCard} ide-card ${readmeClaudeDesktop ? 'active' : ''}`}
+                onClick={() => setReadmeClaudeDesktop(!readmeClaudeDesktop)}
+              >
+                <div className="ide-card-content">
+                  <h4>Claude Desktop</h4>
+                </div>
+                <div className={`${styles.ideCardToggle} ide-card-toggle ${readmeClaudeDesktop ? 'checked' : ''}`}>
+                  <div className="toggle-dot"></div>
+                </div>
+              </div>
+
+              <div 
+                className={`${styles.ideCard} ide-card ${readmeCodex ? 'active' : ''}`}
+                onClick={() => setReadmeCodex(!readmeCodex)}
+              >
+                <div className="ide-card-content">
+                  <h4>Codex</h4>
+                </div>
+                <div className={`${styles.ideCardToggle} ide-card-toggle ${readmeCodex ? 'checked' : ''}`}>
+                  <div className="toggle-dot"></div>
+                </div>
+              </div>
+
+              <div 
+                className={`${styles.ideCard} ide-card ${readmeGeminiCLI ? 'active' : ''}`}
+                onClick={() => setReadmeGeminiCLI(!readmeGeminiCLI)}
+              >
+                <div className="ide-card-content">
+                  <h4>Gemini CLI</h4>
+                </div>
+                <div className={`${styles.ideCardToggle} ide-card-toggle ${readmeGeminiCLI ? 'checked' : ''}`}>
+                  <div className="toggle-dot"></div>
+                </div>
+              </div>
+
+              <div 
+                className={`${styles.ideCard} ide-card ${readmeOpenCode ? 'active' : ''}`}
+                onClick={() => setReadmeOpenCode(!readmeOpenCode)}
+              >
+                <div className="ide-card-content">
+                  <h4>OpenCode</h4>
+                </div>
+                <div className={`${styles.ideCardToggle} ide-card-toggle ${readmeOpenCode ? 'checked' : ''}`}>
+                  <div className="toggle-dot"></div>
+                </div>
+              </div>
+
+              <div 
+                className={`${styles.ideCard} ide-card ${readmeQodoGen ? 'active' : ''}`}
+                onClick={() => setReadmeQodoGen(!readmeQodoGen)}
+              >
+                <div className="ide-card-content">
+                  <h4>Qodo Gen</h4>
+                </div>
+                <div className={`${styles.ideCardToggle} ide-card-toggle ${readmeQodoGen ? 'checked' : ''}`}>
+                  <div className="toggle-dot"></div>
+                </div>
+              </div>
+
+              <div 
+                className={`${styles.ideCard} ide-card ${readmeWarp ? 'active' : ''}`}
+                onClick={() => setReadmeWarp(!readmeWarp)}
+              >
+                <div className="ide-card-content">
+                  <h4>Warp</h4>
+                </div>
+                <div className={`${styles.ideCardToggle} ide-card-toggle ${readmeWarp ? 'checked' : ''}`}>
+                  <div className="toggle-dot"></div>
+                </div>
+              </div>
+
+              <div 
+                className={`${styles.ideCard} ide-card ${readmeWindsurf ? 'active' : ''}`}
+                onClick={() => setReadmeWindsurf(!readmeWindsurf)}
+              >
+                <div className="ide-card-content">
+                  <h4>Windsurf</h4>
+                </div>
+                <div className={`${styles.ideCardToggle} ide-card-toggle ${readmeWindsurf ? 'checked' : ''}`}>
+                  <div className="toggle-dot"></div>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -941,19 +1031,8 @@ function MCP() {
           )}
         </div>
       </div>
-
-      <footer>
-        <p>
-          Learn more about <a href="https://modelcontextprotocol.io" target="_blank" rel="noopener noreferrer">Model Context Protocol</a>
-        </p>
-        <p className="small">
-          Based on <a href="https://github.com/jamesmontemagno/MonkeyMCP/blob/main/.github/prompts/add-mcp-install-badges.md" target="_blank" rel="noopener noreferrer">MCP Badge Documentation</a>
-        </p>
-        <p className="small">
-          Created with <a href="https://code.visualstudio.com/" target="_blank" rel="noopener noreferrer">VS Code</a> and <a href="https://github.com/features/copilot" target="_blank" rel="noopener noreferrer">GitHub Copilot</a> • <a href="https://github.com/jamesmontemagno/mcp-badge-creator" target="_blank" rel="noopener noreferrer">View on GitHub</a>
-        </p>
-      </footer>
-    </div>
+      </div>
+    </>
   )
 }
 

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import type { FormEvent } from 'react'
-import '../App.css'
+import styles from './Packages.module.css'
 import { parsePackageInput, generatePackageBadges, getInstallCommands, type PackageManager } from '../utils/packageBadge'
 
 type CopyTarget = 'version' | 'downloads' | 'downloadsMonthly' | 'downloadsRecent' | 'combined' | 'commands'
@@ -154,18 +154,18 @@ function Packages() {
   const showMavenFields = manualManager === 'maven'
 
   return (
-    <div className="packages-page container">
-      <header className="packages-header">
-        <p className="eyebrow">Package Manager Badges</p>
+    <>
+      <header className={`${styles.packagesHeader} packages-header`}>
+        <p className={`${styles.eyebrow} eyebrow`}>Package Manager Badges</p>
         <h1>Create badges for package registries</h1>
-        <p className="subtitle">
-          Generate version and download badges for NPM, NuGet, PyPI, Maven Central, RubyGems, and Crates.io packages.
-          Paste a package URL or enter package details manually.
+        <p className={`${styles.subtitle} subtitle`}>
+          Generate version and download badges for NPM, PyPI, NuGet, Maven, RubyGems, and Crates.io packages
         </p>
       </header>
 
-      <form className="packages-form" onSubmit={handleGenerate}>
-        <div className="form-row">
+      <div className={`${styles.packagesPage} packages-page`}>
+      <form className={`${styles.packagesForm} packages-form`} onSubmit={handleGenerate}>
+        <div className={`${styles.formRow} form-row`}>
           <div className="form-group flex-grow">
             <label htmlFor="packageInput">Package URL or Name</label>
             <input
@@ -199,7 +199,7 @@ function Packages() {
         </div>
 
         {showMavenFields && (
-          <div className="maven-fields">
+          <div className={`${styles.mavenFields} maven-fields`}>
             <div className="form-group">
               <label htmlFor="groupId">Group ID</label>
               <input
@@ -232,10 +232,10 @@ function Packages() {
       {info && !error && <div className="form-alert success">{info}</div>}
 
       {badgeData && !error && (
-        <section className="packages-output" aria-live="polite">
-          <div className="packages-preview">
+        <section className={`${styles.packagesOutput} packages-output`} aria-live="polite">
+          <div className={`${styles.packagesPreview} packages-preview`}>
             <h2>Badge Preview</h2>
-            <div className="badge-preview-grid">
+            <div className={`${styles.badgePreviewGrid} badge-preview-grid`}>
               <a href={badgeData.packageUrl} target="_blank" rel="noopener noreferrer">
                 <img src={badgeData.version.imageUrl} alt="Version badge" />
               </a>
@@ -310,7 +310,7 @@ function Packages() {
             )}
           </div>
 
-          <div className="combined-section">
+          <div className={`${styles.combinedSection} combined-section`}>
             <article className="markdown-card">
               <header className="output-header">
                 <h3>Combined Markdown</h3>
@@ -328,7 +328,7 @@ function Packages() {
           </div>
 
           {commands.length > 0 && (
-            <div className="installation-section">
+            <div className={`${styles.installationSection} installation-section`}>
               <header className="output-header">
                 <h3>Installation Commands</h3>
                 <button type="button" className="copy-btn" onClick={() => handleCopy('commands')}>
@@ -344,7 +344,8 @@ function Packages() {
           )}
         </section>
       )}
-    </div>
+      </div>
+    </>
   )
 }
 

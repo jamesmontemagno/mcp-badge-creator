@@ -5,12 +5,11 @@ A Vite + React + TypeScript single-page application that generates one-click ins
 
 ## Architecture & Key Files
 
-### Single-Component React App
-- **`src/App.tsx`**: Entire application logic in one component (~400 lines)
-  - State management with `useState` for form fields
-  - Five config types: `http`, `npx`, `uvx`, `docker`, `local`
-  - Badge generation with URL encoding of JSON configs
-  - No external state management library - pure React hooks
+### Multi-Page React App (CSS Modules)
+- **Routing**: `App.tsx` provides shell + navigation; pages live in `src/pages/` (`Home`, `MCP`, `Extensions`, `Packages`, `Settings`).
+- **Styling**: Migrated from monolithic `App.css` to CSS Modules + design tokens.
+- **Server Config Logic**: Still centralized inside `MCP.tsx` for badge + README generation.
+- **Badge Utilities**: Extension + package badge helpers in `src/utils/`.
 
 ### Build & Deploy Pipeline
 - **Vite bundler**: Fast dev server and optimized production builds
@@ -159,6 +158,44 @@ Edit Shields.io URL parameters in `generateMarkdown()`:
 4. Update documentation if adding features
 5. Remember GitHub Actions will auto-deploy on push to main
 
+## CSS Architecture (Post-Migration)
+
+### Files & Layers
+- `src/styles/tokens.css`: Spacing, radii, shadows, brand colors, breakpoints.
+- `src/styles/themes.css`: Theme variable sets (light, dark, green, tron, pink).
+- `src/styles/utilities.css`: Flex/text/visibility utilities.
+- `src/styles/global.css`: Minimal global resets + legacy helper classes (`subtitle`, `container`).
+- `src/styles/components/*.module.css`: Reusable primitives (`Button`, `Card`, `Form`, `Badge`).
+- `src/pages/*/*.module.css`: Page‑specific layout & variants.
+- `App.module.css`: App chrome (nav/header/footer responsiveness).
+
+### Adding Styles
+1. Prefer component modules (`components/`) for reusable UI blocks.
+2. Page-only styles live in that page's `.module.css` file.
+3. Never hardcode colors; always use CSS variables.
+4. If a new brand/platform color is needed → add to `tokens.css`.
+5. Global selectors only if unavoidable (add in `global.css`).
+
+### Using CSS Modules
+```tsx
+import styles from './MyPage.module.css'
+<div className={styles.section}>...</div>
+// Composing:
+<button className={`${buttonStyles.btn} ${buttonStyles.btnPrimary}`}>Save</button>
+```
+
+### Accessibility Extras
+- Focus states: use `outline` in module class (`:focus-visible`).
+- Avoid removing outlines unless replaced with visible focus styling.
+
+### Testing Considerations
+- Playwright tests may still target legacy classNames (`home-card`, `nav-link`). Keep them in markup but styling can be module‑driven.
+- If removing a legacy class: update tests first.
+
+### Removing Styles
+- Delete unused selectors from page modules; do not leave empty rules.
+- Keep shared primitives lean—prefer extending via page classes instead of duplicating.
+
 ## CSS Theming Best Practices
 
 ### Critical: Always Use CSS Variables for Theme-Dependent Styles
@@ -261,13 +298,13 @@ After making CSS changes:
 4. Check card/component visibility in all themes
 5. Test mobile responsive design in all themes
 
-### Adding New CSS
-
-When adding new CSS classes or components:
-1. **ALWAYS** use CSS variables for colors, backgrounds, borders, shadows
-2. Test the new component in all themes before committing
-3. If a component needs theme-specific behavior, use theme class selectors
-4. Document any new CSS variables if you need to add them
+### Adding New CSS (Checklist)
+1. Use existing tokens & theme vars.
+2. Put reusable styles in `components/`.
+3. Page-specific layout stays in that page module.
+4. Test all 5 themes + mobile breakpoint.
+5. No hex literals (except pure white/black or logos).
+6. Update instructions if adding new design tokens.
 
 ### Opacity Best Practice
 
@@ -296,6 +333,13 @@ The ONLY acceptable use of hardcoded colors:
 - Fixed accent colors in gradients that are intentionally theme-independent
 
 
-## When documenting and creating memories at the end of a turn
-ALWAYS put the documents in the .vscode\memory folder
+## Quick Reference Summary
+- Badges: Generate via MCP / Extensions / Packages pages.
+- Config encoding: `encodeURIComponent(JSON.stringify(config))`.
+- IDE URLs: vscode.dev, insiders.vscode.dev, vs-open.link, cursor://, goose://, lmstudio://.
+- CLI commands: `code --add-mcp '<escaped-json>'` / `code-insiders --add-mcp '<escaped-json>'`.
+- Themes: Apply by toggling `theme-*` class on `<html>`.
+
+## Memory Protocol Reminder
+Record progress, decisions, and pending tasks into memory directory when relevant.
 

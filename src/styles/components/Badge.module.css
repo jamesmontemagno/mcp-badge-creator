@@ -1,0 +1,62 @@
+/* Badge Component Module */
+
+.badgePreview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sm);
+  align-items: center;
+}
+
+.badgePreview img {
+  height: 28px;
+}
+
+.markdownOutput,
+.configOutput {
+  margin-bottom: var(--space-lg);
+}
+
+.outputHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--space-md);
+}
+
+.outputHeader h3 {
+  margin: 0;
+  font-size: 1.25rem;
+  color: var(--text-color);
+}
+
+.markdownCard {
+  background: var(--bg-white);
+  border-radius: var(--radius-lg);
+  padding: 1.75rem;
+  box-shadow: var(--shadow-lg);
+  border: 1px solid var(--border-color);
+}
+
+.markdownCard pre {
+  background: var(--bg-light);
+  border: 2px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: var(--space-md);
+  overflow-x: auto;
+  margin: 0;
+}
+
+.markdownCard code {
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 0.9rem;
+  color: var(--text-color);
+  white-space: pre-wrap;
+  word-break: break-all;
+}
+
+.placeholder {
+  text-align: center;
+  color: var(--text-lighter);
+  padding: 3rem 1rem;
+  font-style: italic;
+}

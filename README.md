@@ -261,3 +261,28 @@ MIT License - feel free to use this tool for your projects!
 
 Made with ❤️ for the MCP community
 
+## 🧪 CSS Modules Migration Progress
+
+The project is undergoing a migration from a monolithic `App.css` (~1,945 lines) to a modular CSS Modules architecture with a global design system.
+
+### Phase Checklist
+
+- [x] Phase 1: Global design system (`tokens.css`, `themes.css`, `utilities.css`)
+- [x] Phase 2: External SVG icons (`chevron-down.svg`, `hamburger.svg`)
+- [x] Phase 3: Shared component modules (`Button`, `Card`, `Form`, `Badge`)
+- [x] Phase 4: App layout migration (`App.module.css`, refactor `App.tsx`)
+- [x] Phase 5: Home page migration (`Home.module.css`)
+- [x] Phase 6: Extensions page migration (`Extensions.module.css`)
+- [x] Phase 7: Complex pages migration (`MCP.module.css`, `Packages.module.css`, `Settings.module.css`)
+<!-- Duplicate checklist entries below removed after migration completion -->
+
+### Goals
+
+- Reduce stylesheet size and improve maintainability
+- Eliminate hardcoded colors and duplicated patterns
+- Standardize breakpoints (≤768px, 769–1024px, ≥1025px)
+- Introduce reusable component styling primitives
+- Preserve backward compatibility during migration (legacy class names kept temporarily for tests)
+
+Follow progress or contribute by checking the plan in `specs/CSS_MODULES_MIGRATION_PLAN.md`.
+
