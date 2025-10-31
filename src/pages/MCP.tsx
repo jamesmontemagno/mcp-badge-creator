@@ -405,7 +405,7 @@ function MCP() {
       const parsed = JSON.parse(content);
       
       // Extract server configuration
-      let serverConfig: any = null;
+      let serverConfig: MCPConfig | null = null;
       let extractedServerName = '';
       let inputs: MCPInput[] = [];
       
