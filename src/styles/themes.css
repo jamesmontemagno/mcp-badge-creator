@@ -139,3 +139,25 @@
   --footer-text: rgba(255, 255, 255, 0.9);
   --footer-border: rgba(255, 255, 255, 0.2);
 }
+
+/* Orange Theme - Warm and energetic aesthetic */
+.theme-orange {
+  --primary-color: #f97316;
+  --primary-dark: #ea580c;
+  --primary-darker: #c2410c;
+  --bg-gradient-start: #ea580c;
+  --bg-gradient-mid: #f97316;
+  --bg-gradient-end: #c2410c;
+  --text-color: #333;
+  --text-light: #666;
+  --text-lighter: #999;
+  --bg-white: white;
+  --bg-light: #fff7ed;
+  --border-color: #fed7aa;
+  --border-light: #fdba74;
+  --shadow-color: rgba(249, 115, 22, 0.2);
+  --shadow-light: rgba(249, 115, 22, 0.08);
+  --header-text: white;
+  --footer-text: rgba(255, 255, 255, 0.9);
+  --footer-border: rgba(255, 255, 255, 0.2);
+}

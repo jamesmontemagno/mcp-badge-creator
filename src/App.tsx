@@ -7,7 +7,7 @@ import Extensions from './pages/Extensions'
 import Packages from './pages/Packages'
 import Settings from './pages/Settings'
 
-type ThemeType = 'system' | 'light' | 'dark' | 'green' | 'tron' | 'pink'
+type ThemeType = 'system' | 'light' | 'dark' | 'green' | 'tron' | 'pink' | 'orange'
 
 const navItems = [
   { to: '/', label: 'Home', end: true },
@@ -29,7 +29,7 @@ function Layout() {
   useEffect(() => {
     const applyTheme = (themeName: ThemeType) => {
       // Remove all theme classes
-      document.documentElement.classList.remove('theme-light', 'theme-dark', 'theme-green', 'theme-tron', 'theme-pink')
+      document.documentElement.classList.remove('theme-light', 'theme-dark', 'theme-green', 'theme-tron', 'theme-pink', 'theme-orange')
       
       if (themeName === 'system') {
         // Use system preference
