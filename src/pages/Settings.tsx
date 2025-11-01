@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react'
 import { useOutletContext } from 'react-router-dom'
 import styles from './Settings.module.css'
 
-type ThemeType = 'system' | 'light' | 'dark' | 'green' | 'tron' | 'pink'
+type ThemeType = 'system' | 'light' | 'dark' | 'green' | 'tron' | 'pink' | 'orange'
 
 interface OutletContextType {
   theme: ThemeType
@@ -67,6 +67,7 @@ function Settings() {
               { value: 'green', label: 'Green', description: 'VS Code Insiders style' },
               { value: 'tron', label: 'Tron', description: 'Neon cyberpunk' },
               { value: 'pink', label: 'Pink', description: 'Vibrant and fun' },
+              { value: 'orange', label: 'Orange', description: 'Warm and energetic' },
             ].map((option) => (
               <label key={option.value} className={`${styles.themeOption} theme-option`}>
                 <input
