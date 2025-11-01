@@ -484,6 +484,64 @@
   outline-offset: 2px;
 }
 
+.resetBtn {
+  padding: 0.75rem 1.25rem;
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.05) 100%);
+  border: 2px solid #dc2626;
+  border-radius: 10px;
+  color: #dc2626;
+  cursor: pointer;
+  font-weight: 700;
+  font-size: 0.9rem;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  margin-bottom: 0.5rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 2px 8px rgba(220, 38, 38, 0.15);
+  position: relative;
+  overflow: hidden;
+}
+
+.resetBtn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: #dc2626;
+  opacity: 0.1;
+  transform: translate(-50%, -50%);
+  transition: width 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+              height 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  z-index: 0;
+}
+
+.resetBtn:hover::before {
+  width: 400px;
+  height: 400px;
+}
+
+.resetBtn:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  color: white;
+  border-color: #dc2626;
+  box-shadow: 0 8px 20px rgba(220, 38, 38, 0.3);
+  transform: translateY(-2px);
+}
+
+.resetBtn:active {
+  transform: translateY(0);
+  box-shadow: 0 4px 12px rgba(220, 38, 38, 0.2);
+}
+
+.resetBtn:focus-visible {
+  outline: 2px solid #dc2626;
+  outline-offset: 2px;
+}
+
 .addBtn {
   padding: 0.75rem 1.25rem;
   background: linear-gradient(135deg, var(--bg-light) 0%, var(--bg-white) 100%);
@@ -579,6 +637,11 @@
     width: 100%;
     justify-content: center;
   }
+  
+  .resetBtn {
+    width: 100%;
+    justify-content: center;
+  }
 }
 
 /* Theme support for import button */
@@ -602,6 +665,29 @@
 .theme-light .importBtn:hover {
   background: linear-gradient(135deg, #9333ea 0%, #a855f7 100%);
   border-color: #9333ea;
+}
+
+/* Theme support for reset button */
+.theme-dark .resetBtn {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.15) 0%, rgba(220, 38, 38, 0.08) 100%);
+  border-color: #ef4444;
+  color: #ef4444;
+}
+
+.theme-dark .resetBtn:hover {
+  background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+  border-color: #ef4444;
+}
+
+.theme-light .resetBtn {
+  background: linear-gradient(135deg, rgba(239, 68, 68, 0.08) 0%, rgba(220, 38, 38, 0.04) 100%);
+  border-color: #dc2626;
+  color: #dc2626;
+}
+
+.theme-light .resetBtn:hover {
+  background: linear-gradient(135deg, #dc2626 0%, #b91c1c 100%);
+  border-color: #dc2626;
 }
 
 /* Theme support for add buttons */

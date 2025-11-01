@@ -400,6 +400,72 @@ function MCP() {
     );
   }
 
+  const resetForm = () => {
+    if (!confirm('Are you sure you want to reset all fields? This action cannot be undone.')) {
+      return;
+    }
+
+    // Reset basic fields
+    setServerName('');
+    setConfigType('http');
+    setServerUrl('');
+    setDockerImage('');
+    setLocalCommand('node');
+    setLocalArgs('');
+    setNpxPackage('');
+    setUvxPackage('');
+    setUvxFrom('');
+    setDnxPackage('');
+    setBadgeText('Install in');
+
+    // Reset dynamic arguments and env vars
+    setDynamicArgs({
+      http: [],
+      docker: [],
+      local: [],
+      npx: [],
+      uvx: [],
+      dnx: []
+    });
+    setDynamicEnv({
+      http: [],
+      docker: [],
+      local: [],
+      npx: [],
+      uvx: [],
+      dnx: []
+    });
+
+    // Reset HTTP headers and standalone inputs
+    setHttpHeaders([]);
+    setStandaloneInputs([]);
+
+    // Reset badge generation platforms
+    setIncludeVSCode(true);
+    setIncludeVSCodeInsiders(true);
+    setIncludeVisualStudio(true);
+    setIncludeCursor(false);
+    setIncludeGoose(false);
+    setIncludeLMStudio(false);
+
+    // Reset README platforms
+    setReadmeVSCode(true);
+    setReadmeVSCodeInsiders(true);
+    setReadmeVisualStudio(true);
+    setReadmeCursor(false);
+    setReadmeGoose(false);
+    setReadmeLMStudio(false);
+    setReadmeAmp(false);
+    setReadmeClaudeCode(false);
+    setReadmeClaudeDesktop(false);
+    setReadmeCodex(false);
+    setReadmeGeminiCLI(false);
+    setReadmeOpenCode(false);
+    setReadmeQodoGen(false);
+    setReadmeWarp(false);
+    setReadmeWindsurf(false);
+  }
+
   const parseAndImportConfig = (content: string) => {
     try {
       const parsed = JSON.parse(content);
@@ -958,6 +1024,13 @@ function MCP() {
                 onClick={() => setShowImportModal(true)}
               >
                 <span>📋</span> Paste JSON
+              </button>
+              <button
+                type="button"
+                className={styles.resetBtn}
+                onClick={resetForm}
+              >
+                <span>🔄</span> Reset Form
               </button>
             </div>
             <small className="field-hint">Supports standard MCP configuration formats</small>
