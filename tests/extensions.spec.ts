@@ -3,7 +3,11 @@ import { test, expect } from '@playwright/test';
 test.describe('Extensions Page - URI Schema', () => {
   test.beforeEach(async ({ page }) => {
     // Navigate to the extensions page
-    await page.goto('http://localhost:5173/#/extensions');
+    await page.goto('http://localhost:5173/extensions');
+    
+    // Switch to manual entry mode since tests use manual input
+    const manualEntryBtn = page.locator('button', { hasText: 'Manual Entry' });
+    await manualEntryBtn.click();
   });
 
   test('should generate badges with vscode URI scheme for stable', async ({ page }) => {
