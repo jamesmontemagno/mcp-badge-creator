@@ -186,13 +186,20 @@ async function searchNuGet(query: string, limit: number = 10): Promise<PackageSe
 
 /**
  * Search RubyGems registry
+ * Note: RubyGems API doesn't support CORS, so we use allorigins.win as a proxy
  */
 async function searchRubyGems(query: string, limit: number = 10): Promise<PackageSearchResult[]> {
   try {
-    const response = await fetch(
-      `https://rubygems.org/api/v1/search.json?query=${encodeURIComponent(query)}`,
-      { mode: 'cors' }
-    )
+    // Use CORS proxy to access RubyGems API
+    const apiUrl = `https://rubygems.org/api/v1/search.json?query=${encodeURIComponent(query)}`
+    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}`
+    
+    const response = await fetch(proxyUrl, {
+      mode: 'cors',
+      headers: {
+        'Accept': 'application/json'
+      }
+    })
     
     if (!response.ok) {
       throw new Error(`RubyGems API error: ${response.status}`)
@@ -251,14 +258,20 @@ async function searchCrates(query: string, limit: number = 10): Promise<PackageS
 
 /**
  * Search Maven Central (limited functionality)
- * Maven Central search is complex and may not work due to CORS
+ * Note: Maven Central API doesn't support CORS, so we use allorigins.win as a proxy
  */
 async function searchMaven(query: string, limit: number = 10): Promise<PackageSearchResult[]> {
   try {
-    const response = await fetch(
-      `https://search.maven.org/solrsearch/select?q=${encodeURIComponent(query)}&rows=${limit}&wt=json`,
-      { mode: 'cors' }
-    )
+    // Use CORS proxy to access Maven Central API
+    const apiUrl = `https://search.maven.org/solrsearch/select?q=${encodeURIComponent(query)}&rows=${limit}&wt=json`
+    const proxyUrl = `https://api.allorigins.win/raw?url=${encodeURIComponent(apiUrl)}`
+    
+    const response = await fetch(proxyUrl, {
+      mode: 'cors',
+      headers: {
+        'Accept': 'application/json'
+      }
+    })
     
     if (!response.ok) {
       throw new Error(`Maven API error: ${response.status}`)
