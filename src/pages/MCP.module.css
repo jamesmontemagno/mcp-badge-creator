@@ -599,8 +599,20 @@
   outline-offset: 2px;
 }
 
+/* Import buttons grid layout */
+.importButtonsGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
 @media (max-width: 768px) {
   .ideCardsGrid { grid-template-columns: 1fr; }
+  
+  .importButtonsGrid {
+    grid-template-columns: 1fr;
+  }
   
   .dynamicItemRow {
     flex-wrap: wrap;
@@ -762,8 +774,9 @@
   background: var(--bg-white);
   border-radius: 16px;
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
-  max-width: 600px;
+  max-width: 700px;
   width: 100%;
+  min-height: 500px;
   max-height: 90vh;
   overflow: hidden;
   display: flex;
@@ -822,6 +835,8 @@
   padding: 1.5rem;
   overflow-y: auto;
   flex: 1;
+  min-height: 400px;
+  position: relative;
 }
 
 .modalBody p {
@@ -854,6 +869,29 @@
 .jsonTextarea::placeholder {
   color: var(--text-light);
   opacity: 0.5;
+}
+
+.searchInput {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: 10px;
+  font-size: 0.95rem;
+  background: var(--bg-light);
+  color: var(--text-color);
+  transition: border-color 0.2s ease;
+  margin-bottom: 0.5rem;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(0, 152, 255, 0.1);
+}
+
+.searchInput::placeholder {
+  color: var(--text-light);
+  opacity: 0.6;
 }
 
 .modalFooter {

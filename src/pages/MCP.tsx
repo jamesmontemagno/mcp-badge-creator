@@ -1,5 +1,8 @@
 import { useState } from 'react'
 import styles from './MCP.module.css'
+import MCPSearchDropdown from '../components/MCPSearchDropdown'
+import { parseRuntimeConfig } from '../utils/mcpRegistryApi'
+import type { MCPSearchResult } from '../utils/mcpRegistryApi'
 
 type ConfigType = 'http' | 'docker' | 'local' | 'npx' | 'uvx' | 'dnx';
 
@@ -117,6 +120,11 @@ function MCP() {
   // Import modal state
   const [showImportModal, setShowImportModal] = useState(false)
   const [importJsonText, setImportJsonText] = useState('')
+  
+  // Search registry state
+  const [showSearchModal, setShowSearchModal] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [showSearchDropdown, setShowSearchDropdown] = useState(false)
 
   const generateConfig = (): MCPConfig => {
     const config: MCPConfig = {};
@@ -650,6 +658,73 @@ function MCP() {
     }
   }
 
+  const handleSelectMCPServer = (server: MCPSearchResult) => {
+    // Set server name
+    setServerName(server.name || server.id)
+    
+    // Parse runtime config
+    const parsed = parseRuntimeConfig(server.runtime)
+    
+    if (parsed) {
+      // Set config type
+      setConfigType(parsed.configType)
+      
+      // Set type-specific fields
+      if (parsed.configType === 'http') {
+        setServerUrl(parsed.serverUrl || '')
+        
+        // Set headers if available
+        if (parsed.headers) {
+          const headersList: DynamicHeader[] = Object.entries(parsed.headers).map(([key, value]) => ({
+            key,
+            value: value as string,
+            password: false
+          }))
+          setHttpHeaders(headersList)
+        }
+      } else if (parsed.configType === 'npx') {
+        setNpxPackage(parsed.npxPackage || '')
+      } else if (parsed.configType === 'uvx') {
+        setUvxPackage(parsed.uvxPackage || '')
+        setUvxFrom(parsed.uvxFrom || '')
+      } else if (parsed.configType === 'dnx') {
+        setDnxPackage(parsed.dnxPackage || '')
+      } else if (parsed.configType === 'docker') {
+        setDockerImage(parsed.dockerImage || '')
+      } else if (parsed.configType === 'local') {
+        setLocalCommand(parsed.localCommand || 'node')
+        setLocalArgs(parsed.localArgs || '')
+      }
+      
+      // Set environment variables
+      if (parsed.env && parsed.configType !== 'http') {
+        const envList: DynamicEnvVar[] = Object.entries(parsed.env).map(([key, value]) => {
+          const strValue = value as string
+          // Check if value is a placeholder like ${token}
+          const isPasswordPlaceholder = /^\$\{[^}]+\}$/.test(strValue)
+          
+          return {
+            key,
+            value: isPasswordPlaceholder ? '' : strValue,
+            password: isPasswordPlaceholder,
+            inputName: isPasswordPlaceholder ? strValue.replace(/^\$\{|\}$/g, '') : undefined,
+            inputDescription: isPasswordPlaceholder ? `Enter ${key}` : undefined
+          }
+        })
+        setDynamicEnv(prev => ({
+          ...prev,
+          [parsed.configType]: envList
+        }))
+      }
+    }
+    
+    // Close search modal
+    setShowSearchModal(false)
+    setSearchQuery('')
+    
+    alert(`Configuration from "${server.name}" imported successfully! You can now customize it before generating badges.`)
+  }
+
   const copyToClipboardWithState = async (text: string, setStateFn: (value: boolean) => void) => {
     if (text) {
       await navigator.clipboard.writeText(text);
@@ -1007,7 +1082,14 @@ function MCP() {
               <label>Import Configuration</label>
             </div>
             <p className="section-description">Have an existing mcp.json? Import it to auto-fill the form:</p>
-            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <div className={styles.importButtonsGrid}>
+              <button
+                type="button"
+                className={styles.importBtn}
+                onClick={() => setShowSearchModal(true)}
+              >
+                <span>🔍</span> Search Registry
+              </button>
               <label htmlFor="import-config" className={styles.importBtn}>
                 <span>📄</span> Upload File
                 <input
@@ -1902,6 +1984,67 @@ function MCP() {
                 onClick={handleImportFromText}
               >
                 Import
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      
+      {/* Search Registry Modal */}
+      {showSearchModal && (
+        <div className={styles.modalOverlay} onClick={() => setShowSearchModal(false)}>
+          <div className={styles.modalContent} onClick={(e) => e.stopPropagation()}>
+            <div className={styles.modalHeader}>
+              <h3>Search MCP Registry</h3>
+              <button 
+                className={styles.modalCloseBtn}
+                onClick={() => setShowSearchModal(false)}
+                aria-label="Close"
+              >
+                ✕
+              </button>
+            </div>
+            <div className={styles.modalBody}>
+              <p>Search for MCP servers from the official registry:</p>
+              <div style={{ position: 'relative' }}>
+                <input
+                  type="text"
+                  className={styles.searchInput}
+                  value={searchQuery}
+                  onChange={(e) => {
+                    setSearchQuery(e.target.value)
+                    setShowSearchDropdown(e.target.value.length >= 2)
+                  }}
+                  onFocus={() => {
+                    if (searchQuery.length >= 2) {
+                      setShowSearchDropdown(true)
+                    }
+                  }}
+                  placeholder="Search by server name (e.g., filesystem, git, postgres)"
+                  autoFocus
+                />
+                <MCPSearchDropdown
+                  searchQuery={searchQuery}
+                  onSelectServer={handleSelectMCPServer}
+                  isVisible={showSearchDropdown}
+                  onClose={() => setShowSearchDropdown(false)}
+                />
+              </div>
+              <small className="field-hint">
+                Searches the official MCP registry at registry.modelcontextprotocol.io
+              </small>
+            </div>
+            <div className={styles.modalFooter}>
+              <button
+                type="button"
+                className={styles.modalCancelBtn}
+                onClick={() => {
+                  setShowSearchModal(false)
+                  setSearchQuery('')
+                  setShowSearchDropdown(false)
+                }}
+              >
+                Cancel
               </button>
             </div>
           </div>

@@ -16,7 +16,7 @@
   box-shadow: 0 12px 32px var(--shadow-color);
   max-height: 400px;
   overflow-y: auto;
-  z-index: 1000;
+  z-index: 1100;
   animation: slideDown 0.2s ease-out;
 }
 

@@ -334,3 +334,42 @@ interface StandaloneInput {
 - Compatible with all MCP server types
 - Max-width increased for better UX on large screens
 - Mobile-responsive design maintained throughout
+
+---
+
+## MCP Registry Search Feature (November 2, 2025)
+
+### Overview
+Implemented MCP registry search functionality to allow users to discover and import MCP server configurations directly from the official Model Context Protocol registry.
+
+### Files Changed
+- **New**: `src/utils/mcpRegistryApi.ts` (274 lines) - API client and parser
+- **New**: `src/components/MCPSearchDropdown.tsx` (158 lines) - Search component
+- **New**: `tests/mcp-search.spec.ts` (112 lines) - Test suite
+- **New**: `specs/MCP_REGISTRY_SEARCH.md` - Feature documentation
+- **Modified**: `src/pages/MCP.tsx` (+74 lines) - Integration
+- **Modified**: `src/pages/MCP.module.css` (+25 lines) - Styling
+
+### Technical Implementation
+- API endpoint: `https://registry.modelcontextprotocol.io/v0/servers`
+- Supports 6 config types: HTTP, NPX, UVX, DNX, Docker, Local
+- Debounced search (300ms) with keyboard navigation
+- Modal-based UI following existing patterns
+- Form auto-population with customization support
+
+### Testing & Quality
+- 6 Playwright tests written (pending browser installation)
+- ✅ Linting: Pass
+- ✅ Build: Success
+- ✅ CodeQL: No vulnerabilities
+- ✅ Code Review: 2 issues fixed
+
+### Known Limitations
+- MCP Registry API may not be publicly accessible yet
+- Implementation follows documented spec
+- Will work when API is available
+- Graceful error handling in place
+
+### User Flow
+1. Click "Search Registry" → 2. Search → 3. Select → 4. Customize → 5. Generate badges
+
