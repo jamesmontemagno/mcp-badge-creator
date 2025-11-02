@@ -1,12 +1,18 @@
 import { useState } from 'react'
-import type { FormEvent } from 'react'
+import type { FormEvent, ChangeEvent } from 'react'
 import styles from './Packages.module.css'
 import { parsePackageInput, generatePackageBadges, getInstallCommands, type PackageManager } from '../utils/packageBadge'
+import PackageSearchDropdown from '../components/PackageSearchDropdown'
 
 type CopyTarget = 'version' | 'downloads' | 'downloadsMonthly' | 'downloadsRecent' | 'combined' | 'commands'
+type InputMode = 'manual' | 'search'
+type Registry = 'npm' | 'pypi' | 'nuget' | 'rubygems' | 'crates' | 'maven'
 
 function Packages() {
   const [inputValue, setInputValue] = useState('')
+  const [inputMode, setInputMode] = useState<InputMode>('search')
+  const [searchQuery, setSearchQuery] = useState('')
+  const [showSearchDropdown, setShowSearchDropdown] = useState(false)
   const [manualManager, setManualManager] = useState<PackageManager | ''>('')
   const [groupId, setGroupId] = useState('')
   const [artifactId, setArtifactId] = useState('')
@@ -16,6 +22,9 @@ function Packages() {
   const [commands, setCommands] = useState<string[]>([])
   const [currentManager, setCurrentManager] = useState<PackageManager | null>(null)
   const [copiedTarget, setCopiedTarget] = useState<CopyTarget | null>(null)
+  const [selectedRegistries, setSelectedRegistries] = useState<Set<Registry>>(
+    new Set(['npm', 'nuget', 'rubygems', 'crates', 'maven'])
+  )
 
   const showCopyState = (target: CopyTarget) => {
     setCopiedTarget(target)
@@ -42,9 +51,95 @@ function Packages() {
     if (opts?.error) setError(null)
   }
 
+  const handleInputChange = (event: ChangeEvent<HTMLInputElement>) => {
+    const value = event.target.value
+    setInputValue(value)
+    
+    if (inputMode === 'search') {
+      setSearchQuery(value)
+      setShowSearchDropdown(value.trim().length > 0)
+    }
+  }
+
+  const handleSelectPackage = (packageName: string, registry: string) => {
+    setInputValue(packageName)
+    setSearchQuery('')
+    setShowSearchDropdown(false)
+    setInfo(`Selected: ${packageName} from ${registry.toUpperCase()}`)
+    
+    // Map registry to PackageManager type
+    const managerMap: Record<string, PackageManager> = {
+      npm: 'npm',
+      nuget: 'nuget',
+      pypi: 'pypi',
+      maven: 'maven',
+      rubygems: 'rubygems',
+      crates: 'crates'
+    }
+    
+    const manager = managerMap[registry]
+    
+    // For Maven packages, handle groupId:artifactId format
+    if (manager === 'maven') {
+      const parts = packageName.split(':')
+      if (parts.length === 2) {
+        setGroupId(parts[0])
+        setArtifactId(parts[1])
+        setManualManager('maven')
+        const badges = generatePackageBadges('maven', null, parts[0], parts[1])
+        const cmds = getInstallCommands('maven', null, parts[0], parts[1])
+        if (badges) {
+          setError(null)
+          setBadgeData(badges)
+          setCommands(cmds)
+          setCurrentManager('maven')
+        }
+      }
+    } else {
+      // For other package managers, generate badges automatically
+      setManualManager(manager)
+      const badges = generatePackageBadges(manager, packageName)
+      const cmds = getInstallCommands(manager, packageName)
+      if (badges) {
+        setError(null)
+        setBadgeData(badges)
+        setCommands(cmds)
+        setCurrentManager(manager)
+      }
+    }
+  }
+
+  const handleModeToggle = (mode: InputMode) => {
+    setInputMode(mode)
+    setInputValue('')
+    setSearchQuery('')
+    setShowSearchDropdown(false)
+    setError(null)
+    setInfo(null)
+    setBadgeData(null)
+    setGroupId('')
+    setArtifactId('')
+  }
+
+  const handleRegistryToggle = (registry: Registry) => {
+    setSelectedRegistries(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(registry)) {
+        // Don't allow deselecting all registries
+        if (newSet.size > 1) {
+          newSet.delete(registry)
+        }
+      } else {
+        newSet.add(registry)
+      }
+      return newSet
+    })
+  }
+
   const handleGenerate = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
     setCopiedTarget(null)
+    setShowSearchDropdown(false)
 
     // For Maven with manual input
     if (manualManager === 'maven' && groupId && artifactId) {
@@ -151,7 +246,7 @@ function Packages() {
     }
   }
 
-  const showMavenFields = manualManager === 'maven'
+  const showMavenFields = manualManager === 'maven' && inputMode === 'manual'
 
   return (
     <>
@@ -159,43 +254,110 @@ function Packages() {
         <p className={`${styles.eyebrow} eyebrow`}>Package Manager Badges</p>
         <h1>Create badges for package registries</h1>
         <p className={`${styles.subtitle} subtitle`}>
-          Generate version and download badges for NPM, PyPI, NuGet, Maven, RubyGems, and Crates.io packages
+          Search for packages or manually enter package names to generate version and download badges
         </p>
       </header>
 
       <div className={`${styles.packagesPage} packages-page`}>
       <form className={`${styles.packagesForm} packages-form`} onSubmit={handleGenerate}>
+        <div className={styles.inputModeToggle}>
+          <label className={styles.toggleLabel}>Input mode:</label>
+          <div className={styles.toggleButtons}>
+            <button
+              type="button"
+              className={inputMode === 'search' ? styles.toggleActive : ''}
+              onClick={() => handleModeToggle('search')}
+            >
+              🔍 Search
+            </button>
+            <button
+              type="button"
+              className={inputMode === 'manual' ? styles.toggleActive : ''}
+              onClick={() => handleModeToggle('manual')}
+            >
+              ✏️ Manual Entry
+            </button>
+          </div>
+        </div>
+
+        {inputMode === 'search' && (
+          <div className={styles.registryFilters}>
+            <label className={styles.filterLabel}>Search in:</label>
+            <div className={styles.checkboxGroup}>
+              {(['npm', 'nuget', 'rubygems', 'crates', 'maven'] as const).map(registry => (
+                <label key={registry} className={styles.checkboxLabel}>
+                  <input
+                    type="checkbox"
+                    checked={selectedRegistries.has(registry)}
+                    onChange={() => handleRegistryToggle(registry)}
+                    className={styles.checkbox}
+                  />
+                  <span className={styles.checkboxText}>
+                    {registry === 'npm' && 'NPM'}
+                    {registry === 'nuget' && 'NuGet'}
+                    {registry === 'rubygems' && 'RubyGems'}
+                    {registry === 'crates' && 'Crates.io'}
+                    {registry === 'maven' && 'Maven'}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className={`${styles.formRow} form-row`}>
           <div className="form-group flex-grow">
-            <label htmlFor="packageInput">Package URL or Name</label>
-            <input
-              id="packageInput"
-              type="text"
-              placeholder="e.g. https://www.npmjs.com/package/express or express"
-              value={inputValue}
-              onChange={event => setInputValue(event.target.value)}
-            />
+            <label htmlFor="packageInput">
+              {inputMode === 'search' ? 'Search for package' : 'Package URL or Name'}
+            </label>
+            <div style={{ position: 'relative' }}>
+              <input
+                id="packageInput"
+                type="text"
+                placeholder={
+                  inputMode === 'search'
+                    ? 'Start typing to search... (e.g., express, react, django)'
+                    : 'e.g. https://www.npmjs.com/package/express or express'
+                }
+                value={inputValue}
+                onChange={handleInputChange}
+                autoComplete="off"
+              />
+              {inputMode === 'search' && (
+                <PackageSearchDropdown
+                  searchQuery={searchQuery}
+                  selectedRegistries={selectedRegistries}
+                  onSelectPackage={handleSelectPackage}
+                  isVisible={showSearchDropdown}
+                  onClose={() => setShowSearchDropdown(false)}
+                />
+              )}
+            </div>
             <span className="field-hint">
-              Supports URLs from npmjs.com, nuget.org, pypi.org, central.sonatype.com, rubygems.org, crates.io
+              {inputMode === 'search'
+                ? 'Search across NPM, PyPI, NuGet, RubyGems, and Crates.io. Note: Search may not work in all browsers due to CORS restrictions. Use Manual Entry if search is unavailable.'
+                : 'Supports URLs from npmjs.com, nuget.org, pypi.org, central.sonatype.com, rubygems.org, crates.io'}
             </span>
           </div>
 
-          <div className="form-group">
-            <label htmlFor="packageManager">Package Manager</label>
-            <select
-              id="packageManager"
-              value={manualManager}
-              onChange={event => setManualManager(event.target.value as PackageManager | '')}
-            >
-              <option value="">Auto-detect</option>
-              <option value="npm">NPM</option>
-              <option value="nuget">NuGet</option>
-              <option value="pypi">PyPI</option>
-              <option value="maven">Maven Central</option>
-              <option value="rubygems">RubyGems</option>
-              <option value="crates">Crates.io</option>
-            </select>
-          </div>
+          {inputMode === 'manual' && (
+            <div className="form-group">
+              <label htmlFor="packageManager">Package Manager</label>
+              <select
+                id="packageManager"
+                value={manualManager}
+                onChange={event => setManualManager(event.target.value as PackageManager | '')}
+              >
+                <option value="">Auto-detect</option>
+                <option value="npm">NPM</option>
+                <option value="nuget">NuGet</option>
+                <option value="pypi">PyPI</option>
+                <option value="maven">Maven Central</option>
+                <option value="rubygems">RubyGems</option>
+                <option value="crates">Crates.io</option>
+              </select>
+            </div>
+          )}
         </div>
 
         {showMavenFields && (
@@ -223,9 +385,11 @@ function Packages() {
           </div>
         )}
 
-        <button type="submit" className="primary">
-          Generate badges
-        </button>
+        {inputMode === 'manual' && (
+          <button type="submit" className="primary">
+            Generate badges
+          </button>
+        )}
       </form>
 
       {error && <div className="form-alert error">{error}</div>}
