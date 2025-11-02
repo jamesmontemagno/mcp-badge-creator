@@ -80,30 +80,46 @@ export async function searchMCPServers(
     const servers: MCPSearchResult[] = []
     const results = Array.isArray(data) ? data : data.servers || []
 
-    for (const server of results.slice(0, limit)) {
+    for (const item of results.slice(0, limit)) {
+      // Handle the actual API response structure: { server: {...}, _meta: {...} }
+      const serverData = item.server || item
+      
       // Extract server information
-      const id = server.id || server.name || 'unknown'
-      const name = server.name || server.displayName || id
-      const description = server.description || server.shortDescription || ''
-      const version = server.version || server.latestVersion || ''
-      const tags = server.tags || server.categories || []
+      const id = serverData.name || serverData.id || 'unknown'
+      const name = serverData.name || serverData.displayName || id
+      const description = serverData.description || serverData.shortDescription || ''
+      const version = serverData.version || serverData.latestVersion || ''
+      const tags = serverData.tags || serverData.categories || []
 
-      // Extract runtime configuration
+      // Extract runtime configuration from remotes or runtime field
       let runtime: MCPServerRuntime | undefined
 
-      // Check for runtime configuration in various possible locations
-      if (server.runtime) {
-        runtime = server.runtime
-      } else if (server.config) {
-        runtime = server.config
-      } else if (server.command || server.url) {
+      // Check for remotes array (new API format)
+      if (serverData.remotes && Array.isArray(serverData.remotes) && serverData.remotes.length > 0) {
+        const remote = serverData.remotes[0]
+        
+        // Parse remote configuration
+        if (remote.type === 'streamable-http' || remote.type === 'http') {
+          runtime = {
+            type: 'http',
+            url: remote.url,
+            headers: remote.headers ? Object.fromEntries(
+              remote.headers.map((h: { name: string; value?: string }) => [h.name, h.value || ''])
+            ) : undefined
+          }
+        }
+      } else if (serverData.runtime) {
+        runtime = serverData.runtime
+      } else if (serverData.config) {
+        runtime = serverData.config
+      } else if (serverData.command || serverData.url) {
         runtime = {
-          command: server.command,
-          args: server.args,
-          env: server.env,
-          type: server.type,
-          url: server.url,
-          headers: server.headers
+          command: serverData.command,
+          args: serverData.args,
+          env: serverData.env,
+          type: serverData.type,
+          url: serverData.url,
+          headers: serverData.headers
         }
       }
 

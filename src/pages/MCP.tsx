@@ -1074,7 +1074,7 @@ function MCP() {
               <label>Import Configuration</label>
             </div>
             <p className="section-description">Have an existing mcp.json? Import it to auto-fill the form:</p>
-            <div style={{ display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
+            <div className={styles.importButtonsGrid}>
               <button
                 type="button"
                 className={styles.importBtn}

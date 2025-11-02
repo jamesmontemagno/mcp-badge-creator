@@ -14,7 +14,7 @@
   border: 1px solid var(--border-color);
   border-radius: 12px;
   box-shadow: 0 12px 32px var(--shadow-color);
-  max-height: 400px;
+  max-height: 480px;
   overflow-y: auto;
   z-index: 1000;
   animation: slideDown 0.2s ease-out;
