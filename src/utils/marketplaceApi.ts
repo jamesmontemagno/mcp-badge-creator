@@ -114,10 +114,10 @@ export async function searchExtensions(
     return extensions
   } catch (error) {
     console.error('Error searching marketplace:', error)
-    // Check if it's a CORS error
+    // Check if it's a network-related error
     if (error instanceof TypeError && error.message === 'Failed to fetch') {
       throw new Error(
-        'Unable to search marketplace. This feature requires a browser extension or proxy to bypass CORS restrictions.'
+        'Unable to connect to the marketplace. This may be due to network issues or CORS restrictions.'
       )
     }
     throw error

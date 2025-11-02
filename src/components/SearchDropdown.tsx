@@ -78,7 +78,7 @@ function SearchDropdown({ searchQuery, onSelectExtension, isVisible, onClose }: 
         break
       case 'ArrowUp':
         event.preventDefault()
-        setHighlightedIndex(prev => (prev > 0 ? prev - 1 : -1))
+        setHighlightedIndex(prev => (prev > 0 ? prev - 1 : 0))
         break
       case 'Enter':
         event.preventDefault()
@@ -119,7 +119,7 @@ function SearchDropdown({ searchQuery, onSelectExtension, isVisible, onClose }: 
         )}
 
         {showResults && (
-          <ul className={styles.searchResultsList}>
+          <ul className={styles.searchResultsList} role="listbox" aria-label="Extension search results">
             {results.map((result, index) => (
               <li
                 key={result.extensionId}
@@ -129,7 +129,6 @@ function SearchDropdown({ searchQuery, onSelectExtension, isVisible, onClose }: 
                 data-highlighted={highlightedIndex === index}
                 role="option"
                 aria-selected={highlightedIndex === index}
-                tabIndex={0}
               >
                 <div className={styles.resultHeader}>
                   <div className={styles.resultTitle}>
