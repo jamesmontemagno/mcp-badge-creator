@@ -55,6 +55,52 @@
   gap: 1.25rem;
 }
 
+.inputModeToggle {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.toggleLabel {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.toggleButtons {
+  display: flex;
+  gap: 0.5rem;
+  background: var(--bg-white);
+  border-radius: 8px;
+  padding: 0.25rem;
+  border: 1px solid var(--border-color);
+}
+
+.toggleButtons button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-color);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.toggleButtons button:hover {
+  background: var(--bg-light);
+}
+
+.toggleActive {
+  background: var(--primary-color) !important;
+  color: white !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
 .formRow { /* also in Form.module.css - duplicated for legacy layout */
   display: flex;
   flex-direction: column;
@@ -102,5 +148,21 @@
 }
 
 @media (max-width: 768px) {
-  .formRow { grid-template-columns: 1fr; }
+  .formRow { 
+    grid-template-columns: 1fr; 
+  }
+
+  .inputModeToggle {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .toggleButtons {
+    width: 100%;
+  }
+
+  .toggleButtons button {
+    flex: 1;
+  }
 }
