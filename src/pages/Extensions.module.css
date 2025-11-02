@@ -3,7 +3,8 @@
 .extensionsPage {
   background: var(--bg-white);
   border-radius: 20px;
-  padding: 2.25rem 2rem 2.75rem;
+  padding: 2.25rem 2rem;
+  min-height: 600px;
   box-shadow: 0 24px 45px var(--shadow-color);
   border: 1px solid var(--border-color);
   max-width: 1100px;
@@ -63,6 +64,52 @@
   justify-self: start;
 }
 
+.inputModeToggle {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding-bottom: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.toggleLabel {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.toggleButtons {
+  display: flex;
+  gap: 0.5rem;
+  background: var(--bg-white);
+  border-radius: 8px;
+  padding: 0.25rem;
+  border: 1px solid var(--border-color);
+}
+
+.toggleButtons button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-color);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.toggleButtons button:hover {
+  background: var(--bg-light);
+}
+
+.toggleActive {
+  background: var(--primary-color) !important;
+  color: white !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
 .extensionsOutput {
   display: grid;
   gap: 2rem;
@@ -95,8 +142,68 @@
   height: 36px;
 }
 
+.sortControl {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.sortLabel {
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text-color);
+  white-space: nowrap;
+}
+
+.sortSelect {
+  padding: 0.5rem 0.75rem;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  background: var(--bg-white);
+  color: var(--text-color);
+  font-size: 0.875rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.sortSelect:hover {
+  border-color: var(--primary-color);
+}
+
+.sortSelect:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(36, 191, 165, 0.1);
+}
+
 @media (max-width: 768px) {
   .extensionsPage {
-    padding: 1.75rem 1.25rem 2.25rem;
+    padding: 1.75rem 1.25rem;
+    min-height: 500px;
+  }
+
+  .inputModeToggle {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .toggleButtons {
+    width: 100%;
+  }
+
+  .toggleButtons button {
+    flex: 1;
+  }
+
+  .sortControl {
+    width: 100%;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .sortSelect {
+    width: 100%;
   }
 }
