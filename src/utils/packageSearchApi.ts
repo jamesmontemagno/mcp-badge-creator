@@ -283,11 +283,13 @@ async function searchMaven(query: string, limit: number = 10): Promise<PackageSe
  * Search all package registries simultaneously
  * @param query Search query
  * @param limitPerRegistry Maximum results per registry
+ * @param selectedRegistries Set of registries to search
  * @returns Grouped results by registry
  */
 export async function searchAllRegistries(
   query: string,
-  limitPerRegistry: number = 10
+  limitPerRegistry: number = 10,
+  selectedRegistries?: Set<string>
 ): Promise<GroupedSearchResults> {
   if (!query || query.trim().length === 0) {
     return {
@@ -301,19 +303,24 @@ export async function searchAllRegistries(
   }
   
   // Check cache first
-  const cached = getCachedResults(query)
+  const cacheKey = selectedRegistries 
+    ? `${query}:${Array.from(selectedRegistries).sort().join(',')}`
+    : query
+  const cached = getCachedResults(cacheKey)
   if (cached) {
     return cached
   }
   
-  // Search all registries in parallel
+  // Search all registries in parallel, only if selected
+  const shouldSearch = (registry: string) => !selectedRegistries || selectedRegistries.has(registry)
+  
   const [npm, pypi, nuget, rubygems, crates, maven] = await Promise.all([
-    searchNPM(query, limitPerRegistry),
-    searchPyPI(),
-    searchNuGet(query, limitPerRegistry),
-    searchRubyGems(query, limitPerRegistry),
-    searchCrates(query, limitPerRegistry),
-    searchMaven(query, limitPerRegistry)
+    shouldSearch('npm') ? searchNPM(query, limitPerRegistry) : Promise.resolve([]),
+    shouldSearch('pypi') ? searchPyPI() : Promise.resolve([]),
+    shouldSearch('nuget') ? searchNuGet(query, limitPerRegistry) : Promise.resolve([]),
+    shouldSearch('rubygems') ? searchRubyGems(query, limitPerRegistry) : Promise.resolve([]),
+    shouldSearch('crates') ? searchCrates(query, limitPerRegistry) : Promise.resolve([]),
+    shouldSearch('maven') ? searchMaven(query, limitPerRegistry) : Promise.resolve([])
   ])
   
   const results = {
@@ -326,7 +333,7 @@ export async function searchAllRegistries(
   }
   
   // Cache the results
-  setCachedResults(query, results)
+  setCachedResults(cacheKey, results)
   
   return results
 }

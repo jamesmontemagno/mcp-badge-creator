@@ -6,6 +6,7 @@ import PackageSearchDropdown from '../components/PackageSearchDropdown'
 
 type CopyTarget = 'version' | 'downloads' | 'downloadsMonthly' | 'downloadsRecent' | 'combined' | 'commands'
 type InputMode = 'manual' | 'search'
+type Registry = 'npm' | 'pypi' | 'nuget' | 'rubygems' | 'crates' | 'maven'
 
 function Packages() {
   const [inputValue, setInputValue] = useState('')
@@ -21,6 +22,9 @@ function Packages() {
   const [commands, setCommands] = useState<string[]>([])
   const [currentManager, setCurrentManager] = useState<PackageManager | null>(null)
   const [copiedTarget, setCopiedTarget] = useState<CopyTarget | null>(null)
+  const [selectedRegistries, setSelectedRegistries] = useState<Set<Registry>>(
+    new Set(['npm', 'nuget', 'rubygems', 'crates', 'maven'])
+  )
 
   const showCopyState = (target: CopyTarget) => {
     setCopiedTarget(target)
@@ -115,6 +119,21 @@ function Packages() {
     setBadgeData(null)
     setGroupId('')
     setArtifactId('')
+  }
+
+  const handleRegistryToggle = (registry: Registry) => {
+    setSelectedRegistries(prev => {
+      const newSet = new Set(prev)
+      if (newSet.has(registry)) {
+        // Don't allow deselecting all registries
+        if (newSet.size > 1) {
+          newSet.delete(registry)
+        }
+      } else {
+        newSet.add(registry)
+      }
+      return newSet
+    })
   }
 
   const handleGenerate = (event: FormEvent<HTMLFormElement>) => {
@@ -261,6 +280,31 @@ function Packages() {
           </div>
         </div>
 
+        {inputMode === 'search' && (
+          <div className={styles.registryFilters}>
+            <label className={styles.filterLabel}>Search in:</label>
+            <div className={styles.checkboxGroup}>
+              {(['npm', 'nuget', 'rubygems', 'crates', 'maven'] as const).map(registry => (
+                <label key={registry} className={styles.checkboxLabel}>
+                  <input
+                    type="checkbox"
+                    checked={selectedRegistries.has(registry)}
+                    onChange={() => handleRegistryToggle(registry)}
+                    className={styles.checkbox}
+                  />
+                  <span className={styles.checkboxText}>
+                    {registry === 'npm' && 'NPM'}
+                    {registry === 'nuget' && 'NuGet'}
+                    {registry === 'rubygems' && 'RubyGems'}
+                    {registry === 'crates' && 'Crates.io'}
+                    {registry === 'maven' && 'Maven'}
+                  </span>
+                </label>
+              ))}
+            </div>
+          </div>
+        )}
+
         <div className={`${styles.formRow} form-row`}>
           <div className="form-group flex-grow">
             <label htmlFor="packageInput">
@@ -282,6 +326,7 @@ function Packages() {
               {inputMode === 'search' && (
                 <PackageSearchDropdown
                   searchQuery={searchQuery}
+                  selectedRegistries={selectedRegistries}
                   onSelectPackage={handleSelectPackage}
                   isVisible={showSearchDropdown}
                   onClose={() => setShowSearchDropdown(false)}

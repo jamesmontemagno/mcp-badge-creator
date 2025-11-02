@@ -11,6 +11,7 @@ import {
 
 interface PackageSearchDropdownProps {
   searchQuery: string
+  selectedRegistries: Set<string>
   onSelectPackage: (packageName: string, registry: string) => void
   isVisible: boolean
   onClose: () => void
@@ -18,6 +19,7 @@ interface PackageSearchDropdownProps {
 
 function PackageSearchDropdown({ 
   searchQuery, 
+  selectedRegistries,
   onSelectPackage, 
   isVisible, 
   onClose 
@@ -54,7 +56,7 @@ function PackageSearchDropdown({
       setError(null)
 
       try {
-        const searchResults = await searchAllRegistries(searchQuery, 10)
+        const searchResults = await searchAllRegistries(searchQuery, 10, selectedRegistries)
         setResults(searchResults)
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Search failed. Please try again.'
@@ -68,7 +70,7 @@ function PackageSearchDropdown({
     // Debounce search by 300ms
     const timeoutId = setTimeout(performSearch, 300)
     return () => clearTimeout(timeoutId)
-  }, [searchQuery])
+  }, [searchQuery, selectedRegistries])
 
   // Handle click outside to close dropdown
   useEffect(() => {
