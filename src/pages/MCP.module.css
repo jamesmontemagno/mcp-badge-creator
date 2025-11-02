@@ -856,6 +856,29 @@
   opacity: 0.5;
 }
 
+.searchInput {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: 10px;
+  font-size: 0.95rem;
+  background: var(--bg-light);
+  color: var(--text-color);
+  transition: border-color 0.2s ease;
+  margin-bottom: 0.5rem;
+}
+
+.searchInput:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(0, 152, 255, 0.1);
+}
+
+.searchInput::placeholder {
+  color: var(--text-light);
+  opacity: 0.6;
+}
+
 .modalFooter {
   display: flex;
   gap: 0.75rem;
