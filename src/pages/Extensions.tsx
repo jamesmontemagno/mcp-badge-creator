@@ -12,7 +12,7 @@ function Extensions() {
   const [inputValue, setInputValue] = useState('')
   const [inputMode, setInputMode] = useState<InputMode>('search')
   const [searchQuery, setSearchQuery] = useState('')
-  const [sortBy, setSortBy] = useState<SortBy>('installs')
+  const [sortBy, setSortBy] = useState<SortBy>('relevance')
   const [showSearchDropdown, setShowSearchDropdown] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [info, setInfo] = useState<string | null>(null)
