@@ -193,6 +193,85 @@
   margin-top: 1.75rem;
 }
 
+.installationSection h2 {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-color);
+  margin: 0 0 0.5rem 0;
+}
+
+.installationSection .section-description {
+  font-size: 0.95rem;
+  color: var(--text-light);
+  margin: 0 0 1.25rem 0;
+}
+
+.combinedCommands {
+  margin-bottom: 2rem;
+}
+
+.combinedCommands .markdown-card {
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 1.75rem;
+  box-shadow: 0 12px 30px var(--shadow-light);
+}
+
+.combinedCommands h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin: 0;
+}
+
+.combinedCommands pre {
+  margin: 0;
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.commandGrid {
+  display: grid;
+  gap: 1.25rem;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+}
+
+.commandCard {
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 8px 20px var(--shadow-light);
+  transition: all 0.2s ease;
+}
+
+.commandCard:hover {
+  box-shadow: 0 12px 28px var(--shadow-color);
+  border-color: var(--primary-color);
+}
+
+.commandCard h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin: 0;
+}
+
+.commandCard pre {
+  margin: 0;
+  background: var(--bg-light);
+  padding: 1rem;
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+}
+
+.commandCard code {
+  font-size: 0.875rem;
+  line-height: 1.5;
+  color: var(--text-color);
+}
+
 .commandBlocks pre {
   margin: 0 0 0.75rem 0;
 }
@@ -224,5 +303,13 @@
   .checkboxGroup {
     flex-direction: column;
     gap: 0.75rem;
+  }
+
+  .commandGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .commandCard {
+    padding: 1.25rem;
   }
 }

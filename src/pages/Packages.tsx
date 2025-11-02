@@ -4,7 +4,7 @@ import styles from './Packages.module.css'
 import { parsePackageInput, generatePackageBadges, getInstallCommands, type PackageManager } from '../utils/packageBadge'
 import PackageSearchDropdown from '../components/PackageSearchDropdown'
 
-type CopyTarget = 'version' | 'downloads' | 'downloadsMonthly' | 'downloadsRecent' | 'combined' | 'commands'
+type CopyTarget = 'version' | 'versionPrerelease' | 'downloads' | 'downloadsMonthly' | 'downloadsRecent' | 'combined' | 'commands' | `command-${number}`
 type InputMode = 'manual' | 'search'
 type Registry = 'npm' | 'pypi' | 'nuget' | 'rubygems' | 'crates' | 'maven'
 
@@ -215,30 +215,61 @@ function Packages() {
     if (!badgeData) return
 
     let markdown = ''
-    switch (target) {
-      case 'version':
-        markdown = badgeData.version.markdown
-        break
-      case 'downloads':
-        markdown = badgeData.downloads?.markdown ?? ''
-        break
-      case 'downloadsMonthly':
-        markdown = badgeData.downloadsMonthly?.markdown ?? ''
-        break
-      case 'downloadsRecent':
-        markdown = badgeData.downloadsRecent?.markdown ?? ''
-        break
-      case 'combined': {
-        const parts = [badgeData.version.markdown]
-        if (badgeData.downloads) parts.push(badgeData.downloads.markdown)
-        if (badgeData.downloadsMonthly) parts.push(badgeData.downloadsMonthly.markdown)
-        if (badgeData.downloadsRecent) parts.push(badgeData.downloadsRecent.markdown)
-        markdown = parts.join('\n')
-        break
+    
+    // Handle individual command copying
+    if (target.startsWith('command-')) {
+      const commandIndex = parseInt(target.split('-')[1], 10)
+      const cmd = commands[commandIndex] || ''
+      // Remove the comment line (e.g., "# .NET CLI\n") from the command
+      const lines = cmd.split('\n')
+      markdown = lines[0].startsWith('#') 
+        ? lines.slice(1).join('\n').trim()
+        : cmd.trim()
+    } else {
+      switch (target) {
+        case 'version':
+          markdown = badgeData.version.markdown
+          break
+        case 'versionPrerelease':
+          markdown = badgeData.versionPrerelease?.markdown ?? ''
+          break
+        case 'downloads':
+          markdown = badgeData.downloads?.markdown ?? ''
+          break
+        case 'downloadsMonthly':
+          markdown = badgeData.downloadsMonthly?.markdown ?? ''
+          break
+        case 'downloadsRecent':
+          markdown = badgeData.downloadsRecent?.markdown ?? ''
+          break
+        case 'combined': {
+          const parts = [badgeData.version.markdown]
+          if (badgeData.versionPrerelease) parts.push(badgeData.versionPrerelease.markdown)
+          if (badgeData.downloads) parts.push(badgeData.downloads.markdown)
+          if (badgeData.downloadsMonthly) parts.push(badgeData.downloadsMonthly.markdown)
+          if (badgeData.downloadsRecent) parts.push(badgeData.downloadsRecent.markdown)
+          markdown = parts.join('\n')
+          break
+        }
+        case 'commands':
+          markdown = commands.map(cmd => {
+            // Format each command with proper markdown headings and code blocks
+            const lines = cmd.split('\n')
+            const titleLine = lines[0]
+            const title = titleLine.startsWith('#') 
+              ? titleLine.replace(/^#\s*/, '').trim()
+              : null
+            const codeContent = titleLine.startsWith('#') 
+              ? lines.slice(1).join('\n').trim()
+              : cmd.trim()
+            
+            if (title) {
+              return `### ${title}\n\`\`\`bash\n${codeContent}\n\`\`\``
+            }
+            return `\`\`\`bash\n${codeContent}\n\`\`\``
+          }).join('\n\n')
+          break
       }
-      case 'commands':
-        markdown = commands.join('\n\n')
-        break
     }
 
     if (markdown) {
@@ -403,6 +434,11 @@ function Packages() {
               <a href={badgeData.packageUrl} target="_blank" rel="noopener noreferrer">
                 <img src={badgeData.version.imageUrl} alt="Version badge" />
               </a>
+              {badgeData.versionPrerelease && (
+                <a href={badgeData.packageUrl} target="_blank" rel="noopener noreferrer">
+                  <img src={badgeData.versionPrerelease.imageUrl} alt="Prerelease version badge" />
+                </a>
+              )}
               {badgeData.downloads && (
                 <a href={badgeData.packageUrl} target="_blank" rel="noopener noreferrer">
                   <img src={badgeData.downloads.imageUrl} alt="Downloads badge" />
@@ -436,6 +472,18 @@ function Packages() {
               </header>
               <pre><code>{badgeData.version.markdown}</code></pre>
             </article>
+
+            {badgeData.versionPrerelease && (
+              <article className="markdown-card">
+                <header className="output-header">
+                  <h3>Prerelease Version</h3>
+                  <button type="button" className="copy-btn" onClick={() => handleCopy('versionPrerelease')}>
+                    {copiedTarget === 'versionPrerelease' ? '✅ Copied!' : '📋 Copy'}
+                  </button>
+                </header>
+                <pre><code>{badgeData.versionPrerelease.markdown}</code></pre>
+              </article>
+            )}
 
             {badgeData.downloads && (
               <article className="markdown-card">
@@ -484,6 +532,7 @@ function Packages() {
               </header>
               <pre><code>{[
                 badgeData.version.markdown,
+                badgeData.versionPrerelease?.markdown,
                 badgeData.downloads?.markdown,
                 badgeData.downloadsMonthly?.markdown,
                 badgeData.downloadsRecent?.markdown
@@ -493,16 +542,70 @@ function Packages() {
 
           {commands.length > 0 && (
             <div className={`${styles.installationSection} installation-section`}>
-              <header className="output-header">
-                <h3>Installation Commands</h3>
-                <button type="button" className="copy-btn" onClick={() => handleCopy('commands')}>
-                  {copiedTarget === 'commands' ? '✅ Copied!' : '📋 Copy'}
-                </button>
-              </header>
-              <div className="command-blocks">
-                {commands.map((cmd, index) => (
-                  <pre key={index}><code>{cmd}</code></pre>
-                ))}
+              <h2>Installation Commands</h2>
+              <p className="section-description">
+                Choose your preferred installation method:
+              </p>
+              
+              <div className={`${styles.combinedCommands} combined-commands`}>
+                <article className="markdown-card">
+                  <header className="output-header">
+                    <h3>Combined README Format</h3>
+                    <button 
+                      type="button" 
+                      className="copy-btn" 
+                      onClick={() => handleCopy('commands')}
+                    >
+                      {copiedTarget === 'commands' ? '✅ Copied!' : '📋 Copy All'}
+                    </button>
+                  </header>
+                  <pre><code>{commands.map(cmd => {
+                    // Format each command with proper markdown
+                    const lines = cmd.split('\n')
+                    const titleLine = lines[0]
+                    const title = titleLine.startsWith('#') 
+                      ? titleLine.replace(/^#\s*/, '').trim()
+                      : null
+                    const codeContent = titleLine.startsWith('#') 
+                      ? lines.slice(1).join('\n').trim()
+                      : cmd.trim()
+                    
+                    if (title) {
+                      return `### ${title}\n\`\`\`bash\n${codeContent}\n\`\`\``
+                    }
+                    return `\`\`\`bash\n${codeContent}\n\`\`\``
+                  }).join('\n\n')}</code></pre>
+                </article>
+              </div>
+
+              <div className={styles.commandGrid}>
+                {commands.map((cmd, index) => {
+                  // Extract the title from the comment (e.g., "# .NET CLI" -> ".NET CLI")
+                  const lines = cmd.split('\n')
+                  const titleLine = lines[0]
+                  const title = titleLine.startsWith('#') 
+                    ? titleLine.replace(/^#\s*/, '').trim()
+                    : `Option ${index + 1}`
+                  const codeContent = titleLine.startsWith('#') 
+                    ? lines.slice(1).join('\n').trim()
+                    : cmd.trim()
+                  
+                  return (
+                    <article key={index} className={`${styles.commandCard} markdown-card`}>
+                      <header className="output-header">
+                        <h3>{title}</h3>
+                        <button 
+                          type="button" 
+                          className="copy-btn" 
+                          onClick={() => handleCopy(`command-${index}` as CopyTarget)}
+                        >
+                          {copiedTarget === `command-${index}` ? '✅ Copied!' : '📋 Copy'}
+                        </button>
+                      </header>
+                      <pre><code>{codeContent}</code></pre>
+                    </article>
+                  )
+                })}
               </div>
             </div>
           )}

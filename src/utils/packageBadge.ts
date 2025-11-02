@@ -16,6 +16,10 @@ export interface BadgeSet {
     markdown: string;
     imageUrl: string;
   };
+  versionPrerelease?: {
+    markdown: string;
+    imageUrl: string;
+  };
   downloads?: {
     markdown: string;
     imageUrl: string;
@@ -173,12 +177,17 @@ export function generatePackageBadges(
     case 'nuget': {
       if (!packageId) return null;
       const versionUrl = `https://img.shields.io/nuget/v/${packageId}?style=${style}&logo=nuget`;
+      const prereleaseUrl = `https://img.shields.io/nuget/vpre/${packageId}?style=${style}&logo=nuget&label=prerelease`;
       const downloadsUrl = `https://img.shields.io/nuget/dt/${packageId}?style=${style}&logo=nuget&label=downloads`;
       
       return {
         version: {
           markdown: `[![NuGet version](${versionUrl})](https://www.nuget.org/packages/${packageId})`,
           imageUrl: versionUrl
+        },
+        versionPrerelease: {
+          markdown: `[![NuGet prerelease](${prereleaseUrl})](https://www.nuget.org/packages/${packageId})`,
+          imageUrl: prereleaseUrl
         },
         downloads: {
           markdown: `[![NuGet downloads](${downloadsUrl})](https://www.nuget.org/packages/${packageId})`,
@@ -289,8 +298,11 @@ export function getInstallCommands(
 
     case 'nuget':
       return packageId ? [
-        `dotnet add package ${packageId}`,
-        `Install-Package ${packageId}`
+        `# .NET CLI\ndotnet add package ${packageId}`,
+        `# Package Manager\nInstall-Package ${packageId}`,
+        `# PackageReference\n<PackageReference Include="${packageId}" Version="*" />`,
+        `# Paket CLI\npaket add ${packageId}`,
+        `# Script & Interactive\n#r "nuget: ${packageId}, *"`
       ] : [];
 
     case 'pypi':
