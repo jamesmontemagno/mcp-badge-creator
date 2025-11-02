@@ -776,7 +776,8 @@
   box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
   max-width: 700px;
   width: 100%;
-  max-height: 85vh;
+  min-height: 500px;
+  max-height: 90vh;
   overflow: hidden;
   display: flex;
   flex-direction: column;
@@ -834,6 +835,8 @@
   padding: 1.5rem;
   overflow-y: auto;
   flex: 1;
+  min-height: 400px;
+  position: relative;
 }
 
 .modalBody p {

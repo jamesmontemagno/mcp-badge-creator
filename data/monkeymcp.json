@@ -1,0 +1,36 @@
+{
+    "servers": [
+        {
+            "server": {
+                "$schema": "https://static.modelcontextprotocol.io/schemas/2025-09-29/server.schema.json",
+                "name": "io.github.jamesmontemagno/monkeymcp",
+                "description": "MCP server providing monkey data, journeys, and location services for various monkey species.",
+                "repository": {
+                    "url": "https://github.com/jamesmontemagno/monkeymcp",
+                    "source": "github"
+                },
+                "version": "2.0.3",
+                "packages": [
+                    {
+                        "registryType": "oci",
+                        "identifier": "docker.io/jamesmontemagno/monkeymcp:2.0.3",
+                        "transport": {
+                            "type": "stdio"
+                        }
+                    }
+                ]
+            },
+            "_meta": {
+                "io.modelcontextprotocol.registry/official": {
+                    "status": "active",
+                    "publishedAt": "2025-10-07T23:03:40.813346Z",
+                    "updatedAt": "2025-10-07T23:03:40.813346Z",
+                    "isLatest": true
+                }
+            }
+        }
+    ],
+    "metadata": {
+        "count": 1
+    }
+}

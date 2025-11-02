@@ -698,11 +698,19 @@ function MCP() {
       
       // Set environment variables
       if (parsed.env && parsed.configType !== 'http') {
-        const envList: DynamicEnvVar[] = Object.entries(parsed.env).map(([key, value]) => ({
-          key,
-          value: value as string,
-          password: false
-        }))
+        const envList: DynamicEnvVar[] = Object.entries(parsed.env).map(([key, value]) => {
+          const strValue = value as string
+          // Check if value is a placeholder like ${token}
+          const isPasswordPlaceholder = /^\$\{[^}]+\}$/.test(strValue)
+          
+          return {
+            key,
+            value: isPasswordPlaceholder ? '' : strValue,
+            password: isPasswordPlaceholder,
+            inputName: isPasswordPlaceholder ? strValue.replace(/^\$\{|\}$/g, '') : undefined,
+            inputDescription: isPasswordPlaceholder ? `Enter ${key}` : undefined
+          }
+        })
         setDynamicEnv(prev => ({
           ...prev,
           [parsed.configType]: envList

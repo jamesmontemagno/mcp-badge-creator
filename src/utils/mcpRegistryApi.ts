@@ -91,15 +91,71 @@ export async function searchMCPServers(
       const version = serverData.version || serverData.latestVersion || ''
       const tags = serverData.tags || serverData.categories || []
 
-      // Extract runtime configuration from remotes or runtime field
+      // Extract runtime configuration from packages or remotes
       let runtime: MCPServerRuntime | undefined
 
-      // Check for remotes array (new API format)
-      if (serverData.remotes && Array.isArray(serverData.remotes) && serverData.remotes.length > 0) {
+      // Check for packages array (primary source for runtime config)
+      if (serverData.packages && Array.isArray(serverData.packages) && serverData.packages.length > 0) {
+        const pkg = serverData.packages[0]
+        
+        // Parse package-based configuration
+        if (pkg.registryType === 'npm') {
+          runtime = {
+            command: 'npx',
+            args: ['-y', pkg.identifier],
+            type: 'stdio'
+          }
+        } else if (pkg.registryType === 'pypi') {
+          runtime = {
+            command: 'uvx',
+            args: [pkg.identifier],
+            type: 'stdio'
+          }
+        } else if (pkg.registryType === 'oci') {
+          // OCI means Docker container
+          // Parse runtime arguments if available
+          const dockerArgs = ['run', '-i', '--rm']
+          const env: Record<string, string> = {}
+          
+          if (pkg.runtimeArguments && Array.isArray(pkg.runtimeArguments)) {
+            for (const arg of pkg.runtimeArguments) {
+              if (arg.type === 'named' && arg.name === '-e') {
+                // Extract environment variable
+                const envValue = arg.value || ''
+                const match = envValue.match(/^([^=]+)=(.*)$/)
+                if (match) {
+                  const [, key, value] = match
+                  // Check if this is a secret/password variable
+                  if (arg.variables && Object.keys(arg.variables).length > 0) {
+                    const varName = Object.keys(arg.variables)[0]
+                    const varConfig = arg.variables[varName]
+                    if (varConfig.isSecret) {
+                      env[key] = `\${${varName}}`
+                    } else {
+                      env[key] = value
+                    }
+                  } else {
+                    env[key] = value
+                  }
+                }
+              }
+            }
+          }
+          
+          runtime = {
+            command: 'docker',
+            args: [...dockerArgs, pkg.identifier],
+            env: Object.keys(env).length > 0 ? env : undefined,
+            type: 'stdio'
+          }
+        }
+      } 
+      // Check for remotes array (HTTP servers)
+      else if (serverData.remotes && Array.isArray(serverData.remotes) && serverData.remotes.length > 0) {
         const remote = serverData.remotes[0]
         
         // Parse remote configuration
-        if (remote.type === 'streamable-http' || remote.type === 'http') {
+        if (remote.type === 'streamable-http' || remote.type === 'http' || remote.type === 'sse') {
           runtime = {
             type: 'http',
             url: remote.url,
@@ -108,7 +164,9 @@ export async function searchMCPServers(
             ) : undefined
           }
         }
-      } else if (serverData.runtime) {
+      } 
+      // Fallback to legacy formats
+      else if (serverData.runtime) {
         runtime = serverData.runtime
       } else if (serverData.config) {
         runtime = serverData.config
@@ -254,12 +312,19 @@ export function parseRuntimeConfig(runtime?: MCPServerRuntime): {
 
     // Docker
     if (cmd === 'docker') {
+      // Find the image argument (last positional arg after flags)
       const imageIndex = args.findIndex((arg, idx) => 
-        idx > 0 && !arg.startsWith('-') && args[idx - 1] !== '-i' && args[idx - 1] !== '--rm'
+        idx > 0 && !arg.startsWith('-') && args[idx - 1] !== '-i' && args[idx - 1] !== '--rm' && args[idx - 1] !== '-e'
       )
+      
+      // If not found by position, look for the last non-flag argument
+      const dockerImage = imageIndex >= 0 
+        ? args[imageIndex]
+        : args.filter(arg => !arg.startsWith('-')).pop() || ''
+      
       return {
         configType: 'docker',
-        dockerImage: imageIndex >= 0 ? args[imageIndex] : '',
+        dockerImage,
         env: runtime.env
       }
     }
