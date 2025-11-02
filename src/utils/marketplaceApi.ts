@@ -29,20 +29,34 @@ export interface SearchResult {
   installs: number
 }
 
+export type SortBy = 'installs' | 'relevance' | 'name' | 'publishedDate' | 'rating'
+
 const API_ENDPOINT = 'https://marketplace.visualstudio.com/_apis/public/gallery/extensionquery'
 
 /**
  * Search extensions in the VS Code Marketplace
  * @param searchText The search query (extension name or keyword)
  * @param pageSize Maximum number of results to return
+ * @param sortBy How to sort the results
  * @returns Array of matching extensions
  */
 export async function searchExtensions(
   searchText: string,
-  pageSize: number = 10
+  pageSize: number = 10,
+  sortBy: SortBy = 'installs'
 ): Promise<SearchResult[]> {
   if (!searchText || searchText.trim().length === 0) {
     return []
+  }
+
+  // Map sort options to API values
+  // sortBy values: 0 = None, 4 = InstallCount, 5 = PublishedDate, 6 = Name, 12 = WeightedRating
+  const sortByMap: Record<SortBy, number> = {
+    installs: 4,       // Sort by download count
+    relevance: 0,      // Default relevance
+    name: 6,           // Alphabetical by name
+    publishedDate: 5,  // Most recently published
+    rating: 12,        // Highest rated
   }
 
   const payload = {
@@ -60,7 +74,7 @@ export async function searchExtensions(
         ],
         pageNumber: 1,
         pageSize,
-        sortBy: 4, // Sort by downloads
+        sortBy: sortByMap[sortBy],
         sortOrder: 2, // Descending
       },
     ],

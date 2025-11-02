@@ -2,16 +2,17 @@ import { useState, useEffect, useRef } from 'react'
 import type { KeyboardEvent } from 'react'
 import styles from './SearchDropdown.module.css'
 import { searchExtensions, formatInstallCount } from '../utils/marketplaceApi'
-import type { SearchResult } from '../utils/marketplaceApi'
+import type { SearchResult, SortBy } from '../utils/marketplaceApi'
 
 interface SearchDropdownProps {
   searchQuery: string
+  sortBy: SortBy
   onSelectExtension: (extensionId: string) => void
   isVisible: boolean
   onClose: () => void
 }
 
-function SearchDropdown({ searchQuery, onSelectExtension, isVisible, onClose }: SearchDropdownProps) {
+function SearchDropdown({ searchQuery, sortBy, onSelectExtension, isVisible, onClose }: SearchDropdownProps) {
   const [results, setResults] = useState<SearchResult[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -32,7 +33,7 @@ function SearchDropdown({ searchQuery, onSelectExtension, isVisible, onClose }: 
       setHighlightedIndex(-1)
 
       try {
-        const searchResults = await searchExtensions(searchQuery, 10)
+        const searchResults = await searchExtensions(searchQuery, 10, sortBy)
         setResults(searchResults)
       } catch (err) {
         const errorMessage = err instanceof Error ? err.message : 'Failed to search extensions. Please try again.'
@@ -46,7 +47,7 @@ function SearchDropdown({ searchQuery, onSelectExtension, isVisible, onClose }: 
     // Debounce search
     const timeoutId = setTimeout(performSearch, 300)
     return () => clearTimeout(timeoutId)
-  }, [searchQuery])
+  }, [searchQuery, sortBy])
 
   // Handle click outside to close dropdown
   useEffect(() => {

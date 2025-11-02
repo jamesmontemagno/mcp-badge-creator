@@ -3,6 +3,7 @@ import type { FormEvent, ChangeEvent } from 'react'
 import styles from './Extensions.module.css'
 import { generateExtensionBadges, parseExtensionInput } from '../utils/extensionBadge'
 import SearchDropdown from '../components/SearchDropdown'
+import type { SortBy } from '../utils/marketplaceApi'
 
 type BadgeVariant = 'stable' | 'insiders' | 'combined'
 type InputMode = 'manual' | 'search'
@@ -11,6 +12,7 @@ function Extensions() {
   const [inputValue, setInputValue] = useState('')
   const [inputMode, setInputMode] = useState<InputMode>('search')
   const [searchQuery, setSearchQuery] = useState('')
+  const [sortBy, setSortBy] = useState<SortBy>('installs')
   const [showSearchDropdown, setShowSearchDropdown] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [info, setInfo] = useState<string | null>(null)
@@ -125,6 +127,23 @@ function Extensions() {
                 ✏️ Manual Entry
               </button>
             </div>
+            {inputMode === 'search' && (
+              <div className={styles.sortControl}>
+                <label htmlFor="sortBy" className={styles.sortLabel}>Sort by:</label>
+                <select
+                  id="sortBy"
+                  className={styles.sortSelect}
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value as SortBy)}
+                >
+                  <option value="installs">Most Downloads</option>
+                  <option value="rating">Highest Rated</option>
+                  <option value="relevance">Relevance</option>
+                  <option value="publishedDate">Recently Published</option>
+                  <option value="name">Name (A-Z)</option>
+                </select>
+              </div>
+            )}
           </div>
 
           <label htmlFor="extensionInput">
@@ -147,6 +166,7 @@ function Extensions() {
             {inputMode === 'search' && (
               <SearchDropdown
                 searchQuery={searchQuery}
+                sortBy={sortBy}
                 onSelectExtension={handleSelectExtension}
                 isVisible={showSearchDropdown}
                 onClose={() => setShowSearchDropdown(false)}
