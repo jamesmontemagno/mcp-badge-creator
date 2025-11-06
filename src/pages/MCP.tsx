@@ -158,26 +158,28 @@ function MCP() {
         // STDIO servers have command, args, and env (no name or type)
         config.command = 'docker';
         config.args = ['run', '-i', '--rm'];
-        // Add dynamic args before image name
+        // Add dynamic args before env vars
         if (currentDynamicArgs.length > 0) {
           currentDynamicArgs.forEach(arg => {
             config.args!.push(arg.flag);
             if (arg.value) config.args!.push(arg.value);
           });
         }
-        // Add environment variables as -e flags before image name
+        // Add environment variables: -e KEY_NAME in args, KEY: value in env
+        config.env = {};
         if (currentDynamicEnv.length > 0) {
           currentDynamicEnv.forEach(envVar => {
             const inputId = getInputId(envVar.key, envVar.inputName);
             const envValue = envVar.password ? `\${input:${inputId}}` : envVar.value;
+            // Add -e KEY_NAME to args
             config.args!.push('-e');
-            config.args!.push(`${envVar.key}=${envValue}`);
+            config.args!.push(envVar.key);
+            // Add KEY: value to env object
+            config.env![envVar.key] = envValue;
           });
         }
         // Add image name last
         config.args!.push(dockerImage);
-        // Docker env object should be empty
-        config.env = {};
         break;
       case 'npx':
         config.command = 'npx';
@@ -270,21 +272,16 @@ function MCP() {
     return encodeURIComponent(JSON.stringify(config));
   }
 
-  // Helper function to get config with inputs for badge URLs
+  // Helper function to get config for badge URLs
+  // VS Code badge URLs expect just the server config (no wrapper)
   const getConfigForBadge = () => {
-    const config = generateConfig();
+    return generateConfig();
+  }
+  
+  // Helper function to get inputs array for badge URLs
+  const getInputsForBadge = () => {
     const fullConfig = generateFullConfig();
-    
-    // If we have inputs, return the full config structure with inputs
-    if (fullConfig.inputs && fullConfig.inputs.length > 0) {
-      return {
-        ...config,
-        inputs: fullConfig.inputs
-      };
-    }
-    
-    // Otherwise, return just the server config
-    return config;
+    return fullConfig.inputs || [];
   }
 
   const generateCliCommand = (isInsiders: boolean = false): string => {
@@ -585,7 +582,7 @@ function MCP() {
           const args = serverConfig.args || [];
           
           // Find Docker image - it's the last non-flag argument
-          // Skip 'run', '-i', '--rm', and any '-e' flags with their values
+          // Skip 'run', '-i', '--rm', and any '-e' flags with their KEY_NAME
           let imageIndex = -1;
           for (let i = args.length - 1; i >= 0; i--) {
             const arg = args[i];
@@ -593,7 +590,7 @@ function MCP() {
             if (arg.startsWith('-') || arg === 'run' || arg === '-i' || arg === '--rm') {
               continue;
             }
-            // Skip if previous arg was -e (this is an env var value)
+            // Skip if previous arg was -e (this is an env var key name)
             if (i > 0 && args[i - 1] === '-e') {
               continue;
             }
@@ -603,34 +600,56 @@ function MCP() {
           }
           setDockerImage(imageIndex >= 0 ? args[imageIndex] : '');
           
-          // Parse environment variables from -e flags in args
+          // Parse environment variables from env object (not from -e flags in args)
+          // The -e flags in args just specify which env vars to pass, the values come from env object
           const envList: DynamicEnvVar[] = [];
-          for (let i = 0; i < args.length; i++) {
-            if (args[i] === '-e' && i + 1 < args.length) {
-              const envPair = args[i + 1];
-              const [key, ...valueParts] = envPair.split('=');
-              const value = valueParts.join('='); // Handle values with = in them
-              
-              const isPassword = value.includes('${input:');
-              const inputMatch = isPassword ? value.match(/\$\{input:([^}]+)\}/) : null;
+          if (serverConfig.env) {
+            Object.entries(serverConfig.env).forEach(([key, value]) => {
+              const isPassword = typeof value === 'string' && value.includes('${input:');
+              const inputMatch = isPassword ? (value as string).match(/\$\{input:([^}]+)\}/) : null;
               const inputId = inputMatch ? inputMatch[1] : '';
               const inputObj = inputs.find(inp => inp.id === inputId);
               
               envList.push({
                 key,
-                value: isPassword ? '' : value,
+                value: isPassword ? '' : value as string,
                 password: isPassword,
                 inputName: inputId,
                 inputDescription: inputObj?.description || ''
               });
-              i++; // Skip next arg since we consumed it
-            }
+            });
           }
           
           if (envList.length > 0) {
             setDynamicEnv(prev => ({
               ...prev,
               docker: envList
+            }));
+          }
+          
+          // Parse custom args (anything before -e flags)
+          const customArgs: DynamicArgument[] = [];
+          for (let i = 0; i < args.length; i++) {
+            const arg = args[i];
+            // Skip standard docker run args
+            if (arg === 'run' || arg === '-i' || arg === '--rm') continue;
+            // Stop when we hit -e flags (env vars)
+            if (arg === '-e') break;
+            // Skip if it's the image name
+            if (i === imageIndex) continue;
+            
+            // This is a custom arg
+            if (arg.startsWith('-')) {
+              const nextArg = i + 1 < args.length && !args[i + 1].startsWith('-') && args[i + 1] !== '-e' ? args[i + 1] : '';
+              customArgs.push({ flag: arg, value: nextArg });
+              if (nextArg) i++; // Skip the value
+            }
+          }
+          
+          if (customArgs.length > 0) {
+            setDynamicArgs(prev => ({
+              ...prev,
+              docker: customArgs
             }));
           }
         } else {
@@ -640,7 +659,7 @@ function MCP() {
         }
         
         // Parse environment variables from env object (for non-Docker configs)
-        // Docker env vars are already parsed from -e flags above
+        // Docker env vars are already parsed in the docker section above
         if (serverConfig.env && cmd !== 'docker') {
           const envList: DynamicEnvVar[] = [];
           Object.entries(serverConfig.env).forEach(([key, value]) => {
@@ -821,17 +840,27 @@ function MCP() {
     
     const configForBadge = getConfigForBadge();
     const encodedConfig = encodeConfig(configForBadge);
+    const inputs = getInputsForBadge();
+    const encodedInputs = inputs.length > 0 ? encodeURIComponent(JSON.stringify(inputs)) : '';
     const badges: string[] = [];
 
     const customBadgeText = badgeText.replace(/\s/g, '_');
 
     if (includeVSCode) {
-      const vscodeUrl = `https://vscode.dev/redirect/mcp/install?name=${encodeURIComponent(serverName)}&config=${encodedConfig}`;
+      let vscodeUrl = `https://vscode.dev/redirect/mcp/install?name=${encodeURIComponent(serverName)}`;
+      if (encodedInputs) {
+        vscodeUrl += `&inputs=${encodedInputs}`;
+      }
+      vscodeUrl += `&config=${encodedConfig}`;
       badges.push(`[![Install in VS Code](https://img.shields.io/badge/${customBadgeText}-VS_Code-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](${vscodeUrl})`);
     }
 
     if (includeVSCodeInsiders) {
-      const vscodeInsidersUrl = `https://insiders.vscode.dev/redirect/mcp/install?name=${encodeURIComponent(serverName)}&config=${encodedConfig}&quality=insiders`;
+      let vscodeInsidersUrl = `https://insiders.vscode.dev/redirect/mcp/install?name=${encodeURIComponent(serverName)}`;
+      if (encodedInputs) {
+        vscodeInsidersUrl += `&inputs=${encodedInputs}`;
+      }
+      vscodeInsidersUrl += `&config=${encodedConfig}&quality=insiders`;
       badges.push(`[![Install in VS Code Insiders](https://img.shields.io/badge/${customBadgeText}-VS_Code_Insiders-24bfa5?style=flat-square&logo=visualstudiocode&logoColor=white)](${vscodeInsidersUrl})`);
     }
 
@@ -928,7 +957,11 @@ function MCP() {
     if (readmeVSCode) {
       readmeContent += `<details>\n<summary>VS Code</summary>\n\n`;
       readmeContent += `#### Click the button to install:\n\n`;
-      const vscodeUrl = `https://vscode.dev/redirect/mcp/install?name=${encodeURIComponent(serverName)}&config=${encodeConfig(getConfigForBadge())}`;
+      const inputs = getInputsForBadge();
+      const encodedInputs = inputs.length > 0 ? encodeURIComponent(JSON.stringify(inputs)) : '';
+      let vscodeUrl = `https://vscode.dev/redirect/mcp/install?name=${encodeURIComponent(serverName)}`;
+      if (encodedInputs) vscodeUrl += `&inputs=${encodedInputs}`;
+      vscodeUrl += `&config=${encodeConfig(getConfigForBadge())}`;
       readmeContent += `[![Install in VS Code](https://img.shields.io/badge/${badgeText.replace(/\s/g, '_')}-VS_Code-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](${vscodeUrl})\n\n`;
       readmeContent += `#### Or install manually:\n\n`;
       readmeContent += `Follow the MCP install [guide](https://code.visualstudio.com/docs/copilot/chat/mcp-servers#_add-an-mcp-server), use the standard config above. You can also install the ${serverName} MCP server using the VS Code CLI:\n\n`;
@@ -940,7 +973,11 @@ function MCP() {
     if (readmeVSCodeInsiders) {
       readmeContent += `<details>\n<summary>VS Code Insiders</summary>\n\n`;
       readmeContent += `#### Click the button to install:\n\n`;
-      const vscodeInsidersUrl = `https://insiders.vscode.dev/redirect/mcp/install?name=${encodeURIComponent(serverName)}&config=${encodeConfig(getConfigForBadge())}&quality=insiders`;
+      const inputs = getInputsForBadge();
+      const encodedInputs = inputs.length > 0 ? encodeURIComponent(JSON.stringify(inputs)) : '';
+      let vscodeInsidersUrl = `https://insiders.vscode.dev/redirect/mcp/install?name=${encodeURIComponent(serverName)}`;
+      if (encodedInputs) vscodeInsidersUrl += `&inputs=${encodedInputs}`;
+      vscodeInsidersUrl += `&config=${encodeConfig(getConfigForBadge())}&quality=insiders`;
       readmeContent += `[![Install in VS Code Insiders](https://img.shields.io/badge/${badgeText.replace(/\s/g, '_')}-VS_Code_Insiders-24bfa5?style=flat-square&logo=visualstudiocode&logoColor=white)](${vscodeInsidersUrl})\n\n`;
       readmeContent += `#### Or install manually:\n\n`;
       readmeContent += `Follow the MCP install [guide](https://code.visualstudio.com/docs/copilot/chat/mcp-servers#_add-an-mcp-server), use the standard config above. You can also install the ${serverName} MCP server using the VS Code Insiders CLI:\n\n`;
