@@ -500,6 +500,9 @@ function MCP() {
 
   const parseAndImportConfig = (content: string) => {
     try {
+      // Reset form before importing new configuration
+      resetForm();
+      
       const parsed = JSON.parse(content);
       
       // Extract server configuration
