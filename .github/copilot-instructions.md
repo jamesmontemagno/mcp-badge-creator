@@ -51,8 +51,54 @@ npm install       # Install dependencies
 npm run dev       # Start dev server at http://localhost:5173/mcp-badge-creator/
 npm run build     # TypeScript compile + Vite build to ./dist
 npm run preview   # Preview production build locally
-npm run lint      # ESLint check
+npm run lint      # ESLint check (ALWAYS run after code changes)
+npm run test:unit:run  # Run Vitest unit tests
 ```
+
+### Code Quality Standards
+
+**CRITICAL: Always run linter after making changes**
+
+```bash
+npm run lint      # Must pass with 0 errors before committing
+```
+
+#### TypeScript & ESLint Rules
+- **Strict TypeScript**: No `any` types allowed (use proper interfaces/types)
+- **No unused variables**: Remove or prefix with `_` if intentionally unused
+- **Explicit types**: Prefer explicit type annotations for clarity
+- **Type safety**: All function parameters and return types should be typed
+
+#### Common Linting Errors & Fixes
+
+**❌ Avoid:**
+```typescript
+const data: any = {...}  // No any types
+const unused = 5;        // Unused variables
+```
+
+**✅ Do this:**
+```typescript
+const data: Record<string, string> = {...}
+const _unused = 5;  // Or remove if truly unused
+
+// Define proper types
+interface EnvVar {
+  key: string;
+  value: string;
+  password: boolean;
+  inputName: string;
+  inputDescription: string;
+}
+const envList: EnvVar[] = [];
+```
+
+#### Pre-Commit Checklist
+1. ✅ Run `npm run lint` - must pass with 0 errors
+2. ✅ Run `npm run test:unit:run` - all tests must pass
+3. ✅ Run `npm run build` - verify TypeScript compilation succeeds
+4. ✅ Test functionality in browser (`npm run dev`)
+5. ✅ Check console for runtime errors
 
 ### Deployment Process
 1. Push to `main` branch triggers GitHub Actions workflow
@@ -175,11 +221,39 @@ Edit Shields.io URL parameters in `generateMarkdown()`:
 - No authentication or user accounts
 
 ## When Making Changes
-1. Always test locally with `npm run dev` first
-2. Verify badge URLs work by clicking generated badges
-3. Check responsive design (mobile/tablet/desktop)
-4. Update documentation if adding features
-5. Remember GitHub Actions will auto-deploy on push to main
+1. **Write code following TypeScript strict mode** (no `any`, proper types)
+2. **Run linter immediately**: `npm run lint` (must pass with 0 errors)
+3. **Run unit tests**: `npm run test:unit:run` (all must pass)
+4. **Test locally** with `npm run dev` first
+5. **Verify badge URLs** work by clicking generated badges
+6. **Check responsive design** (mobile/tablet/desktop)
+7. **Test all 5 themes** if touching CSS
+8. **Update documentation** if adding features
+9. **Build verification**: `npm run build` must succeed
+10. Remember GitHub Actions will auto-deploy on push to main
+
+## Testing Strategy
+
+### Unit Tests (Vitest)
+- Location: `src/utils/*.test.ts`
+- Run: `npm run test:unit:run`
+- Coverage: Config parsing, badge generation, URL encoding
+- **All tests must pass before committing**
+
+### End-to-End Tests (Playwright)
+- Location: `tests/*.spec.ts`
+- Run: `npm run test` (requires browser installation)
+- Coverage: User flows, UI interactions, navigation
+
+### Manual Testing Checklist
+- [ ] Fill form and generate badges
+- [ ] Copy markdown and verify format
+- [ ] Click badges in browser - URLs should work
+- [ ] Test import/paste functionality
+- [ ] Verify all config types (HTTP, Docker, NPX, UVX, Local)
+- [ ] Test with inputs/passwords
+- [ ] Check README generation
+- [ ] Test theme switching
 
 ## CSS Architecture (Post-Migration)
 
