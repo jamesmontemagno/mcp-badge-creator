@@ -287,10 +287,12 @@ function MCP() {
   const generateCliCommand = (isInsiders: boolean = false): string => {
     const fullConfig = generateFullConfig();
     
-    // CLI command requires the full config structure with inputs
+    // CLI command requires the server config with inputs at root level
+    // Extract the server config from the servers wrapper
+    const serverConfig = fullConfig.servers[serverName];
     const cliConfig = {
       name: serverName,
-      ...generateConfig(),
+      ...serverConfig,
       ...(fullConfig.inputs && fullConfig.inputs.length > 0 ? { inputs: fullConfig.inputs } : {})
     };
     
