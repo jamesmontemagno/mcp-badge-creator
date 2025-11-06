@@ -157,23 +157,27 @@ function MCP() {
       case 'docker':
         // STDIO servers have command, args, and env (no name or type)
         config.command = 'docker';
-        config.args = ['run', '-i', '--rm', dockerImage];
-        // Add dynamic args
+        config.args = ['run', '-i', '--rm'];
+        // Add dynamic args before image name
         if (currentDynamicArgs.length > 0) {
           currentDynamicArgs.forEach(arg => {
             config.args!.push(arg.flag);
             if (arg.value) config.args!.push(arg.value);
           });
         }
-        // Add dynamic env vars
-        config.env = {};
+        // Add environment variables as -e flags before image name
         if (currentDynamicEnv.length > 0) {
           currentDynamicEnv.forEach(envVar => {
             const inputId = getInputId(envVar.key, envVar.inputName);
             const envValue = envVar.password ? `\${input:${inputId}}` : envVar.value;
-            config.env![envVar.key] = envValue;
+            config.args!.push('-e');
+            config.args!.push(`${envVar.key}=${envValue}`);
           });
         }
+        // Add image name last
+        config.args!.push(dockerImage);
+        // Docker env object should be empty
+        config.env = {};
         break;
       case 'npx':
         config.command = 'npx';
@@ -579,16 +583,65 @@ function MCP() {
         } else if (cmd === 'docker') {
           setConfigType('docker');
           const args = serverConfig.args || [];
-          const imageIndex = args.findIndex((arg: string) => !arg.startsWith('-') && arg !== 'run' && arg !== '-i' && arg !== '--rm');
-          setDockerImage(args[imageIndex] || '');
+          
+          // Find Docker image - it's the last non-flag argument
+          // Skip 'run', '-i', '--rm', and any '-e' flags with their values
+          let imageIndex = -1;
+          for (let i = args.length - 1; i >= 0; i--) {
+            const arg = args[i];
+            // Skip if it's a flag or common docker run args
+            if (arg.startsWith('-') || arg === 'run' || arg === '-i' || arg === '--rm') {
+              continue;
+            }
+            // Skip if previous arg was -e (this is an env var value)
+            if (i > 0 && args[i - 1] === '-e') {
+              continue;
+            }
+            // This must be the image name
+            imageIndex = i;
+            break;
+          }
+          setDockerImage(imageIndex >= 0 ? args[imageIndex] : '');
+          
+          // Parse environment variables from -e flags in args
+          const envList: DynamicEnvVar[] = [];
+          for (let i = 0; i < args.length; i++) {
+            if (args[i] === '-e' && i + 1 < args.length) {
+              const envPair = args[i + 1];
+              const [key, ...valueParts] = envPair.split('=');
+              const value = valueParts.join('='); // Handle values with = in them
+              
+              const isPassword = value.includes('${input:');
+              const inputMatch = isPassword ? value.match(/\$\{input:([^}]+)\}/) : null;
+              const inputId = inputMatch ? inputMatch[1] : '';
+              const inputObj = inputs.find(inp => inp.id === inputId);
+              
+              envList.push({
+                key,
+                value: isPassword ? '' : value,
+                password: isPassword,
+                inputName: inputId,
+                inputDescription: inputObj?.description || ''
+              });
+              i++; // Skip next arg since we consumed it
+            }
+          }
+          
+          if (envList.length > 0) {
+            setDynamicEnv(prev => ({
+              ...prev,
+              docker: envList
+            }));
+          }
         } else {
           setConfigType('local');
           setLocalCommand(cmd);
           setLocalArgs(serverConfig.args?.join(', ') || '');
         }
         
-        // Parse environment variables
-        if (serverConfig.env) {
+        // Parse environment variables from env object (for non-Docker configs)
+        // Docker env vars are already parsed from -e flags above
+        if (serverConfig.env && cmd !== 'docker') {
           const envList: DynamicEnvVar[] = [];
           Object.entries(serverConfig.env).forEach(([key, value]) => {
             const isPassword = typeof value === 'string' && value.includes('${input:');
@@ -625,6 +678,13 @@ function MCP() {
         if (serverConfig.env) {
           Object.values(serverConfig.env).forEach(value => {
             const match = typeof value === 'string' ? value.match(/\$\{input:([^}]+)\}/) : null;
+            if (match) referencedInputIds.add(match[1]);
+          });
+        }
+        // For Docker, also check args for -e flags
+        if (serverConfig.command === 'docker' && serverConfig.args) {
+          serverConfig.args.forEach((arg: string) => {
+            const match = arg.match(/\$\{input:([^}]+)\}/);
             if (match) referencedInputIds.add(match[1]);
           });
         }
