@@ -17,8 +17,8 @@ interface MCPConfig {
 }
 
 interface MCPInput {
-  type: 'promptString';
   id: string;
+  type: 'promptString';
   description: string;
   password?: boolean;
 }
@@ -319,20 +319,20 @@ function MCP() {
       // Build full config with inputs array
       const inputs: MCPInput[] = [
         ...envPasswordInputs.map(env => ({
-          type: 'promptString' as const,
           id: getInputId(env.key, env.inputName),
+          type: 'promptString' as const,
           description: env.inputDescription || `Enter ${env.key}`,
           password: true
         })),
         ...headerPasswordInputs.map(header => ({
-          type: 'promptString' as const,
           id: getInputId(header.key, header.inputName),
+          type: 'promptString' as const,
           description: header.inputDescription || `Enter ${header.key}`,
           password: true
         })),
         ...standaloneInputs.map(input => ({
-          type: 'promptString' as const,
           id: input.id,
+          type: 'promptString' as const,
           description: input.description,
           password: input.password
         }))
@@ -835,6 +835,12 @@ function MCP() {
     }
   }
 
+  // Helper function to escape URLs for use in Markdown links
+  // Markdown link syntax breaks with unescaped parentheses
+  const escapeUrlForMarkdown = (url: string): string => {
+    return url.replace(/\(/g, '%28').replace(/\)/g, '%29');
+  }
+
   const generateMarkdown = (): string => {
     if (!serverName) return '';
     
@@ -852,6 +858,7 @@ function MCP() {
         vscodeUrl += `&inputs=${encodedInputs}`;
       }
       vscodeUrl += `&config=${encodedConfig}`;
+      vscodeUrl = escapeUrlForMarkdown(vscodeUrl);
       badges.push(`[![Install in VS Code](https://img.shields.io/badge/${customBadgeText}-VS_Code-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](${vscodeUrl})`);
     }
 
@@ -861,11 +868,13 @@ function MCP() {
         vscodeInsidersUrl += `&inputs=${encodedInputs}`;
       }
       vscodeInsidersUrl += `&config=${encodedConfig}&quality=insiders`;
+      vscodeInsidersUrl = escapeUrlForMarkdown(vscodeInsidersUrl);
       badges.push(`[![Install in VS Code Insiders](https://img.shields.io/badge/${customBadgeText}-VS_Code_Insiders-24bfa5?style=flat-square&logo=visualstudiocode&logoColor=white)](${vscodeInsidersUrl})`);
     }
 
     if (includeVisualStudio) {
-      const vsUrl = `https://vs-open.link/mcp-install?${encodedConfig}`;
+      let vsUrl = `https://vs-open.link/mcp-install?${encodedConfig}`;
+      vsUrl = escapeUrlForMarkdown(vsUrl);
       badges.push(`[![Install in Visual Studio](https://img.shields.io/badge/${customBadgeText}-Visual_Studio-C16FDE?style=flat-square&logo=visualstudio&logoColor=white)](${vsUrl})`);
     }
 
@@ -878,7 +887,8 @@ function MCP() {
         ...(fullConfig.inputs && fullConfig.inputs.length > 0 ? { inputs: fullConfig.inputs } : {})
       };
       const base64Config = btoa(JSON.stringify(configWithName));
-      const cursorUrl = `https://cursor.com/en/install-mcp?name=${encodeURIComponent(serverName)}&config=${base64Config}`;
+      let cursorUrl = `https://cursor.com/en/install-mcp?name=${encodeURIComponent(serverName)}&config=${base64Config}`;
+      cursorUrl = escapeUrlForMarkdown(cursorUrl);
       badges.push(`[![Install in Cursor](https://img.shields.io/badge/${customBadgeText}-Cursor-000000?style=flat-square&logoColor=white)](${cursorUrl})`);
     }
 
@@ -892,7 +902,8 @@ function MCP() {
       };
       const args = configWithName.args ? configWithName.args.join('%20') : '';
       const cmd = configWithName.command || '';
-      const gooseUrl = `https://block.github.io/goose/extension?cmd=${encodeURIComponent(cmd)}&arg=${encodeURIComponent(args)}&id=${encodeURIComponent(serverName)}&name=${encodeURIComponent(serverName)}&description=MCP%20Server%20for%20${encodeURIComponent(serverName)}`;
+      let gooseUrl = `https://block.github.io/goose/extension?cmd=${encodeURIComponent(cmd)}&arg=${encodeURIComponent(args)}&id=${encodeURIComponent(serverName)}&name=${encodeURIComponent(serverName)}&description=MCP%20Server%20for%20${encodeURIComponent(serverName)}`;
+      gooseUrl = escapeUrlForMarkdown(gooseUrl);
       badges.push(`[![Install in Goose](https://block.github.io/goose/img/extension-install-dark.svg)](${gooseUrl})`);
     }
 
@@ -905,7 +916,8 @@ function MCP() {
         ...(fullConfig.inputs && fullConfig.inputs.length > 0 ? { inputs: fullConfig.inputs } : {})
       };
       const base64Config = btoa(JSON.stringify(configWithName));
-      const lmstudioUrl = `https://lmstudio.ai/install-mcp?name=${encodeURIComponent(serverName)}&config=${base64Config}`;
+      let lmstudioUrl = `https://lmstudio.ai/install-mcp?name=${encodeURIComponent(serverName)}&config=${base64Config}`;
+      lmstudioUrl = escapeUrlForMarkdown(lmstudioUrl);
       badges.push(`[![Add MCP Server ${serverName} to LM Studio](https://files.lmstudio.ai/deeplink/mcp-install-light.svg)](${lmstudioUrl})`);
     }
 
@@ -962,6 +974,7 @@ function MCP() {
       let vscodeUrl = `https://vscode.dev/redirect/mcp/install?name=${encodeURIComponent(serverName)}`;
       if (encodedInputs) vscodeUrl += `&inputs=${encodedInputs}`;
       vscodeUrl += `&config=${encodeConfig(getConfigForBadge())}`;
+      vscodeUrl = escapeUrlForMarkdown(vscodeUrl);
       readmeContent += `[![Install in VS Code](https://img.shields.io/badge/${badgeText.replace(/\s/g, '_')}-VS_Code-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](${vscodeUrl})\n\n`;
       readmeContent += `#### Or install manually:\n\n`;
       readmeContent += `Follow the MCP install [guide](https://code.visualstudio.com/docs/copilot/chat/mcp-servers#_add-an-mcp-server), use the standard config above. You can also install the ${serverName} MCP server using the VS Code CLI:\n\n`;
@@ -978,6 +991,7 @@ function MCP() {
       let vscodeInsidersUrl = `https://insiders.vscode.dev/redirect/mcp/install?name=${encodeURIComponent(serverName)}`;
       if (encodedInputs) vscodeInsidersUrl += `&inputs=${encodedInputs}`;
       vscodeInsidersUrl += `&config=${encodeConfig(getConfigForBadge())}&quality=insiders`;
+      vscodeInsidersUrl = escapeUrlForMarkdown(vscodeInsidersUrl);
       readmeContent += `[![Install in VS Code Insiders](https://img.shields.io/badge/${badgeText.replace(/\s/g, '_')}-VS_Code_Insiders-24bfa5?style=flat-square&logo=visualstudiocode&logoColor=white)](${vscodeInsidersUrl})\n\n`;
       readmeContent += `#### Or install manually:\n\n`;
       readmeContent += `Follow the MCP install [guide](https://code.visualstudio.com/docs/copilot/chat/mcp-servers#_add-an-mcp-server), use the standard config above. You can also install the ${serverName} MCP server using the VS Code Insiders CLI:\n\n`;
@@ -989,7 +1003,8 @@ function MCP() {
     if (readmeVisualStudio) {
       readmeContent += `<details>\n<summary>Visual Studio</summary>\n\n`;
       readmeContent += `#### Click the button to install:\n\n`;
-      const vsUrl = `https://vs-open.link/mcp-install?${encodeConfig(getConfigForBadge())}`;
+      let vsUrl = `https://vs-open.link/mcp-install?${encodeConfig(getConfigForBadge())}`;
+      vsUrl = escapeUrlForMarkdown(vsUrl);
       readmeContent += `[![Install in Visual Studio](https://img.shields.io/badge/${badgeText.replace(/\s/g, '_')}-Visual_Studio-C16FDE?style=flat-square&logo=visualstudio&logoColor=white)](${vsUrl})\n\n`;
       readmeContent += `#### Or install manually:\n\n`;
       readmeContent += `1. Open Visual Studio\n`;
@@ -1032,7 +1047,8 @@ function MCP() {
         ...(fullConfig.inputs && fullConfig.inputs.length > 0 ? { inputs: fullConfig.inputs } : {})
       };
       const base64Config = btoa(JSON.stringify(configWithName));
-      const cursorUrl = `https://cursor.com/en/install-mcp?name=${encodeURIComponent(serverName)}&config=${base64Config}`;
+      let cursorUrl = `https://cursor.com/en/install-mcp?name=${encodeURIComponent(serverName)}&config=${base64Config}`;
+      cursorUrl = escapeUrlForMarkdown(cursorUrl);
       // Use Cursor badge with same style as VS Code badges (no icon)
       readmeContent += `[![Install in Cursor](https://img.shields.io/badge/${badgeText.replace(/\s/g, '_')}-Cursor-000000?style=flat-square&logoColor=white)](${cursorUrl})\n\n`;
       readmeContent += `#### Or install manually:\n\n`;
@@ -1050,7 +1066,8 @@ function MCP() {
       };
       const args = configWithName.args ? configWithName.args.join('%20') : '';
       const cmd = configWithName.command || '';
-      const gooseUrl = `https://block.github.io/goose/extension?cmd=${encodeURIComponent(cmd)}&arg=${encodeURIComponent(args)}&id=${encodeURIComponent(serverName)}&name=${encodeURIComponent(serverName)}&description=MCP%20Server%20for%20${encodeURIComponent(serverName)}`;
+      let gooseUrl = `https://block.github.io/goose/extension?cmd=${encodeURIComponent(cmd)}&arg=${encodeURIComponent(args)}&id=${encodeURIComponent(serverName)}&name=${encodeURIComponent(serverName)}&description=MCP%20Server%20for%20${encodeURIComponent(serverName)}`;
+      gooseUrl = escapeUrlForMarkdown(gooseUrl);
       readmeContent += `[![Install in Goose](https://block.github.io/goose/img/extension-install-dark.svg)](${gooseUrl})\n\n`;
       readmeContent += `#### Or install manually:\n\n`;
       readmeContent += `Go to \`Advanced settings\` -> \`Extensions\` -> \`Add custom extension\`. Name to your liking, use type \`STDIO\`, and set the \`command\` from the standard config above. Click "Add Extension".\n</details>\n\n`;
@@ -1066,7 +1083,8 @@ function MCP() {
         ...(fullConfig.inputs && fullConfig.inputs.length > 0 ? { inputs: fullConfig.inputs } : {})
       };
       const base64Config = btoa(JSON.stringify(configWithName));
-      const lmstudioUrl = `https://lmstudio.ai/install-mcp?name=${encodeURIComponent(serverName)}&config=${base64Config}`;
+      let lmstudioUrl = `https://lmstudio.ai/install-mcp?name=${encodeURIComponent(serverName)}&config=${base64Config}`;
+      lmstudioUrl = escapeUrlForMarkdown(lmstudioUrl);
       readmeContent += `[![Add MCP Server ${serverName} to LM Studio](https://files.lmstudio.ai/deeplink/mcp-install-light.svg)](${lmstudioUrl})\n\n`;
       readmeContent += `#### Or install manually:\n\n`;
       readmeContent += `Go to \`Program\` in the right sidebar -> \`Install\` -> \`Edit mcp.json\`. Use the standard config above.\n</details>\n\n`;
