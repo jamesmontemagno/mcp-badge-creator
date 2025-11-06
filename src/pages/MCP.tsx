@@ -17,8 +17,8 @@ interface MCPConfig {
 }
 
 interface MCPInput {
-  type: 'promptString';
   id: string;
+  type: 'promptString';
   description: string;
   password?: boolean;
 }
@@ -157,23 +157,29 @@ function MCP() {
       case 'docker':
         // STDIO servers have command, args, and env (no name or type)
         config.command = 'docker';
-        config.args = ['run', '-i', '--rm', dockerImage];
-        // Add dynamic args
+        config.args = ['run', '-i', '--rm'];
+        // Add dynamic args before env vars
         if (currentDynamicArgs.length > 0) {
           currentDynamicArgs.forEach(arg => {
             config.args!.push(arg.flag);
             if (arg.value) config.args!.push(arg.value);
           });
         }
-        // Add dynamic env vars
+        // Add environment variables: -e KEY_NAME in args, KEY: value in env
         config.env = {};
         if (currentDynamicEnv.length > 0) {
           currentDynamicEnv.forEach(envVar => {
             const inputId = getInputId(envVar.key, envVar.inputName);
             const envValue = envVar.password ? `\${input:${inputId}}` : envVar.value;
+            // Add -e KEY_NAME to args
+            config.args!.push('-e');
+            config.args!.push(envVar.key);
+            // Add KEY: value to env object
             config.env![envVar.key] = envValue;
           });
         }
+        // Add image name last
+        config.args!.push(dockerImage);
         break;
       case 'npx':
         config.command = 'npx';
@@ -266,10 +272,28 @@ function MCP() {
     return encodeURIComponent(JSON.stringify(config));
   }
 
+  // Helper function to get config for badge URLs
+  // VS Code badge URLs expect just the server config (no wrapper)
+  const getConfigForBadge = () => {
+    return generateConfig();
+  }
+  
+  // Helper function to get inputs array for badge URLs
+  const getInputsForBadge = () => {
+    const fullConfig = generateFullConfig();
+    return fullConfig.inputs || [];
+  }
+
   const generateCliCommand = (isInsiders: boolean = false): string => {
-    const config = generateConfig();
-    // CLI command requires name property inside the config JSON
-    const cliConfig = { name: serverName, ...config };
+    const fullConfig = generateFullConfig();
+    
+    // CLI command requires the full config structure with inputs
+    const cliConfig = {
+      name: serverName,
+      ...generateConfig(),
+      ...(fullConfig.inputs && fullConfig.inputs.length > 0 ? { inputs: fullConfig.inputs } : {})
+    };
+    
     const jsonString = JSON.stringify(cliConfig);
     // Escape with backslashes for cross-platform compatibility (works in PowerShell, Bash, Zsh)
     const escapedJson = jsonString.replace(/"/g, '\\"');
@@ -295,20 +319,20 @@ function MCP() {
       // Build full config with inputs array
       const inputs: MCPInput[] = [
         ...envPasswordInputs.map(env => ({
-          type: 'promptString' as const,
           id: getInputId(env.key, env.inputName),
+          type: 'promptString' as const,
           description: env.inputDescription || `Enter ${env.key}`,
           password: true
         })),
         ...headerPasswordInputs.map(header => ({
-          type: 'promptString' as const,
           id: getInputId(header.key, header.inputName),
+          type: 'promptString' as const,
           description: header.inputDescription || `Enter ${header.key}`,
           password: true
         })),
         ...standaloneInputs.map(input => ({
-          type: 'promptString' as const,
           id: input.id,
+          type: 'promptString' as const,
           description: input.description,
           password: input.password
         }))
@@ -476,6 +500,9 @@ function MCP() {
 
   const parseAndImportConfig = (content: string) => {
     try {
+      // Reset form before importing new configuration
+      resetForm();
+      
       const parsed = JSON.parse(content);
       
       // Extract server configuration
@@ -556,16 +583,115 @@ function MCP() {
         } else if (cmd === 'docker') {
           setConfigType('docker');
           const args = serverConfig.args || [];
-          const imageIndex = args.findIndex((arg: string) => !arg.startsWith('-') && arg !== 'run' && arg !== '-i' && arg !== '--rm');
-          setDockerImage(args[imageIndex] || '');
+          
+          // Find Docker image - it's the last non-flag argument
+          // Skip 'run', '-i', '--rm', and any '-e' flags with their values
+          let imageIndex = -1;
+          for (let i = args.length - 1; i >= 0; i--) {
+            const arg = args[i];
+            // Skip if it's a flag or common docker run args
+            if (arg.startsWith('-') || arg === 'run' || arg === '-i' || arg === '--rm') {
+              continue;
+            }
+            // Skip if previous arg was -e (this could be env var key or KEY=VALUE)
+            if (i > 0 && args[i - 1] === '-e') {
+              continue;
+            }
+            // This must be the image name
+            imageIndex = i;
+            break;
+          }
+          setDockerImage(imageIndex >= 0 ? args[imageIndex] : '');
+          
+          // Parse environment variables - check both env object and -e flags in args
+          const envList: DynamicEnvVar[] = [];
+          
+          // First, parse from env object (preferred format)
+          if (serverConfig.env && Object.keys(serverConfig.env).length > 0) {
+            Object.entries(serverConfig.env).forEach(([key, value]) => {
+              const isPassword = typeof value === 'string' && value.includes('${input:');
+              const inputMatch = isPassword ? (value as string).match(/\$\{input:([^}]+)\}/) : null;
+              const inputId = inputMatch ? inputMatch[1] : '';
+              const inputObj = inputs.find(inp => inp.id === inputId);
+              
+              envList.push({
+                key,
+                value: isPassword ? '' : value as string,
+                password: isPassword,
+                inputName: inputId,
+                inputDescription: inputObj?.description || ''
+              });
+            });
+          } 
+          // If env object is empty, check for inline format in args: -e KEY=VALUE
+          else {
+            for (let i = 0; i < args.length; i++) {
+              if (args[i] === '-e' && i + 1 < args.length) {
+                const envArg = args[i + 1];
+                // Check if it's KEY=VALUE format (inline) or just KEY (separate env object)
+                if (envArg.includes('=')) {
+                  const [key, ...valueParts] = envArg.split('=');
+                  const value = valueParts.join('='); // Handle values with = in them
+                  
+                  const isPassword = value.includes('${input:');
+                  const inputMatch = isPassword ? value.match(/\$\{input:([^}]+)\}/) : null;
+                  const inputId = inputMatch ? inputMatch[1] : '';
+                  const inputObj = inputs.find(inp => inp.id === inputId);
+                  
+                  envList.push({
+                    key,
+                    value: isPassword ? '' : value,
+                    password: isPassword,
+                    inputName: inputId,
+                    inputDescription: inputObj?.description || ''
+                  });
+                }
+                i++; // Skip the next arg since we consumed it
+              }
+            }
+          }
+          
+          if (envList.length > 0) {
+            setDynamicEnv(prev => ({
+              ...prev,
+              docker: envList
+            }));
+          }
+          
+          // Parse custom args (anything before -e flags)
+          const customArgs: DynamicArgument[] = [];
+          for (let i = 0; i < args.length; i++) {
+            const arg = args[i];
+            // Skip standard docker run args
+            if (arg === 'run' || arg === '-i' || arg === '--rm') continue;
+            // Stop when we hit -e flags (env vars)
+            if (arg === '-e') break;
+            // Skip if it's the image name
+            if (i === imageIndex) continue;
+            
+            // This is a custom arg
+            if (arg.startsWith('-')) {
+              const nextArg = i + 1 < args.length && !args[i + 1].startsWith('-') && args[i + 1] !== '-e' ? args[i + 1] : '';
+              customArgs.push({ flag: arg, value: nextArg });
+              if (nextArg) i++; // Skip the value
+            }
+          }
+          
+          if (customArgs.length > 0) {
+            setDynamicArgs(prev => ({
+              ...prev,
+              docker: customArgs
+            }));
+          }
         } else {
           setConfigType('local');
           setLocalCommand(cmd);
           setLocalArgs(serverConfig.args?.join(', ') || '');
         }
         
-        // Parse environment variables
-        if (serverConfig.env) {
+        // Parse environment variables from env object (for non-Docker configs)
+        // Docker env vars are already parsed in the docker section above
+        if (serverConfig.env && cmd !== 'docker') {
           const envList: DynamicEnvVar[] = [];
           Object.entries(serverConfig.env).forEach(([key, value]) => {
             const isPassword = typeof value === 'string' && value.includes('${input:');
@@ -602,6 +728,13 @@ function MCP() {
         if (serverConfig.env) {
           Object.values(serverConfig.env).forEach(value => {
             const match = typeof value === 'string' ? value.match(/\$\{input:([^}]+)\}/) : null;
+            if (match) referencedInputIds.add(match[1]);
+          });
+        }
+        // For Docker, also check args for -e flags
+        if (serverConfig.command === 'docker' && serverConfig.args) {
+          serverConfig.args.forEach((arg: string) => {
+            const match = arg.match(/\$\{input:([^}]+)\}/);
             if (match) referencedInputIds.add(match[1]);
           });
         }
@@ -733,52 +866,89 @@ function MCP() {
     }
   }
 
+  // Helper function to escape URLs for use in Markdown links
+  // Markdown link syntax breaks with unescaped parentheses
+  const escapeUrlForMarkdown = (url: string): string => {
+    return url.replace(/\(/g, '%28').replace(/\)/g, '%29');
+  }
+
   const generateMarkdown = (): string => {
     if (!serverName) return '';
     
-    const config = generateConfig();
-    const encodedConfig = encodeConfig(config);
+    const configForBadge = getConfigForBadge();
+    const encodedConfig = encodeConfig(configForBadge);
+    const inputs = getInputsForBadge();
+    const encodedInputs = inputs.length > 0 ? encodeURIComponent(JSON.stringify(inputs)) : '';
     const badges: string[] = [];
 
     const customBadgeText = badgeText.replace(/\s/g, '_');
 
     if (includeVSCode) {
-      const vscodeUrl = `https://vscode.dev/redirect/mcp/install?name=${encodeURIComponent(serverName)}&config=${encodedConfig}`;
+      let vscodeUrl = `https://vscode.dev/redirect/mcp/install?name=${encodeURIComponent(serverName)}`;
+      if (encodedInputs) {
+        vscodeUrl += `&inputs=${encodedInputs}`;
+      }
+      vscodeUrl += `&config=${encodedConfig}`;
+      vscodeUrl = escapeUrlForMarkdown(vscodeUrl);
       badges.push(`[![Install in VS Code](https://img.shields.io/badge/${customBadgeText}-VS_Code-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](${vscodeUrl})`);
     }
 
     if (includeVSCodeInsiders) {
-      const vscodeInsidersUrl = `https://insiders.vscode.dev/redirect/mcp/install?name=${encodeURIComponent(serverName)}&config=${encodedConfig}&quality=insiders`;
+      let vscodeInsidersUrl = `https://insiders.vscode.dev/redirect/mcp/install?name=${encodeURIComponent(serverName)}`;
+      if (encodedInputs) {
+        vscodeInsidersUrl += `&inputs=${encodedInputs}`;
+      }
+      vscodeInsidersUrl += `&config=${encodedConfig}&quality=insiders`;
+      vscodeInsidersUrl = escapeUrlForMarkdown(vscodeInsidersUrl);
       badges.push(`[![Install in VS Code Insiders](https://img.shields.io/badge/${customBadgeText}-VS_Code_Insiders-24bfa5?style=flat-square&logo=visualstudiocode&logoColor=white)](${vscodeInsidersUrl})`);
     }
 
     if (includeVisualStudio) {
-      const vsUrl = `https://vs-open.link/mcp-install?${encodedConfig}`;
+      let vsUrl = `https://vs-open.link/mcp-install?${encodedConfig}`;
+      vsUrl = escapeUrlForMarkdown(vsUrl);
       badges.push(`[![Install in Visual Studio](https://img.shields.io/badge/${customBadgeText}-Visual_Studio-C16FDE?style=flat-square&logo=visualstudio&logoColor=white)](${vsUrl})`);
     }
 
     if (includeCursor) {
       // Use Cursor badge with same style as VS Code badges but black background
-      const configWithName = { name: serverName, ...config };
+      const fullConfig = generateFullConfig();
+      const configWithName = { 
+        name: serverName, 
+        ...generateConfig(),
+        ...(fullConfig.inputs && fullConfig.inputs.length > 0 ? { inputs: fullConfig.inputs } : {})
+      };
       const base64Config = btoa(JSON.stringify(configWithName));
-      const cursorUrl = `https://cursor.com/en/install-mcp?name=${encodeURIComponent(serverName)}&config=${base64Config}`;
+      let cursorUrl = `https://cursor.com/en/install-mcp?name=${encodeURIComponent(serverName)}&config=${base64Config}`;
+      cursorUrl = escapeUrlForMarkdown(cursorUrl);
       badges.push(`[![Install in Cursor](https://img.shields.io/badge/${customBadgeText}-Cursor-000000?style=flat-square&logoColor=white)](${cursorUrl})`);
     }
 
     if (includeGoose) {
       // Use Goose's official badge format from Playwright repository
-      const configWithName = { name: serverName, ...config };
+      const fullConfig = generateFullConfig();
+      const configWithName = { 
+        name: serverName, 
+        ...generateConfig(),
+        ...(fullConfig.inputs && fullConfig.inputs.length > 0 ? { inputs: fullConfig.inputs } : {})
+      };
       const args = configWithName.args ? configWithName.args.join('%20') : '';
       const cmd = configWithName.command || '';
-      const gooseUrl = `https://block.github.io/goose/extension?cmd=${encodeURIComponent(cmd)}&arg=${encodeURIComponent(args)}&id=${encodeURIComponent(serverName)}&name=${encodeURIComponent(serverName)}&description=MCP%20Server%20for%20${encodeURIComponent(serverName)}`;
+      let gooseUrl = `https://block.github.io/goose/extension?cmd=${encodeURIComponent(cmd)}&arg=${encodeURIComponent(args)}&id=${encodeURIComponent(serverName)}&name=${encodeURIComponent(serverName)}&description=MCP%20Server%20for%20${encodeURIComponent(serverName)}`;
+      gooseUrl = escapeUrlForMarkdown(gooseUrl);
       badges.push(`[![Install in Goose](https://block.github.io/goose/img/extension-install-dark.svg)](${gooseUrl})`);
     }
 
     if (includeLMStudio) {
       // Use LM Studio's official badge format from Playwright repository
-      const configWithName = { name: serverName, ...config };
+      const fullConfig = generateFullConfig();
+      const configWithName = { 
+        name: serverName, 
+        ...generateConfig(),
+        ...(fullConfig.inputs && fullConfig.inputs.length > 0 ? { inputs: fullConfig.inputs } : {})
+      };
       const base64Config = btoa(JSON.stringify(configWithName));
-      const lmstudioUrl = `https://lmstudio.ai/install-mcp?name=${encodeURIComponent(serverName)}&config=${base64Config}`;
+      let lmstudioUrl = `https://lmstudio.ai/install-mcp?name=${encodeURIComponent(serverName)}&config=${base64Config}`;
+      lmstudioUrl = escapeUrlForMarkdown(lmstudioUrl);
       badges.push(`[![Add MCP Server ${serverName} to LM Studio](https://files.lmstudio.ai/deeplink/mcp-install-light.svg)](${lmstudioUrl})`);
     }
 
@@ -830,7 +1000,12 @@ function MCP() {
     if (readmeVSCode) {
       readmeContent += `<details>\n<summary>VS Code</summary>\n\n`;
       readmeContent += `#### Click the button to install:\n\n`;
-      const vscodeUrl = `https://vscode.dev/redirect/mcp/install?name=${encodeURIComponent(serverName)}&config=${encodeConfig(generateConfig())}`;
+      const inputs = getInputsForBadge();
+      const encodedInputs = inputs.length > 0 ? encodeURIComponent(JSON.stringify(inputs)) : '';
+      let vscodeUrl = `https://vscode.dev/redirect/mcp/install?name=${encodeURIComponent(serverName)}`;
+      if (encodedInputs) vscodeUrl += `&inputs=${encodedInputs}`;
+      vscodeUrl += `&config=${encodeConfig(getConfigForBadge())}`;
+      vscodeUrl = escapeUrlForMarkdown(vscodeUrl);
       readmeContent += `[![Install in VS Code](https://img.shields.io/badge/${badgeText.replace(/\s/g, '_')}-VS_Code-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](${vscodeUrl})\n\n`;
       readmeContent += `#### Or install manually:\n\n`;
       readmeContent += `Follow the MCP install [guide](https://code.visualstudio.com/docs/copilot/chat/mcp-servers#_add-an-mcp-server), use the standard config above. You can also install the ${serverName} MCP server using the VS Code CLI:\n\n`;
@@ -842,7 +1017,12 @@ function MCP() {
     if (readmeVSCodeInsiders) {
       readmeContent += `<details>\n<summary>VS Code Insiders</summary>\n\n`;
       readmeContent += `#### Click the button to install:\n\n`;
-      const vscodeInsidersUrl = `https://insiders.vscode.dev/redirect/mcp/install?name=${encodeURIComponent(serverName)}&config=${encodeConfig(generateConfig())}&quality=insiders`;
+      const inputs = getInputsForBadge();
+      const encodedInputs = inputs.length > 0 ? encodeURIComponent(JSON.stringify(inputs)) : '';
+      let vscodeInsidersUrl = `https://insiders.vscode.dev/redirect/mcp/install?name=${encodeURIComponent(serverName)}`;
+      if (encodedInputs) vscodeInsidersUrl += `&inputs=${encodedInputs}`;
+      vscodeInsidersUrl += `&config=${encodeConfig(getConfigForBadge())}&quality=insiders`;
+      vscodeInsidersUrl = escapeUrlForMarkdown(vscodeInsidersUrl);
       readmeContent += `[![Install in VS Code Insiders](https://img.shields.io/badge/${badgeText.replace(/\s/g, '_')}-VS_Code_Insiders-24bfa5?style=flat-square&logo=visualstudiocode&logoColor=white)](${vscodeInsidersUrl})\n\n`;
       readmeContent += `#### Or install manually:\n\n`;
       readmeContent += `Follow the MCP install [guide](https://code.visualstudio.com/docs/copilot/chat/mcp-servers#_add-an-mcp-server), use the standard config above. You can also install the ${serverName} MCP server using the VS Code Insiders CLI:\n\n`;
@@ -854,7 +1034,8 @@ function MCP() {
     if (readmeVisualStudio) {
       readmeContent += `<details>\n<summary>Visual Studio</summary>\n\n`;
       readmeContent += `#### Click the button to install:\n\n`;
-      const vsUrl = `https://vs-open.link/mcp-install?${encodeConfig(generateConfig())}`;
+      let vsUrl = `https://vs-open.link/mcp-install?${encodeConfig(getConfigForBadge())}`;
+      vsUrl = escapeUrlForMarkdown(vsUrl);
       readmeContent += `[![Install in Visual Studio](https://img.shields.io/badge/${badgeText.replace(/\s/g, '_')}-Visual_Studio-C16FDE?style=flat-square&logo=visualstudio&logoColor=white)](${vsUrl})\n\n`;
       readmeContent += `#### Or install manually:\n\n`;
       readmeContent += `1. Open Visual Studio\n`;
@@ -891,9 +1072,14 @@ function MCP() {
     if (readmeCursor) {
       readmeContent += `<details>\n<summary>Cursor</summary>\n\n`;
       readmeContent += `#### Click the button to install:\n\n`;
-      const configWithName = { name: serverName, ...generateConfig() };
+      const configWithName = { 
+        name: serverName, 
+        ...generateConfig(),
+        ...(fullConfig.inputs && fullConfig.inputs.length > 0 ? { inputs: fullConfig.inputs } : {})
+      };
       const base64Config = btoa(JSON.stringify(configWithName));
-      const cursorUrl = `https://cursor.com/en/install-mcp?name=${encodeURIComponent(serverName)}&config=${base64Config}`;
+      let cursorUrl = `https://cursor.com/en/install-mcp?name=${encodeURIComponent(serverName)}&config=${base64Config}`;
+      cursorUrl = escapeUrlForMarkdown(cursorUrl);
       // Use Cursor badge with same style as VS Code badges (no icon)
       readmeContent += `[![Install in Cursor](https://img.shields.io/badge/${badgeText.replace(/\s/g, '_')}-Cursor-000000?style=flat-square&logoColor=white)](${cursorUrl})\n\n`;
       readmeContent += `#### Or install manually:\n\n`;
@@ -904,10 +1090,15 @@ function MCP() {
     if (readmeGoose) {
       readmeContent += `<details>\n<summary>Goose</summary>\n\n`;
       readmeContent += `#### Click the button to install:\n\n`;
-      const configWithName = { name: serverName, ...generateConfig() };
+      const configWithName = { 
+        name: serverName, 
+        ...generateConfig(),
+        ...(fullConfig.inputs && fullConfig.inputs.length > 0 ? { inputs: fullConfig.inputs } : {})
+      };
       const args = configWithName.args ? configWithName.args.join('%20') : '';
       const cmd = configWithName.command || '';
-      const gooseUrl = `https://block.github.io/goose/extension?cmd=${encodeURIComponent(cmd)}&arg=${encodeURIComponent(args)}&id=${encodeURIComponent(serverName)}&name=${encodeURIComponent(serverName)}&description=MCP%20Server%20for%20${encodeURIComponent(serverName)}`;
+      let gooseUrl = `https://block.github.io/goose/extension?cmd=${encodeURIComponent(cmd)}&arg=${encodeURIComponent(args)}&id=${encodeURIComponent(serverName)}&name=${encodeURIComponent(serverName)}&description=MCP%20Server%20for%20${encodeURIComponent(serverName)}`;
+      gooseUrl = escapeUrlForMarkdown(gooseUrl);
       readmeContent += `[![Install in Goose](https://block.github.io/goose/img/extension-install-dark.svg)](${gooseUrl})\n\n`;
       readmeContent += `#### Or install manually:\n\n`;
       readmeContent += `Go to \`Advanced settings\` -> \`Extensions\` -> \`Add custom extension\`. Name to your liking, use type \`STDIO\`, and set the \`command\` from the standard config above. Click "Add Extension".\n</details>\n\n`;
@@ -917,9 +1108,14 @@ function MCP() {
     if (readmeLMStudio) {
       readmeContent += `<details>\n<summary>LM Studio</summary>\n\n`;
       readmeContent += `#### Click the button to install:\n\n`;
-      const configWithName = { name: serverName, ...generateConfig() };
+      const configWithName = { 
+        name: serverName, 
+        ...generateConfig(),
+        ...(fullConfig.inputs && fullConfig.inputs.length > 0 ? { inputs: fullConfig.inputs } : {})
+      };
       const base64Config = btoa(JSON.stringify(configWithName));
-      const lmstudioUrl = `https://lmstudio.ai/install-mcp?name=${encodeURIComponent(serverName)}&config=${base64Config}`;
+      let lmstudioUrl = `https://lmstudio.ai/install-mcp?name=${encodeURIComponent(serverName)}&config=${base64Config}`;
+      lmstudioUrl = escapeUrlForMarkdown(lmstudioUrl);
       readmeContent += `[![Add MCP Server ${serverName} to LM Studio](https://files.lmstudio.ai/deeplink/mcp-install-light.svg)](${lmstudioUrl})\n\n`;
       readmeContent += `#### Or install manually:\n\n`;
       readmeContent += `Go to \`Program\` in the right sidebar -> \`Install\` -> \`Edit mcp.json\`. Use the standard config above.\n</details>\n\n`;
