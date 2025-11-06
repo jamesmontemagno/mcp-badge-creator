@@ -585,7 +585,7 @@ function MCP() {
           const args = serverConfig.args || [];
           
           // Find Docker image - it's the last non-flag argument
-          // Skip 'run', '-i', '--rm', and any '-e' flags with their KEY_NAME
+          // Skip 'run', '-i', '--rm', and any '-e' flags with their values
           let imageIndex = -1;
           for (let i = args.length - 1; i >= 0; i--) {
             const arg = args[i];
@@ -593,7 +593,7 @@ function MCP() {
             if (arg.startsWith('-') || arg === 'run' || arg === '-i' || arg === '--rm') {
               continue;
             }
-            // Skip if previous arg was -e (this is an env var key name)
+            // Skip if previous arg was -e (this could be env var key or KEY=VALUE)
             if (i > 0 && args[i - 1] === '-e') {
               continue;
             }
@@ -603,10 +603,11 @@ function MCP() {
           }
           setDockerImage(imageIndex >= 0 ? args[imageIndex] : '');
           
-          // Parse environment variables from env object (not from -e flags in args)
-          // The -e flags in args just specify which env vars to pass, the values come from env object
+          // Parse environment variables - check both env object and -e flags in args
           const envList: DynamicEnvVar[] = [];
-          if (serverConfig.env) {
+          
+          // First, parse from env object (preferred format)
+          if (serverConfig.env && Object.keys(serverConfig.env).length > 0) {
             Object.entries(serverConfig.env).forEach(([key, value]) => {
               const isPassword = typeof value === 'string' && value.includes('${input:');
               const inputMatch = isPassword ? (value as string).match(/\$\{input:([^}]+)\}/) : null;
@@ -621,6 +622,33 @@ function MCP() {
                 inputDescription: inputObj?.description || ''
               });
             });
+          } 
+          // If env object is empty, check for inline format in args: -e KEY=VALUE
+          else {
+            for (let i = 0; i < args.length; i++) {
+              if (args[i] === '-e' && i + 1 < args.length) {
+                const envArg = args[i + 1];
+                // Check if it's KEY=VALUE format (inline) or just KEY (separate env object)
+                if (envArg.includes('=')) {
+                  const [key, ...valueParts] = envArg.split('=');
+                  const value = valueParts.join('='); // Handle values with = in them
+                  
+                  const isPassword = value.includes('${input:');
+                  const inputMatch = isPassword ? value.match(/\$\{input:([^}]+)\}/) : null;
+                  const inputId = inputMatch ? inputMatch[1] : '';
+                  const inputObj = inputs.find(inp => inp.id === inputId);
+                  
+                  envList.push({
+                    key,
+                    value: isPassword ? '' : value,
+                    password: isPassword,
+                    inputName: inputId,
+                    inputDescription: inputObj?.description || ''
+                  });
+                }
+                i++; // Skip the next arg since we consumed it
+              }
+            }
           }
           
           if (envList.length > 0) {
