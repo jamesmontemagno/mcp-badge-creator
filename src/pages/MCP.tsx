@@ -266,10 +266,33 @@ function MCP() {
     return encodeURIComponent(JSON.stringify(config));
   }
 
-  const generateCliCommand = (isInsiders: boolean = false): string => {
+  // Helper function to get config with inputs for badge URLs
+  const getConfigForBadge = () => {
     const config = generateConfig();
-    // CLI command requires name property inside the config JSON
-    const cliConfig = { name: serverName, ...config };
+    const fullConfig = generateFullConfig();
+    
+    // If we have inputs, return the full config structure with inputs
+    if (fullConfig.inputs && fullConfig.inputs.length > 0) {
+      return {
+        ...config,
+        inputs: fullConfig.inputs
+      };
+    }
+    
+    // Otherwise, return just the server config
+    return config;
+  }
+
+  const generateCliCommand = (isInsiders: boolean = false): string => {
+    const fullConfig = generateFullConfig();
+    
+    // CLI command requires the full config structure with inputs
+    const cliConfig = {
+      name: serverName,
+      ...generateConfig(),
+      ...(fullConfig.inputs && fullConfig.inputs.length > 0 ? { inputs: fullConfig.inputs } : {})
+    };
+    
     const jsonString = JSON.stringify(cliConfig);
     // Escape with backslashes for cross-platform compatibility (works in PowerShell, Bash, Zsh)
     const escapedJson = jsonString.replace(/"/g, '\\"');
@@ -736,8 +759,8 @@ function MCP() {
   const generateMarkdown = (): string => {
     if (!serverName) return '';
     
-    const config = generateConfig();
-    const encodedConfig = encodeConfig(config);
+    const configForBadge = getConfigForBadge();
+    const encodedConfig = encodeConfig(configForBadge);
     const badges: string[] = [];
 
     const customBadgeText = badgeText.replace(/\s/g, '_');
@@ -759,7 +782,12 @@ function MCP() {
 
     if (includeCursor) {
       // Use Cursor badge with same style as VS Code badges but black background
-      const configWithName = { name: serverName, ...config };
+      const fullConfig = generateFullConfig();
+      const configWithName = { 
+        name: serverName, 
+        ...generateConfig(),
+        ...(fullConfig.inputs && fullConfig.inputs.length > 0 ? { inputs: fullConfig.inputs } : {})
+      };
       const base64Config = btoa(JSON.stringify(configWithName));
       const cursorUrl = `https://cursor.com/en/install-mcp?name=${encodeURIComponent(serverName)}&config=${base64Config}`;
       badges.push(`[![Install in Cursor](https://img.shields.io/badge/${customBadgeText}-Cursor-000000?style=flat-square&logoColor=white)](${cursorUrl})`);
@@ -767,7 +795,12 @@ function MCP() {
 
     if (includeGoose) {
       // Use Goose's official badge format from Playwright repository
-      const configWithName = { name: serverName, ...config };
+      const fullConfig = generateFullConfig();
+      const configWithName = { 
+        name: serverName, 
+        ...generateConfig(),
+        ...(fullConfig.inputs && fullConfig.inputs.length > 0 ? { inputs: fullConfig.inputs } : {})
+      };
       const args = configWithName.args ? configWithName.args.join('%20') : '';
       const cmd = configWithName.command || '';
       const gooseUrl = `https://block.github.io/goose/extension?cmd=${encodeURIComponent(cmd)}&arg=${encodeURIComponent(args)}&id=${encodeURIComponent(serverName)}&name=${encodeURIComponent(serverName)}&description=MCP%20Server%20for%20${encodeURIComponent(serverName)}`;
@@ -776,7 +809,12 @@ function MCP() {
 
     if (includeLMStudio) {
       // Use LM Studio's official badge format from Playwright repository
-      const configWithName = { name: serverName, ...config };
+      const fullConfig = generateFullConfig();
+      const configWithName = { 
+        name: serverName, 
+        ...generateConfig(),
+        ...(fullConfig.inputs && fullConfig.inputs.length > 0 ? { inputs: fullConfig.inputs } : {})
+      };
       const base64Config = btoa(JSON.stringify(configWithName));
       const lmstudioUrl = `https://lmstudio.ai/install-mcp?name=${encodeURIComponent(serverName)}&config=${base64Config}`;
       badges.push(`[![Add MCP Server ${serverName} to LM Studio](https://files.lmstudio.ai/deeplink/mcp-install-light.svg)](${lmstudioUrl})`);
@@ -830,7 +868,7 @@ function MCP() {
     if (readmeVSCode) {
       readmeContent += `<details>\n<summary>VS Code</summary>\n\n`;
       readmeContent += `#### Click the button to install:\n\n`;
-      const vscodeUrl = `https://vscode.dev/redirect/mcp/install?name=${encodeURIComponent(serverName)}&config=${encodeConfig(generateConfig())}`;
+      const vscodeUrl = `https://vscode.dev/redirect/mcp/install?name=${encodeURIComponent(serverName)}&config=${encodeConfig(getConfigForBadge())}`;
       readmeContent += `[![Install in VS Code](https://img.shields.io/badge/${badgeText.replace(/\s/g, '_')}-VS_Code-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](${vscodeUrl})\n\n`;
       readmeContent += `#### Or install manually:\n\n`;
       readmeContent += `Follow the MCP install [guide](https://code.visualstudio.com/docs/copilot/chat/mcp-servers#_add-an-mcp-server), use the standard config above. You can also install the ${serverName} MCP server using the VS Code CLI:\n\n`;
@@ -842,7 +880,7 @@ function MCP() {
     if (readmeVSCodeInsiders) {
       readmeContent += `<details>\n<summary>VS Code Insiders</summary>\n\n`;
       readmeContent += `#### Click the button to install:\n\n`;
-      const vscodeInsidersUrl = `https://insiders.vscode.dev/redirect/mcp/install?name=${encodeURIComponent(serverName)}&config=${encodeConfig(generateConfig())}&quality=insiders`;
+      const vscodeInsidersUrl = `https://insiders.vscode.dev/redirect/mcp/install?name=${encodeURIComponent(serverName)}&config=${encodeConfig(getConfigForBadge())}&quality=insiders`;
       readmeContent += `[![Install in VS Code Insiders](https://img.shields.io/badge/${badgeText.replace(/\s/g, '_')}-VS_Code_Insiders-24bfa5?style=flat-square&logo=visualstudiocode&logoColor=white)](${vscodeInsidersUrl})\n\n`;
       readmeContent += `#### Or install manually:\n\n`;
       readmeContent += `Follow the MCP install [guide](https://code.visualstudio.com/docs/copilot/chat/mcp-servers#_add-an-mcp-server), use the standard config above. You can also install the ${serverName} MCP server using the VS Code Insiders CLI:\n\n`;
@@ -854,7 +892,7 @@ function MCP() {
     if (readmeVisualStudio) {
       readmeContent += `<details>\n<summary>Visual Studio</summary>\n\n`;
       readmeContent += `#### Click the button to install:\n\n`;
-      const vsUrl = `https://vs-open.link/mcp-install?${encodeConfig(generateConfig())}`;
+      const vsUrl = `https://vs-open.link/mcp-install?${encodeConfig(getConfigForBadge())}`;
       readmeContent += `[![Install in Visual Studio](https://img.shields.io/badge/${badgeText.replace(/\s/g, '_')}-Visual_Studio-C16FDE?style=flat-square&logo=visualstudio&logoColor=white)](${vsUrl})\n\n`;
       readmeContent += `#### Or install manually:\n\n`;
       readmeContent += `1. Open Visual Studio\n`;
@@ -891,7 +929,11 @@ function MCP() {
     if (readmeCursor) {
       readmeContent += `<details>\n<summary>Cursor</summary>\n\n`;
       readmeContent += `#### Click the button to install:\n\n`;
-      const configWithName = { name: serverName, ...generateConfig() };
+      const configWithName = { 
+        name: serverName, 
+        ...generateConfig(),
+        ...(fullConfig.inputs && fullConfig.inputs.length > 0 ? { inputs: fullConfig.inputs } : {})
+      };
       const base64Config = btoa(JSON.stringify(configWithName));
       const cursorUrl = `https://cursor.com/en/install-mcp?name=${encodeURIComponent(serverName)}&config=${base64Config}`;
       // Use Cursor badge with same style as VS Code badges (no icon)
@@ -904,7 +946,11 @@ function MCP() {
     if (readmeGoose) {
       readmeContent += `<details>\n<summary>Goose</summary>\n\n`;
       readmeContent += `#### Click the button to install:\n\n`;
-      const configWithName = { name: serverName, ...generateConfig() };
+      const configWithName = { 
+        name: serverName, 
+        ...generateConfig(),
+        ...(fullConfig.inputs && fullConfig.inputs.length > 0 ? { inputs: fullConfig.inputs } : {})
+      };
       const args = configWithName.args ? configWithName.args.join('%20') : '';
       const cmd = configWithName.command || '';
       const gooseUrl = `https://block.github.io/goose/extension?cmd=${encodeURIComponent(cmd)}&arg=${encodeURIComponent(args)}&id=${encodeURIComponent(serverName)}&name=${encodeURIComponent(serverName)}&description=MCP%20Server%20for%20${encodeURIComponent(serverName)}`;
@@ -917,7 +963,11 @@ function MCP() {
     if (readmeLMStudio) {
       readmeContent += `<details>\n<summary>LM Studio</summary>\n\n`;
       readmeContent += `#### Click the button to install:\n\n`;
-      const configWithName = { name: serverName, ...generateConfig() };
+      const configWithName = { 
+        name: serverName, 
+        ...generateConfig(),
+        ...(fullConfig.inputs && fullConfig.inputs.length > 0 ? { inputs: fullConfig.inputs } : {})
+      };
       const base64Config = btoa(JSON.stringify(configWithName));
       const lmstudioUrl = `https://lmstudio.ai/install-mcp?name=${encodeURIComponent(serverName)}&config=${base64Config}`;
       readmeContent += `[![Add MCP Server ${serverName} to LM Studio](https://files.lmstudio.ai/deeplink/mcp-install-light.svg)](${lmstudioUrl})\n\n`;
