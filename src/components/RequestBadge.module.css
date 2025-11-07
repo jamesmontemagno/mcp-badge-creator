@@ -1,0 +1,46 @@
+/* RequestBadge Component CSS Module */
+
+.requestBadgeSection {
+  margin-top: 3rem;
+  padding: 2rem;
+  background: var(--bg-light);
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  text-align: center;
+}
+
+.requestBadgeText {
+  margin: 0 0 1.25rem 0;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.requestBadgeBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.25rem;
+  background: var(--primary-color);
+  color: white;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px var(--shadow-light);
+}
+
+.requestBadgeBtn:hover {
+  background: var(--primary-dark);
+  box-shadow: 0 6px 16px var(--shadow-color);
+  transform: translateY(-1px);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .requestBadgeBtn {
+    font-size: 0.85rem;
+    padding: 0.6rem 1rem;
+  }
+}

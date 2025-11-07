@@ -4,6 +4,7 @@ import styles from './Extensions.module.css'
 import { generateExtensionBadges, parseExtensionInput } from '../utils/extensionBadge'
 import SearchDropdown from '../components/SearchDropdown'
 import type { SortBy } from '../utils/marketplaceApi'
+import RequestBadge from '../components/RequestBadge'
 
 type BadgeVariant = 'stable' | 'insiders' | 'install' | 'rating' | 'installs' | 'downloads' | 'version' | 'lastUpdated' | 'releaseDate' | 'about' | 'all'
 type InputMode = 'manual' | 'search'
@@ -624,6 +625,8 @@ function Extensions() {
           </div>
         </section>
       )}
+      
+      <RequestBadge />
       </div>
     </>
   )
