@@ -12,6 +12,8 @@ function Profile() {
   const [defaultUsername, setDefaultUsername] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [copiedBadge, setCopiedBadge] = useState<string | null>(null)
+  const [draggedIndex, setDraggedIndex] = useState<number | null>(null)
+  const [showReorderSection, setShowReorderSection] = useState(false)
 
   // Badge configurations (alphabetized by display label)
   const [badgeConfigs, setBadgeConfigs] = useState<BadgeConfig[]>([
@@ -188,7 +190,26 @@ function Profile() {
     setError(null)
   }
 
-  const badges = generateProfileBadges(badgeConfigs)
+  const allBadges = generateProfileBadges(badgeConfigs)
+  
+  // Reordering: maintain order of enabled badges
+  const [badgeOrder, setBadgeOrder] = useState<BadgeType[]>([])
+  
+  // Sync badge order when enabled badges change
+  useEffect(() => {
+    const enabledTypes = allBadges.map(b => b.type as BadgeType)
+    setBadgeOrder(prev => {
+      // Keep existing order for badges still enabled, add new ones at end
+      const stillEnabled = prev.filter(t => enabledTypes.includes(t))
+      const newlyEnabled = enabledTypes.filter(t => !prev.includes(t))
+      return [...stillEnabled, ...newlyEnabled]
+    })
+  }, [allBadges])
+  
+  // Reorder badges based on badgeOrder state
+  const badges = badgeOrder
+    .map(type => allBadges.find(b => b.type === type))
+    .filter((b): b is NonNullable<typeof b> => b !== undefined)
 
   const combinedMarkdown = badges.map(b => b.markdown).join(' ')
 
@@ -459,6 +480,28 @@ function Profile() {
     }
     return { imageUrl: '' }
   }
+  
+  // Drag and drop handlers
+  const handleDragStart = (index: number) => {
+    setDraggedIndex(index)
+  }
+  
+  const handleDragOver = (e: React.DragEvent, index: number) => {
+    e.preventDefault()
+    if (draggedIndex === null || draggedIndex === index) return
+    
+    const newOrder = [...badgeOrder]
+    const draggedType = newOrder[draggedIndex]
+    newOrder.splice(draggedIndex, 1)
+    newOrder.splice(index, 0, draggedType)
+    
+    setBadgeOrder(newOrder)
+    setDraggedIndex(index)
+  }
+  
+  const handleDragEnd = () => {
+    setDraggedIndex(null)
+  }
 
   return (
     <>
@@ -511,7 +554,39 @@ function Profile() {
             {/* Preview */}
             <div className={styles.previewHeader}>
               <h2>Preview</h2>
+              {badges.length > 1 && (
+                <button
+                  type="button"
+                  className={styles.reorderToggle}
+                  onClick={() => setShowReorderSection(!showReorderSection)}
+                >
+                  {showReorderSection ? '✕ Close Reorder' : '↕️ Reorder Badges'}
+                </button>
+              )}
             </div>
+            
+            {/* Reorder Section */}
+            {showReorderSection && badges.length > 1 && (
+              <div className={styles.reorderSection}>
+                <p className={styles.reorderHint}>Drag and drop badges to reorder them</p>
+                <div className={styles.reorderList}>
+                  {badges.map((badge, index) => (
+                    <div
+                      key={badge.type}
+                      className={`${styles.reorderItem} ${draggedIndex === index ? styles.dragging : ''}`}
+                      draggable
+                      onDragStart={() => handleDragStart(index)}
+                      onDragOver={(e) => handleDragOver(e, index)}
+                      onDragEnd={handleDragEnd}
+                    >
+                      <span className={styles.dragHandle}>⋮⋮</span>
+                      <span className={styles.reorderLabel}>{badge.label}</span>
+                      <span className={styles.reorderPosition}>#{index + 1}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
 
             <div className={styles.previewFlat}>
               {badges.map((badge, idx) => {

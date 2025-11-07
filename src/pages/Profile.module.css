@@ -392,6 +392,97 @@
   color: var(--text-color);
 }
 
+.reorderToggle {
+  padding: 0.5rem 1rem;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 0.875rem;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.reorderToggle:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+.reorderToggle:active {
+  transform: translateY(0);
+}
+
+/* Reorder Section */
+.reorderSection {
+  background: var(--bg-light);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.reorderHint {
+  font-size: 0.875rem;
+  color: var(--text-light);
+  margin: 0 0 1rem 0;
+  text-align: center;
+}
+
+.reorderList {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.reorderItem {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.75rem 1rem;
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  cursor: move;
+  transition: box-shadow 0.2s, transform 0.1s;
+  user-select: none;
+}
+
+.reorderItem:hover {
+  box-shadow: 0 2px 8px var(--shadow-light);
+}
+
+.reorderItem.dragging {
+  opacity: 0.5;
+  transform: scale(0.98);
+}
+
+.dragHandle {
+  color: var(--text-lighter);
+  font-size: 1.25rem;
+  cursor: grab;
+  line-height: 1;
+}
+
+.dragHandle:active {
+  cursor: grabbing;
+}
+
+.reorderLabel {
+  flex: 1;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.reorderPosition {
+  font-size: 0.75rem;
+  color: var(--text-lighter);
+  background: var(--bg-light);
+  padding: 0.25rem 0.5rem;
+  border-radius: var(--radius-sm);
+  font-weight: 600;
+}
+
 .previewToggle {
   display: flex;
   gap: 0.5rem;
@@ -623,6 +714,19 @@
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
+  }
+  
+  .reorderToggle {
+    width: 100%;
+    text-align: center;
+  }
+  
+  .reorderItem {
+    padding: 0.625rem 0.75rem;
+  }
+  
+  .reorderLabel {
+    font-size: 0.875rem;
   }
 
   .markdownColumns {
