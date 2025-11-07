@@ -79,6 +79,30 @@ function Home() {
         })}
       </div>
 
+      <section className={styles.homeBadges} aria-labelledby="project-badges-heading">
+        <h2 id="project-badges-heading" className={styles.homeBadgesHeader}>Project Badges</h2>
+        <div className={styles.homeBadgesGrid} role="list" aria-label="Repository status badges">
+          <a href="https://github.com/jamesmontemagno/mcp-badge-creator/stargazers" target="_blank" rel="noopener noreferrer" role="listitem">
+            <img src="https://img.shields.io/github/stars/jamesmontemagno/mcp-badge-creator" alt="GitHub stars" loading="lazy" />
+          </a>
+          <a href="https://github.com/jamesmontemagno/mcp-badge-creator/actions/workflows/deploy.yml" target="_blank" rel="noopener noreferrer" role="listitem">
+            <img src="https://img.shields.io/github/actions/workflow/status/jamesmontemagno/mcp-badge-creator/deploy.yml?label=deploy" alt="Deploy workflow status" loading="lazy" />
+          </a>
+          <a href="https://github.com/jamesmontemagno/mcp-badge-creator/commits" target="_blank" rel="noopener noreferrer" role="listitem">
+            <img src="https://img.shields.io/github/last-commit/jamesmontemagno/mcp-badge-creator" alt="Last commit" loading="lazy" />
+          </a>
+          <a href="https://github.com/jamesmontemagno/mcp-badge-creator/issues" target="_blank" rel="noopener noreferrer" role="listitem">
+            <img src="https://img.shields.io/github/issues/jamesmontemagno/mcp-badge-creator" alt="Open issues" loading="lazy" />
+          </a>
+          <a href="https://github.com/jamesmontemagno/mcp-badge-creator/tree/main/LICENSE" target="_blank" rel="noopener noreferrer" role="listitem">
+            <img src="https://img.shields.io/github/license/jamesmontemagno/mcp-badge-creator" alt="License" loading="lazy" />
+          </a>
+          <a href="https://github.com/jamesmontemagno/mcp-badge-creator" target="_blank" rel="noopener noreferrer" role="listitem">
+            <img src="https://img.shields.io/badge/built_with-Vite_+_React-646CFF?logo=vite&logoColor=white" alt="Built with Vite and React" loading="lazy" />
+          </a>
+        </div>
+      </section>
+
       <footer className={`${styles.homeFooter} home-footer`}>
         <p>
           Created with <a href="https://code.visualstudio.com/" target="_blank" rel="noopener noreferrer">VS Code</a> and <a href="https://github.com/features/copilot" target="_blank" rel="noopener noreferrer">GitHub Copilot</a> • <a href="https://github.com/jamesmontemagno/mcp-badge-creator" target="_blank" rel="noopener noreferrer">View on GitHub</a>

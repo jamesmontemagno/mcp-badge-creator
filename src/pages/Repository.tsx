@@ -23,6 +23,7 @@ function Repository() {
   const [customWorkflowFilename, setCustomWorkflowFilename] = useState('')
   const [workflowValidationError, setWorkflowValidationError] = useState<string | null>(null)
   const [selectedWorkflowPresets, setSelectedWorkflowPresets] = useState<Set<string>>(new Set())
+  const [defaultBranch, setDefaultBranch] = useState<string>('main')
 
   // Badge configurations
   const [badgeConfigs, setBadgeConfigs] = useState<BadgeConfig[]>([
@@ -44,6 +45,7 @@ function Repository() {
   // Local storage persistence keys
   const BADGE_KEY = 'repositoryBadgeConfigs'
   const WORKFLOW_KEY = 'repositoryWorkflowConfigs'
+  const BRANCH_KEY = 'repositoryDefaultBranch'
 
   // Load persisted configs on mount
   useEffect(() => {
@@ -67,6 +69,10 @@ function Repository() {
           setSelectedWorkflowPresets(new Set(wf.filter(w => WORKFLOW_PRESETS.includes(w.workflowFile || '')).map(w => w.workflowFile!)))
         }
       }
+      const storedBranch = localStorage.getItem(BRANCH_KEY)
+      if (storedBranch) {
+        setDefaultBranch(storedBranch)
+      }
     } catch {
       // ignore corrupt storage
     }
@@ -78,6 +84,9 @@ function Repository() {
   }
   const persistWorkflows = (configs: BadgeConfig[]) => {
     try { localStorage.setItem(WORKFLOW_KEY, JSON.stringify(configs)) } catch { /* ignore */ }
+  }
+  const persistBranch = (branch: string) => {
+    try { localStorage.setItem(BRANCH_KEY, branch) } catch { /* ignore */ }
   }
 
   const [workflowConfigs, setWorkflowConfigs] = useState<BadgeConfig[]>([])
@@ -288,7 +297,7 @@ function Repository() {
 
   const repoInfo = parseRepositoryInput(inputValue)
   const allConfigs = [...badgeConfigs, ...workflowConfigs]
-  const badges = repoInfo ? generateRepositoryBadges(repoInfo, allConfigs) : []
+  const badges = repoInfo ? generateRepositoryBadges(repoInfo, allConfigs, defaultBranch || 'main') : []
 
   const essentialBadges = badges.filter(b => ['stars', 'license', 'contributors', 'release','coverage','openssf'].includes(b.type))
   const workflowBadges = badges.filter(b => b.type === 'workflow')
@@ -431,6 +440,21 @@ function Repository() {
     </div>
   )
 
+  // Helper to extract image and link URLs from markdown (supports linked and unlinked badges)
+  const parseBadgeMarkdown = (markdown: string): { imageUrl: string; linkUrl?: string } => {
+    // Linked form: [![Alt](imageUrl)](linkUrl)
+    const linkMatch = markdown.match(/^\[!\[[^\]]*\]\(([^)]+)\)\]\(([^)]+)\)$/)
+    if (linkMatch) {
+      return { imageUrl: linkMatch[1], linkUrl: linkMatch[2] }
+    }
+    // Image only form: ![Alt](imageUrl)
+    const imgMatch = markdown.match(/!\[[^\]]*\]\(([^)]+)\)/)
+    if (imgMatch) {
+      return { imageUrl: imgMatch[1] }
+    }
+    return { imageUrl: '' }
+  }
+
   return (
     <>
       <header className={styles.repositoryHeader}>
@@ -456,6 +480,20 @@ function Repository() {
             onChange={handleInputChange}
             autoComplete="off"
           />
+          <div className={styles.inlineFieldsRow}>
+            <div className={styles.inlineField}>
+              <label htmlFor="defaultBranch">Default branch</label>
+              <input
+                id="defaultBranch"
+                type="text"
+                value={defaultBranch}
+                onChange={e => { setDefaultBranch(e.target.value.trim() || 'main'); persistBranch(e.target.value.trim() || 'main') }}
+                placeholder="main"
+                autoComplete="off"
+              />
+              <span className="field-hint">Used for license & last commit links (defaults to main)</span>
+            </div>
+          </div>
 
           <span className="field-hint">
             Accepts GitHub repository URLs (github.com/owner/repo) or direct format (owner/repo).
@@ -570,11 +608,16 @@ function Repository() {
                     <div className={styles.previewSectionHeader}>Essential</div>
                     <div className={styles.previewRow}>
                       {essentialBadges.map(badge => (
-                        <img
-                          key={badge.type}
-                          src={badge.markdown.match(/\((https:\/\/[^)]+)\)/)?.[1]}
-                          alt={badge.label}
-                        />
+                        (() => {
+                          const { imageUrl, linkUrl } = parseBadgeMarkdown(badge.markdown)
+                          return linkUrl ? (
+                            <a key={badge.type} href={linkUrl} target="_blank" rel="noopener noreferrer">
+                              <img src={imageUrl} alt={badge.label} />
+                            </a>
+                          ) : (
+                            <img key={badge.type} src={imageUrl} alt={badge.label} />
+                          )
+                        })()
                       ))}
                     </div>
                   </div>
@@ -585,11 +628,16 @@ function Repository() {
                     <div className={styles.previewSectionHeader}>CI/CD</div>
                     <div className={styles.previewRow}>
                       {workflowBadges.map((badge, idx) => (
-                        <img
-                          key={`${badge.type}-${idx}`}
-                          src={badge.markdown.match(/\((https:\/\/[^)]+)\)/)?.[1]}
-                          alt={badge.label}
-                        />
+                        (() => {
+                          const { imageUrl, linkUrl } = parseBadgeMarkdown(badge.markdown)
+                          return linkUrl ? (
+                            <a key={`${badge.type}-${idx}`} href={linkUrl} target="_blank" rel="noopener noreferrer">
+                              <img src={imageUrl} alt={badge.label} />
+                            </a>
+                          ) : (
+                            <img key={`${badge.type}-${idx}`} src={imageUrl} alt={badge.label} />
+                          )
+                        })()
                       ))}
                     </div>
                   </div>
@@ -600,11 +648,16 @@ function Repository() {
                     <div className={styles.previewSectionHeader}>Advanced</div>
                     <div className={styles.previewRow}>
                       {advancedBadges.map(badge => (
-                        <img
-                          key={badge.type}
-                          src={badge.markdown.match(/\((https:\/\/[^)]+)\)/)?.[1]}
-                          alt={badge.label}
-                        />
+                        (() => {
+                          const { imageUrl, linkUrl } = parseBadgeMarkdown(badge.markdown)
+                          return linkUrl ? (
+                            <a key={badge.type} href={linkUrl} target="_blank" rel="noopener noreferrer">
+                              <img src={imageUrl} alt={badge.label} />
+                            </a>
+                          ) : (
+                            <img key={badge.type} src={imageUrl} alt={badge.label} />
+                          )
+                        })()
                       ))}
                     </div>
                   </div>
@@ -613,11 +666,16 @@ function Repository() {
             ) : (
               <div className={styles.previewFlat}>
                 {badges.map((badge, idx) => (
-                  <img
-                    key={`${badge.type}-${idx}`}
-                    src={badge.markdown.match(/\((https:\/\/[^)]+)\)/)?.[1]}
-                    alt={badge.label}
-                  />
+                  (() => {
+                    const { imageUrl, linkUrl } = parseBadgeMarkdown(badge.markdown)
+                    return linkUrl ? (
+                      <a key={`${badge.type}-${idx}`} href={linkUrl} target="_blank" rel="noopener noreferrer">
+                        <img src={imageUrl} alt={badge.label} />
+                      </a>
+                    ) : (
+                      <img key={`${badge.type}-${idx}`} src={imageUrl} alt={badge.label} />
+                    )
+                  })()
                 ))}
               </div>
             )}
@@ -654,10 +712,16 @@ function Repository() {
                     </button>
                   </header>
                   <div className={styles.cardBadgePreview}>
-                    <img
-                      src={badge.markdown.match(/\((https:\/\/[^)]+)\)/)?.[1]}
-                      alt={badge.label}
-                    />
+                    {(() => {
+                      const { imageUrl, linkUrl } = parseBadgeMarkdown(badge.markdown)
+                      return linkUrl ? (
+                        <a href={linkUrl} target="_blank" rel="noopener noreferrer">
+                          <img src={imageUrl} alt={badge.label} />
+                        </a>
+                      ) : (
+                        <img src={imageUrl} alt={badge.label} />
+                      )
+                    })()}
                   </div>
                   <pre>
                     <code>{badge.markdown}</code>

@@ -2,6 +2,16 @@
 
 > Create beautiful one-click install badges for your projects - from MCP servers to VS Code extensions, npm packages, and GitHub repositories.
 
+## 📊 Project Badges
+
+[![Stars](https://img.shields.io/github/stars/jamesmontemagno/mcp-badge-creator)](https://github.com/jamesmontemagno/mcp-badge-creator/stargazers)
+[![Deploy Status](https://img.shields.io/github/actions/workflow/status/jamesmontemagno/mcp-badge-creator/deploy.yml?label=deploy)](https://github.com/jamesmontemagno/mcp-badge-creator/actions/workflows/deploy.yml)
+[![Last Commit](https://img.shields.io/github/last-commit/jamesmontemagno/mcp-badge-creator)](https://github.com/jamesmontemagno/mcp-badge-creator/commits)
+[![Issues](https://img.shields.io/github/issues/jamesmontemagno/mcp-badge-creator)](https://github.com/jamesmontemagno/mcp-badge-creator/issues)
+[![License](https://img.shields.io/github/license/jamesmontemagno/mcp-badge-creator)](https://github.com/jamesmontemagno/mcp-badge-creator/tree/main/LICENSE)
+[![Built With](https://img.shields.io/badge/built_with-Vite_+_React-646CFF?logo=vite&logoColor=white)](https://github.com/jamesmontemagno/mcp-badge-creator)
+
+
 ## 🌟 Features
 
 - ✅ **Multiple Badge Types**: 
@@ -297,7 +307,11 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## 📄 License
 
-MIT License - feel free to use this tool for your projects!
+This project is licensed under the MIT License.
+
+Copyright (c) 2025 Refractored LLC
+
+See the [LICENSE](./LICENSE) file for full text.
 
 ## 🙏 Acknowledgments
 

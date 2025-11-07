@@ -166,6 +166,7 @@ describe('generateRepositoryBadges', () => {
     const badges = generateRepositoryBadges(repoInfo, configs);
     
     expect(badges[0].markdown).toContain('github/forks/testowner/testrepo');
+    expect(badges[0].markdown).toContain('](https://github.com/testowner/testrepo/forks)');
     expect(badges[0].label).toBe('Forks');
   });
 
@@ -177,6 +178,7 @@ describe('generateRepositoryBadges', () => {
     
     expect(badges[0].markdown).toContain('github/issues/testowner/testrepo');
     expect(badges[0].markdown).toContain('color=ff6f00');
+    expect(badges[0].markdown).toContain('](https://github.com/testowner/testrepo/issues)');
     expect(badges[0].label).toBe('Issues');
   });
 
@@ -187,6 +189,7 @@ describe('generateRepositoryBadges', () => {
     const badges = generateRepositoryBadges(repoInfo, configs);
     
     expect(badges[0].markdown).toContain('github/license/testowner/testrepo');
+    expect(badges[0].markdown).toContain('](https://github.com/testowner/testrepo/tree/main/LICENSE)');
     expect(badges[0].label).toBe('License');
   });
 
@@ -198,6 +201,7 @@ describe('generateRepositoryBadges', () => {
     
     expect(badges).toHaveLength(1);
     expect(badges[0].markdown).toContain('actions/workflow/status/testowner/testrepo/ci.yml');
+    expect(badges[0].markdown).toContain('](https://github.com/testowner/testrepo/actions/workflows/ci.yml)');
     expect(badges[0].label).toBe('ci');
   });
 
@@ -226,6 +230,7 @@ describe('generateRepositoryBadges', () => {
     const badges = generateRepositoryBadges(repoInfo, configs);
     
     expect(badges[0].markdown).toContain('github/contributors/testowner/testrepo');
+    expect(badges[0].markdown).toContain('](https://github.com/testowner/testrepo/graphs/contributors)');
     expect(badges[0].label).toBe('Contributors');
   });
 
@@ -236,6 +241,7 @@ describe('generateRepositoryBadges', () => {
     const badges = generateRepositoryBadges(repoInfo, configs);
     
     expect(badges[0].markdown).toContain('github/v/release/testowner/testrepo');
+    expect(badges[0].markdown).toContain('](https://github.com/testowner/testrepo/releases/latest)');
     expect(badges[0].label).toBe('Release');
   });
 
@@ -246,6 +252,7 @@ describe('generateRepositoryBadges', () => {
     const badges = generateRepositoryBadges(repoInfo, configs);
     
     expect(badges[0].markdown).toContain('github/languages/top/testowner/testrepo');
+    expect(badges[0].markdown).toContain('](https://github.com/testowner/testrepo/languages)');
     expect(badges[0].label).toBe('Language');
   });
 
@@ -256,16 +263,18 @@ describe('generateRepositoryBadges', () => {
     const badges = generateRepositoryBadges(repoInfo, configs);
     
     expect(badges[0].markdown).toContain('github/languages/code-size/testowner/testrepo');
+    expect(badges[0].markdown).toContain('](https://github.com/testowner/testrepo)');
     expect(badges[0].label).toBe('Code Size');
   });
 
-  it('should generate last commit badge', () => {
+  it('should generate last commit badge (default branch main)', () => {
     const configs: BadgeConfig[] = [
       { type: 'lastCommit', enabled: true, customColor: '#6e7681' },
     ];
-    const badges = generateRepositoryBadges(repoInfo, configs);
+    const badges = generateRepositoryBadges(repoInfo, configs); // default branch main
     
     expect(badges[0].markdown).toContain('github/last-commit/testowner/testrepo');
+    expect(badges[0].markdown).toContain('](https://github.com/testowner/testrepo/commits/main)');
     expect(badges[0].label).toBe('Last Commit');
   });
 
@@ -276,6 +285,7 @@ describe('generateRepositoryBadges', () => {
     const badges = generateRepositoryBadges(repoInfo, configs);
     
     expect(badges[0].markdown).toContain('github/repo-size/testowner/testrepo');
+    expect(badges[0].markdown).toContain('](https://github.com/testowner/testrepo)');
     expect(badges[0].label).toBe('Repo Size');
   });
 
@@ -286,6 +296,7 @@ describe('generateRepositoryBadges', () => {
     const badges = generateRepositoryBadges(repoInfo, configs);
     expect(badges[0].markdown).toContain('codecov/c/github/testowner/testrepo');
     expect(badges[0].markdown).toContain('logo=codecov');
+    expect(badges[0].markdown).toContain('](https://codecov.io/gh/testowner/testrepo)');
     expect(badges[0].label).toBe('Coverage');
   });
 
@@ -296,7 +307,20 @@ describe('generateRepositoryBadges', () => {
     const badges = generateRepositoryBadges(repoInfo, configs);
     expect(badges[0].markdown).toContain('ossf-scorecard/github.com/testowner/testrepo');
     expect(badges[0].markdown).toContain('label=OpenSSF%20Scorecard');
+    expect(badges[0].markdown).toContain('](https://securityscorecards.dev/viewer/?uri=github.com/testowner/testrepo)');
     expect(badges[0].label).toBe('OpenSSF');
+  });
+
+  it('should respect custom branch for license and last commit links', () => {
+    const configs: BadgeConfig[] = [
+      { type: 'license', enabled: true, customColor: '#dfb317' },
+      { type: 'lastCommit', enabled: true, customColor: '#6e7681' },
+    ];
+    const badges = generateRepositoryBadges(repoInfo, configs, 'develop');
+    const license = badges.find(b => b.type === 'license');
+    const lastCommit = badges.find(b => b.type === 'lastCommit');
+    expect(license?.markdown).toContain('](https://github.com/testowner/testrepo/tree/develop/LICENSE)');
+    expect(lastCommit?.markdown).toContain('](https://github.com/testowner/testrepo/commits/develop)');
   });
 
   it('should use custom label when provided', () => {
