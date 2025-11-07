@@ -1,0 +1,74 @@
+name: Badge Request
+description: Request a new badge type or feature
+title: "[Badge Request] "
+labels: ["enhancement", "badge-request"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for suggesting a new badge! Please fill out the form below to help us understand your request.
+
+  - type: dropdown
+    id: badge-category
+    attributes:
+      label: Badge Category
+      description: Which category does this badge belong to?
+      options:
+        - Repository
+        - Extension
+        - Package
+        - MCP
+        - CLI
+        - IDE
+        - Other
+    validations:
+      required: true
+
+  - type: input
+    id: badge-type
+    attributes:
+      label: Badge Type
+      description: What type of badge is this? (e.g., "Test Coverage", "Build Status", "NPM Downloads")
+      placeholder: e.g., Test Coverage
+    validations:
+      required: true
+
+  - type: textarea
+    id: description
+    attributes:
+      label: Description
+      description: Please provide a detailed description of the badge you'd like to see added.
+      placeholder: |
+        Describe what the badge should display and why it would be useful.
+        Include any relevant context about where this badge would be used.
+    validations:
+      required: true
+
+  - type: textarea
+    id: example-markdown
+    attributes:
+      label: Example Markdown (if known)
+      description: If you have an example of what the badge markdown should look like, please share it here.
+      placeholder: |
+        ![Badge Label](https://img.shields.io/example/badge?style=flat-square&color=2ea44f)
+      render: markdown
+    validations:
+      required: false
+
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use Case
+      description: Describe how you would use this badge and what problem it solves.
+      placeholder: |
+        I maintain several open-source projects and would like to display...
+    validations:
+      required: false
+
+  - type: textarea
+    id: additional-context
+    attributes:
+      label: Additional Context
+      description: Add any other context, screenshots, or examples about the badge request here.
+    validations:
+      required: false

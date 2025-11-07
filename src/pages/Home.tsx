@@ -27,6 +27,14 @@ const navigationCards = [
     icon: '📦',
     className: 'card-packages',
   },
+  {
+    id: 'repository',
+    title: 'Repository Badges',
+    description: 'Create GitHub repository badges for stars, workflows, contributors, and more with customizable colors.',
+    to: '/repository',
+    icon: '⭐',
+    className: 'card-repository',
+  },
 ]
 
 function Home() {
@@ -49,6 +57,8 @@ function Home() {
               ? styles.cardExtensions
               : card.className === 'card-packages'
               ? styles.cardPackages
+              : card.className === 'card-repository'
+              ? styles.cardRepository
               : ''
           return (
             <Link

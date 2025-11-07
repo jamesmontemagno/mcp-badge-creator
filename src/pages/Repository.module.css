@@ -1,0 +1,503 @@
+/* Repository Page CSS Module */
+
+.repositoryPage {
+  background: var(--bg-white);
+  border-radius: 20px;
+  padding: 2.25rem 2rem;
+  min-height: 600px;
+  box-shadow: 0 24px 45px var(--shadow-color);
+  border: 1px solid var(--border-color);
+  max-width: 1100px;
+  width: 100%;
+}
+
+.repositoryHeader {
+  color: var(--header-text);
+  margin-bottom: 2.25rem;
+  max-width: 1100px;
+  width: 100%;
+  position: relative;
+}
+
+.repositoryHeader h1 {
+  font-size: clamp(2rem, 5.5vw, 2.75rem);
+  line-height: 1.1;
+  margin: 0 0 1.25rem 0;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: var(--header-text);
+}
+
+.eyebrow {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  margin: 0 0 0.85rem 0;
+  display: inline-block;
+  padding: 0.4rem 0.75rem 0.35rem;
+  border-radius: var(--radius-full);
+  background: rgba(255, 255, 255, 0.18);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.18);
+  color: var(--header-text);
+}
+
+.subtitle {
+  font-size: clamp(1rem, 1.85vw, 1.35rem);
+  max-width: 780px;
+  line-height: 1.45;
+  margin: 0;
+  font-weight: 500;
+  color: var(--header-text);
+}
+
+.requestBadgeSection {
+  margin-top: 3rem;
+  padding: 2rem;
+  background: var(--bg-light);
+  border-radius: 16px;
+  border: 1px solid var(--border-color);
+  text-align: center;
+}
+
+.requestBadgeText {
+  margin: 0 0 1.25rem 0;
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.requestBadgeBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.65rem 1.25rem;
+  background: var(--primary-color);
+  color: white;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px var(--shadow-light);
+}
+
+.requestBadgeBtn:hover {
+  background: var(--primary-dark);
+  box-shadow: 0 6px 16px var(--shadow-color);
+  transform: translateY(-1px);
+}
+
+.repositoryForm {
+  display: grid;
+  gap: 0.9rem;
+  background: var(--bg-light);
+  border-radius: 14px;
+  padding: 1.5rem;
+  border: 1px solid var(--border-color);
+  margin-bottom: 1.5rem;
+}
+
+.repositoryForm button.primary {
+  justify-self: start;
+}
+
+/* Section Headers */
+.sectionHeader {
+  margin-top: 1.5rem;
+  margin-bottom: 0.75rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--border-color);
+}
+
+.sectionHeader h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-color);
+  letter-spacing: -0.01em;
+}
+
+/* Badge Checkbox Rows with Right-Aligned Color Controls */
+.badgeCheckboxRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.75rem 0.5rem;
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.badgeCheckboxRow:hover {
+  background: var(--bg-white);
+}
+
+.badgeCheckboxRow label {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  font-weight: 500;
+  color: var(--text-color);
+  cursor: pointer;
+  flex: 1;
+}
+
+.badgeCheckboxRow input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+  cursor: pointer;
+}
+
+/* Color Controls - Right Aligned */
+.colorControls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}
+
+.colorPicker {
+  width: 60px;
+  height: 32px;
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.colorPicker:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(36, 191, 165, 0.1);
+}
+
+.colorPicker:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(36, 191, 165, 0.15);
+}
+
+.resetColorBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background: var(--bg-white);
+  color: var(--text-color);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  transition: all 0.2s ease;
+}
+
+.resetColorBtn:hover {
+  background: var(--primary-color);
+  color: white;
+  border-color: var(--primary-color);
+  transform: rotate(180deg);
+}
+
+.removeWorkflowBtn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background: var(--bg-white);
+  color: var(--text-color);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  transition: all 0.2s ease;
+}
+
+.removeWorkflowBtn:hover {
+  background: #dc2626;
+  color: white;
+  border-color: #dc2626;
+}
+
+/* Workflow Chips */
+.workflowChips {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 0.75rem;
+  margin-bottom: 1rem;
+}
+
+.workflowChip {
+  padding: 0.75rem 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: 8px;
+  background: var(--bg-white);
+  color: var(--text-color);
+  font-size: 0.9rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.workflowChip:hover {
+  border-color: var(--primary-color);
+  background: var(--bg-light);
+}
+
+.workflowChipActive {
+  border-color: var(--primary-color);
+  background: var(--primary-color);
+  color: white;
+  box-shadow: 0 4px 12px var(--shadow-light);
+}
+
+/* Custom Workflow Input */
+.customWorkflowInput {
+  margin-top: 1rem;
+}
+
+.customWorkflowInput label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--text-color);
+}
+
+.customWorkflowControls {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.customWorkflowControls input {
+  flex: 1;
+}
+
+.addWorkflowBtn {
+  padding: 0.65rem 1.5rem;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  box-shadow: 0 2px 8px var(--shadow-light);
+}
+
+.addWorkflowBtn:hover:not(:disabled) {
+  background: var(--primary-dark);
+  box-shadow: 0 4px 12px var(--shadow-color);
+  transform: translateY(-1px);
+}
+
+.addWorkflowBtn:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.validationError {
+  display: block;
+  margin-top: 0.5rem;
+  color: #dc2626;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.workflowList {
+  display: grid;
+  gap: 0.5rem;
+}
+
+/* Output Section */
+.repositoryOutput {
+  display: grid;
+  gap: 2rem;
+}
+
+.previewHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+}
+
+.previewHeader h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+/* Preview Toggle */
+.previewToggle {
+  display: flex;
+  gap: 0.5rem;
+  background: var(--bg-white);
+  border-radius: 8px;
+  padding: 0.25rem;
+  border: 1px solid var(--border-color);
+}
+
+.previewToggle button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--text-color);
+  font-size: 0.875rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.previewToggle button:hover {
+  background: var(--bg-light);
+}
+
+.previewToggleActive {
+  background: var(--primary-color) !important;
+  color: white !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Grouped Preview */
+.previewGrouped {
+  display: grid;
+  gap: 1.5rem;
+  background: var(--bg-white);
+  border-radius: 16px;
+  padding: 1.75rem;
+  box-shadow: 0 12px 24px var(--shadow-color);
+  border: 1px solid var(--border-color);
+}
+
+.previewSection {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.previewSectionHeader {
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-light);
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.previewRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+}
+
+.previewRow img {
+  height: 20px;
+}
+
+/* Flat Preview */
+.previewFlat {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  background: var(--bg-white);
+  border-radius: 16px;
+  padding: 1.75rem;
+  box-shadow: 0 12px 24px var(--shadow-color);
+  border: 1px solid var(--border-color);
+}
+
+.previewFlat img {
+  height: 20px;
+}
+
+/* Markdown Cards */
+.markdownColumns {
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+}
+
+.markdownCard,
+.combinedMarkdown {
+  background: var(--bg-white);
+  border-radius: 16px;
+  padding: 1.75rem;
+  box-shadow: 0 12px 24px var(--shadow-color);
+  border: 1px solid var(--border-color);
+}
+
+.cardBadgePreview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 0;
+  margin: 0.75rem 0;
+  background: var(--bg-light);
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+}
+
+.cardBadgePreview img {
+  height: 20px;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .repositoryPage {
+    padding: 1.75rem 1.25rem;
+    min-height: 500px;
+  }
+
+  .repositoryHeader {
+    margin-bottom: 1.75rem;
+  }
+
+  .requestBadgeBtn {
+    font-size: 0.85rem;
+    padding: 0.6rem 1rem;
+  }
+
+  .badgeCheckboxRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.75rem;
+  }
+
+  .colorControls {
+    align-self: flex-end;
+  }
+
+  .workflowChips {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  }
+
+  .customWorkflowControls {
+    flex-direction: column;
+  }
+
+  .customWorkflowControls button {
+    width: 100%;
+  }
+
+  .previewHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .previewToggle {
+    width: 100%;
+  }
+
+  .previewToggle button {
+    flex: 1;
+  }
+
+  .markdownColumns {
+    grid-template-columns: 1fr;
+  }
+}
