@@ -99,6 +99,7 @@
 .cardMcp { border: 1px solid rgba(0,152,255,0.35); }
 .cardExtensions { border: 1px solid rgba(36,191,165,0.45); }
 .cardPackages { border: 1px solid rgba(193,111,222,0.45); }
+.cardRepository { border: 1px solid rgba(255,193,7,0.45); }
 
 @media (max-width: 768px) {
   .homeCard {
