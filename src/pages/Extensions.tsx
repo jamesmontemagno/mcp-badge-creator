@@ -87,26 +87,42 @@ function Extensions() {
       return
     }
 
-    const markdown =
-      variant === 'stable'
-        ? badgeData.stable.markdown
-        : variant === 'insiders'
-        ? badgeData.insiders.markdown
-        : variant === 'install'
-        ? badgeData.installMarkdown
-        : variant === 'rating'
-        ? badgeData.about.rating.markdown
-        : variant === 'installs'
-        ? badgeData.about.installs.markdown
-        : variant === 'version'
-        ? badgeData.about.version.markdown
-        : variant === 'lastUpdated'
-        ? badgeData.about.lastUpdated.markdown
-        : variant === 'releaseDate'
-        ? badgeData.about.releaseDate.markdown
-        : variant === 'about'
-        ? badgeData.aboutMarkdown
-        : badgeData.allMarkdown
+    let markdown: string
+    switch (variant) {
+      case 'stable':
+        markdown = badgeData.stable.markdown
+        break
+      case 'insiders':
+        markdown = badgeData.insiders.markdown
+        break
+      case 'install':
+        markdown = badgeData.installMarkdown
+        break
+      case 'rating':
+        markdown = badgeData.about.rating.markdown
+        break
+      case 'installs':
+        markdown = badgeData.about.installs.markdown
+        break
+      case 'version':
+        markdown = badgeData.about.version.markdown
+        break
+      case 'lastUpdated':
+        markdown = badgeData.about.lastUpdated.markdown
+        break
+      case 'releaseDate':
+        markdown = badgeData.about.releaseDate.markdown
+        break
+      case 'about':
+        markdown = badgeData.aboutMarkdown
+        break
+      case 'all':
+        markdown = badgeData.allMarkdown
+        break
+      default:
+        return
+    }
+    
     await copyMarkdown(markdown, variant)
   }
 
