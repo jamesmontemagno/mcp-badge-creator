@@ -152,8 +152,10 @@ describe('generateRepositoryBadges', () => {
     expect(badges).toHaveLength(1);
     expect(badges[0].type).toBe('stars');
     expect(badges[0].markdown).toContain('github/stars/testowner/testrepo');
-    expect(badges[0].markdown).toContain('color=0969da');
-    expect(badges[0].markdown).not.toContain('#');
+    expect(badges[0].markdown).toContain('stargazers'); // linked to stargazers page
+    expect(badges[0].markdown).not.toContain('style=flat-square');
+    expect(badges[0].markdown).not.toContain('color=');
+    expect(badges[0].markdown).not.toContain('logo=');
     expect(badges[0].label).toBe('Stars');
   });
 
@@ -277,6 +279,26 @@ describe('generateRepositoryBadges', () => {
     expect(badges[0].label).toBe('Repo Size');
   });
 
+  it('should generate coverage badge', () => {
+    const configs: BadgeConfig[] = [
+      { type: 'coverage', enabled: true, customColor: '#2ea44f' },
+    ];
+    const badges = generateRepositoryBadges(repoInfo, configs);
+    expect(badges[0].markdown).toContain('codecov/c/github/testowner/testrepo');
+    expect(badges[0].markdown).toContain('logo=codecov');
+    expect(badges[0].label).toBe('Coverage');
+  });
+
+  it('should generate openssf scorecard badge', () => {
+    const configs: BadgeConfig[] = [
+      { type: 'openssf', enabled: true, customColor: '#0969da' },
+    ];
+    const badges = generateRepositoryBadges(repoInfo, configs);
+    expect(badges[0].markdown).toContain('ossf-scorecard/github.com/testowner/testrepo');
+    expect(badges[0].markdown).toContain('label=OpenSSF%20Scorecard');
+    expect(badges[0].label).toBe('OpenSSF');
+  });
+
   it('should use custom label when provided', () => {
     const configs: BadgeConfig[] = [
       { type: 'stars', enabled: true, customColor: '#0969da', label: 'Custom Stars Label' },
@@ -309,9 +331,9 @@ describe('generateRepositoryBadges', () => {
     expect(badges.map(b => b.type)).toEqual(['stars', 'license', 'workflow']);
   });
 
-  it('should strip # from color codes', () => {
+  it('should strip # from color codes for colorized badges (forks example)', () => {
     const configs: BadgeConfig[] = [
-      { type: 'stars', enabled: true, customColor: '#FF0000' },
+      { type: 'forks', enabled: true, customColor: '#FF0000' },
     ];
     const badges = generateRepositoryBadges(repoInfo, configs);
     
@@ -319,23 +341,28 @@ describe('generateRepositoryBadges', () => {
     expect(badges[0].markdown).not.toContain('color=#');
   });
 
-  it('should include flat-square style', () => {
+  it('should include flat-square style for non-star badges (forks example)', () => {
     const configs: BadgeConfig[] = [
-      { type: 'stars', enabled: true, customColor: '#0969da' },
+      { type: 'forks', enabled: true, customColor: '#0969da' },
     ];
     const badges = generateRepositoryBadges(repoInfo, configs);
     
     expect(badges[0].markdown).toContain('style=flat-square');
   });
 
-  it('should include appropriate logos', () => {
+  it('should include appropriate logos (forks has logo, stars fixed style without logo)', () => {
     const configs: BadgeConfig[] = [
       { type: 'stars', enabled: true, customColor: '#0969da' },
+      { type: 'forks', enabled: true, customColor: '#0969da' },
       { type: 'license', enabled: true, customColor: '#dfb317' },
     ];
     const badges = generateRepositoryBadges(repoInfo, configs);
     
-    expect(badges[0].markdown).toContain('logo=github');
-    expect(badges[1].markdown).not.toContain('logo=');
+    const starsBadge = badges.find(b => b.type === 'stars');
+    const forksBadge = badges.find(b => b.type === 'forks');
+    const licenseBadge = badges.find(b => b.type === 'license');
+    expect(starsBadge?.markdown).not.toContain('logo=');
+    expect(forksBadge?.markdown).toContain('logo=github');
+    expect(licenseBadge?.markdown).not.toContain('logo=');
   });
 });

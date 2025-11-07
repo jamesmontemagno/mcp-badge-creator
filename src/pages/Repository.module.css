@@ -118,6 +118,176 @@
   letter-spacing: -0.01em;
 }
 
+/* Grid layout for badge option cards */
+.badgeGrid {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  margin-bottom: 0.5rem;
+}
+
+.badgeFieldset {
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1rem 1.1rem 1.25rem;
+  background: var(--bg-white);
+  margin: 0 0 1.2rem 0;
+}
+
+.badgeFieldset legend {
+  padding: 0 0.5rem;
+  font-size: 0.8rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--text-light);
+}
+
+/* Card style for each badge option */
+.badgeGrid .badgeCheckboxRow {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.6rem;
+  border: 1px solid var(--border-light);
+  background: var(--bg-light);
+  padding: 0.9rem 0.9rem 0.85rem;
+  box-shadow: 0 2px 6px var(--shadow-light);
+}
+
+.badgeGrid .badgeCheckboxRow:hover {
+  background: var(--bg-white);
+  border-color: var(--border-color);
+  box-shadow: 0 4px 12px var(--shadow-light);
+}
+
+.badgeGrid .badgeCheckboxRow label {
+  font-size: 0.95rem;
+  font-weight: 600;
+}
+
+.badgeGrid .colorControls {
+  justify-content: flex-start;
+}
+
+/* Workflow list cards align with badge grid */
+.workflowList {
+  display: grid;
+  gap: 0.75rem;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+}
+
+.workflowList .badgeCheckboxRow {
+  flex-direction: column;
+  align-items: stretch;
+  gap: 0.6rem;
+  border: 1px solid var(--border-light);
+  background: var(--bg-light);
+  padding: 0.9rem 0.9rem 0.85rem;
+  box-shadow: 0 2px 6px var(--shadow-light);
+}
+
+.workflowList .badgeCheckboxRow:hover {
+  background: var(--bg-white);
+  border-color: var(--border-color);
+  box-shadow: 0 4px 12px var(--shadow-light);
+}
+
+/* Fieldset action buttons */
+.fieldsetActions {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+  margin: 0.4rem 0 0.75rem;
+}
+
+.fieldsetActions button {
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  font-size: 0.65rem;
+  letter-spacing: 0.08em;
+  font-weight: 600;
+  padding: 0.4rem 0.6rem;
+  border-radius: 6px;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: all 0.15s ease;
+}
+
+.fieldsetActions button:hover {
+  background: var(--primary-color);
+  color: #fff;
+  border-color: var(--primary-color);
+}
+
+/* Toggle advanced section button */
+
+/* Tooltip */
+.tooltipWrapper {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.infoIcon {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid var(--border-color);
+  background: var(--bg-white);
+  font-size: 0.65rem;
+  color: var(--text-color);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.infoIcon:hover,
+.infoIcon:focus-visible {
+  background: var(--primary-color);
+  color: #fff;
+  border-color: var(--primary-color);
+}
+
+.tooltipBubble {
+  position: absolute;
+  top: 110%;
+  left: 0;
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
+  box-shadow: 0 8px 16px var(--shadow-light);
+  padding: 0.6rem 0.75rem;
+  border-radius: 8px;
+  font-size: 0.7rem;
+  line-height: 1.2;
+  width: 200px;
+  z-index: 20;
+  opacity: 0;
+  transform: translateY(-4px);
+  pointer-events: none;
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.tooltipWrapper:hover .tooltipBubble,
+.tooltipWrapper:focus-within .tooltipBubble {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.badgeDescriptionVisuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  border: 0;
+}
+
 /* Badge Checkbox Rows with Right-Aligned Color Controls */
 .badgeCheckboxRow {
   display: flex;
@@ -223,7 +393,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
   gap: 0.75rem;
-  margin-bottom: 1rem;
+  margin-bottom: 1.25rem; /* Added extra space below chips */
 }
 
 .workflowChip {
@@ -254,6 +424,7 @@
 /* Custom Workflow Input */
 .customWorkflowInput {
   margin-top: 1rem;
+  margin-bottom: 1.25rem; /* Provide breathing room before workflow list */
 }
 
 .customWorkflowInput label {
@@ -461,10 +632,24 @@
     padding: 0.6rem 1rem;
   }
 
-  .badgeCheckboxRow {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 0.75rem;
+  .badgeGrid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .badgeGrid .badgeCheckboxRow,
+  .workflowList .badgeCheckboxRow {
+    gap: 0.5rem;
+  }
+
+  .workflowList {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  @media (max-width: 520px) {
+    .badgeGrid,
+    .workflowList {
+      grid-template-columns: 1fr;
+    }
   }
 
   .colorControls {
@@ -495,6 +680,11 @@
 
   .previewToggle button {
     flex: 1;
+  }
+
+  .fieldsetActions {
+    flex-wrap: wrap;
+    justify-content: flex-start;
   }
 
   .markdownColumns {

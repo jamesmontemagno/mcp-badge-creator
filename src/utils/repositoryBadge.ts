@@ -4,7 +4,7 @@
  */
 
 export interface BadgeConfig {
-  type: 'stars' | 'forks' | 'issues' | 'license' | 'workflow' | 'contributors' | 'release' | 'language' | 'codeSize' | 'lastCommit' | 'repoSize';
+  type: 'stars' | 'forks' | 'issues' | 'license' | 'workflow' | 'contributors' | 'release' | 'language' | 'codeSize' | 'lastCommit' | 'repoSize' | 'coverage' | 'openssf';
   enabled: boolean;
   customColor: string; // hex with #
   label?: string; // custom label override
@@ -88,6 +88,8 @@ export function getSemanticDefaultColor(type: BadgeConfig['type']): string {
     codeSize: '6e7681',      // Gray - metadata
     lastCommit: '6e7681',    // Gray - metadata
     repoSize: '6e7681',      // Gray - metadata
+    coverage: '2ea44f',      // Green - quality
+    openssf: '0969da',       // Blue - security posture
   };
   
   return colors[type];
@@ -117,8 +119,9 @@ export function generateRepositoryBadges(
     
     switch (config.type) {
       case 'stars':
-        badgeUrl = `https://img.shields.io/github/stars/${owner}/${repo}?style=flat-square&color=${color}&logo=github`;
-        altText = 'GitHub Stars';
+        // Use README style: bare stars badge (no style/color/logo) wrapped in link to stargazers
+        badgeUrl = `https://img.shields.io/github/stars/${owner}/${repo}`;
+        altText = 'GitHub stars';
         label = label || 'Stars';
         break;
         
@@ -184,10 +187,24 @@ export function generateRepositoryBadges(
         altText = 'Repository Size';
         label = label || 'Repo Size';
         break;
+      case 'coverage':
+        // Codecov coverage badge
+        badgeUrl = `https://img.shields.io/codecov/c/github/${owner}/${repo}?style=flat-square&color=${color}&logo=codecov`;
+        altText = 'Coverage';
+        label = label || 'Coverage';
+        break;
+      case 'openssf':
+        badgeUrl = `https://img.shields.io/ossf-scorecard/github.com/${owner}/${repo}?style=flat-square&color=${color}&label=OpenSSF%20Scorecard&logo=openssf`;
+        altText = 'OpenSSF Scorecard';
+        label = label || 'OpenSSF';
+        break;
     }
     
     if (badgeUrl) {
-      const markdown = `![${altText}](${badgeUrl})`;
+      // Stars badge links to stargazers page per requested style
+      const markdown = config.type === 'stars'
+        ? `[![${altText}](${badgeUrl})](https://github.com/${owner}/${repo}/stargazers)`
+        : `![${altText}](${badgeUrl})`;
       badges.push({ type: config.type, markdown, label });
     }
   }

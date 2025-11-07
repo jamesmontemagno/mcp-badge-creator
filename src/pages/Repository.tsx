@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import type { FormEvent, ChangeEvent } from 'react'
 import styles from './Repository.module.css'
 import {
@@ -31,6 +31,8 @@ function Repository() {
     { type: 'license', enabled: false, customColor: `#${getSemanticDefaultColor('license')}` },
     { type: 'contributors', enabled: false, customColor: `#${getSemanticDefaultColor('contributors')}` },
     { type: 'release', enabled: false, customColor: `#${getSemanticDefaultColor('release')}` },
+    { type: 'coverage', enabled: false, customColor: `#${getSemanticDefaultColor('coverage')}` },
+    { type: 'openssf', enabled: false, customColor: `#${getSemanticDefaultColor('openssf')}` },
     // Advanced Badges
     { type: 'forks', enabled: false, customColor: `#${getSemanticDefaultColor('forks')}` },
     { type: 'issues', enabled: false, customColor: `#${getSemanticDefaultColor('issues')}` },
@@ -39,6 +41,44 @@ function Repository() {
     { type: 'lastCommit', enabled: false, customColor: `#${getSemanticDefaultColor('lastCommit')}` },
     { type: 'repoSize', enabled: false, customColor: `#${getSemanticDefaultColor('repoSize')}` },
   ])
+  // Local storage persistence keys
+  const BADGE_KEY = 'repositoryBadgeConfigs'
+  const WORKFLOW_KEY = 'repositoryWorkflowConfigs'
+
+  // Load persisted configs on mount
+  useEffect(() => {
+    try {
+      const storedBadges = localStorage.getItem(BADGE_KEY)
+      if (storedBadges) {
+        const parsed: BadgeConfig[] = JSON.parse(storedBadges)
+        if (Array.isArray(parsed)) {
+          setBadgeConfigs(prev => prev.map(p => {
+            const found = parsed.find(b => b.type === p.type)
+            return found ? { ...p, enabled: !!found.enabled, customColor: found.customColor || p.customColor, label: found.label } : p
+          }))
+        }
+      }
+      const storedWorkflows = localStorage.getItem(WORKFLOW_KEY)
+      if (storedWorkflows) {
+        const parsedWf: BadgeConfig[] = JSON.parse(storedWorkflows)
+        if (Array.isArray(parsedWf)) {
+          const wf = parsedWf.filter(w => w.type === 'workflow' && w.workflowFile)
+          setWorkflowConfigs(wf.map(w => ({ ...w, type: 'workflow' })) as BadgeConfig[])
+          setSelectedWorkflowPresets(new Set(wf.filter(w => WORKFLOW_PRESETS.includes(w.workflowFile || '')).map(w => w.workflowFile!)))
+        }
+      }
+    } catch {
+      // ignore corrupt storage
+    }
+  }, [])
+
+  // Persist badge configs
+  const persistBadges = (configs: BadgeConfig[]) => {
+    try { localStorage.setItem(BADGE_KEY, JSON.stringify(configs)) } catch { /* ignore */ }
+  }
+  const persistWorkflows = (configs: BadgeConfig[]) => {
+    try { localStorage.setItem(WORKFLOW_KEY, JSON.stringify(configs)) } catch { /* ignore */ }
+  }
 
   const [workflowConfigs, setWorkflowConfigs] = useState<BadgeConfig[]>([])
 
@@ -60,29 +100,35 @@ function Repository() {
   }
 
   const handleBadgeToggle = (type: BadgeConfig['type']) => {
-    setBadgeConfigs(configs =>
-      configs.map(config =>
+    setBadgeConfigs(configs => {
+      const updated = configs.map(config =>
         config.type === type ? { ...config, enabled: !config.enabled } : config
       )
-    )
+      persistBadges(updated)
+      return updated
+    })
   }
 
   const handleColorChange = (type: BadgeConfig['type'], color: string) => {
-    setBadgeConfigs(configs =>
-      configs.map(config =>
+    setBadgeConfigs(configs => {
+      const updated = configs.map(config =>
         config.type === type ? { ...config, customColor: color } : config
       )
-    )
+      persistBadges(updated)
+      return updated
+    })
   }
 
   const handleColorReset = (type: BadgeConfig['type']) => {
-    setBadgeConfigs(configs =>
-      configs.map(config =>
+    setBadgeConfigs(configs => {
+      const updated = configs.map(config =>
         config.type === type
           ? { ...config, customColor: `#${getSemanticDefaultColor(type)}` }
           : config
       )
-    )
+      persistBadges(updated)
+      return updated
+    })
   }
 
   const handleWorkflowPresetClick = (workflowFile: string) => {
@@ -91,19 +137,25 @@ function Repository() {
     if (newSelected.has(workflowFile)) {
       // Deselect
       newSelected.delete(workflowFile)
-      setWorkflowConfigs(configs => configs.filter(c => c.workflowFile !== workflowFile))
+      setWorkflowConfigs(configs => {
+        const updated = configs.filter(c => c.workflowFile !== workflowFile)
+        persistWorkflows(updated)
+        return updated
+      })
     } else {
       // Select
       newSelected.add(workflowFile)
-      setWorkflowConfigs(configs => [
-        ...configs,
-        {
+      setWorkflowConfigs(configs => {
+        const newWorkflow: BadgeConfig = {
           type: 'workflow',
           enabled: true,
           customColor: `#${getSemanticDefaultColor('workflow')}`,
           workflowFile,
-        },
-      ])
+        }
+        const updated: BadgeConfig[] = [...configs, newWorkflow]
+        persistWorkflows(updated)
+        return updated
+      })
     }
     
     setSelectedWorkflowPresets(newSelected)
@@ -137,56 +189,89 @@ function Repository() {
       return
     }
     
-    setWorkflowConfigs(configs => [
-      ...configs,
-      {
+    setWorkflowConfigs(configs => {
+      const newWorkflow: BadgeConfig = {
         type: 'workflow',
         enabled: true,
         customColor: `#${getSemanticDefaultColor('workflow')}`,
         workflowFile: customWorkflowFilename,
-      },
-    ])
+      }
+      const updated: BadgeConfig[] = [...configs, newWorkflow]
+      persistWorkflows(updated)
+      return updated
+    })
     
     setCustomWorkflowFilename('')
     setWorkflowValidationError(null)
   }
 
   const handleWorkflowToggle = (workflowFile: string) => {
-    setWorkflowConfigs(configs =>
-      configs.map(config =>
+    setWorkflowConfigs(configs => {
+      const updated: BadgeConfig[] = configs.map(config =>
         config.workflowFile === workflowFile
-          ? { ...config, enabled: !config.enabled }
+          ? { ...config, enabled: !config.enabled, type: 'workflow' }
           : config
       )
-    )
+      persistWorkflows(updated)
+      return updated
+    })
   }
 
   const handleWorkflowColorChange = (workflowFile: string, color: string) => {
-    setWorkflowConfigs(configs =>
-      configs.map(config =>
-        config.workflowFile === workflowFile ? { ...config, customColor: color } : config
+    setWorkflowConfigs(configs => {
+      const updated: BadgeConfig[] = configs.map(config =>
+        config.workflowFile === workflowFile ? { ...config, customColor: color, type: 'workflow' } : config
       )
-    )
+      persistWorkflows(updated)
+      return updated
+    })
   }
 
   const handleWorkflowColorReset = (workflowFile: string) => {
-    setWorkflowConfigs(configs =>
-      configs.map(config =>
+    setWorkflowConfigs(configs => {
+      const updated: BadgeConfig[] = configs.map(config =>
         config.workflowFile === workflowFile
-          ? { ...config, customColor: `#${getSemanticDefaultColor('workflow')}` }
+          ? { ...config, customColor: `#${getSemanticDefaultColor('workflow')}`, type: 'workflow' }
           : config
       )
-    )
+      persistWorkflows(updated)
+      return updated
+    })
   }
 
   const handleRemoveWorkflow = (workflowFile: string) => {
-    setWorkflowConfigs(configs => configs.filter(c => c.workflowFile !== workflowFile))
+    setWorkflowConfigs(configs => {
+      const updated: BadgeConfig[] = configs.filter(c => c.workflowFile !== workflowFile).map(c => ({ ...c, type: 'workflow' }))
+      persistWorkflows(updated)
+      return updated
+    })
     setSelectedWorkflowPresets(prev => {
       const newSet = new Set(prev)
       newSet.delete(workflowFile)
       return newSet
     })
   }
+
+  // Select/Clear essential badges
+  const selectAllEssential = () => {
+    setBadgeConfigs(configs => {
+      const updated = configs.map(c =>
+        ['stars','license','contributors','release','coverage','openssf'].includes(c.type) ? { ...c, enabled: true } : c
+      )
+      persistBadges(updated)
+      return updated
+    })
+  }
+  const clearAllEssential = () => {
+    setBadgeConfigs(configs => {
+      const updated = configs.map(c =>
+        ['stars','license','contributors','release','coverage','openssf'].includes(c.type) ? { ...c, enabled: false } : c
+      )
+      persistBadges(updated)
+      return updated
+    })
+  }
+
 
   const handleGenerate = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault()
@@ -205,7 +290,7 @@ function Repository() {
   const allConfigs = [...badgeConfigs, ...workflowConfigs]
   const badges = repoInfo ? generateRepositoryBadges(repoInfo, allConfigs) : []
 
-  const essentialBadges = badges.filter(b => ['stars', 'license', 'contributors', 'release'].includes(b.type))
+  const essentialBadges = badges.filter(b => ['stars', 'license', 'contributors', 'release','coverage','openssf'].includes(b.type))
   const workflowBadges = badges.filter(b => b.type === 'workflow')
   const advancedBadges = badges.filter(b => ['forks', 'issues', 'language', 'codeSize', 'lastCommit', 'repoSize'].includes(b.type))
 
@@ -224,21 +309,52 @@ function Repository() {
       codeSize: '📊 Code Size',
       lastCommit: '🕒 Last Commit',
       repoSize: '💾 Repo Size',
+      coverage: '✅ Coverage',
+      openssf: '🛡️ OpenSSF',
     }
     return labels[type]
   }
 
+  const getBadgeDescription = (type: BadgeConfig['type']): string => {
+    const desc: Record<BadgeConfig['type'], string> = {
+      stars: 'Number of users who have starred this repository.',
+      license: 'Repository license as detected by GitHub.',
+      contributors: 'Total contributors with commits merged into the default branch.',
+      release: 'Latest published GitHub release tag.',
+      forks: 'Number of times this repository has been forked.',
+      issues: 'Count of open GitHub issues.',
+      language: 'Primary language used in the repository.',
+      codeSize: 'Aggregated code size as reported by GitHub.',
+      lastCommit: 'Time of the last commit to the default branch.',
+      repoSize: 'Total repository size including all files.',
+      workflow: 'Status of the selected GitHub Actions workflow file.',
+      coverage: 'Test coverage percentage (Codecov).',
+      openssf: 'OpenSSF Scorecard security & best practices score.'
+    }
+    return desc[type]
+  }
+
   const renderBadgeRow = (config: BadgeConfig) => (
     <div key={config.type} className={styles.badgeCheckboxRow}>
-      <label>
-        <input
-          type="checkbox"
-          checked={config.enabled}
-          onChange={() => handleBadgeToggle(config.type)}
-        />
-        {getBadgeLabel(config.type)}
-      </label>
-      {config.enabled && (
+      <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', gap:'0.5rem'}}>
+        <label>
+          <input
+            type="checkbox"
+            checked={config.enabled}
+            onChange={() => handleBadgeToggle(config.type)}
+            aria-describedby={`desc-${config.type}`}
+          />
+          {getBadgeLabel(config.type)}
+        </label>
+        <span className={styles.tooltipWrapper}>
+          <button type="button" className={styles.infoIcon} aria-describedby={`desc-${config.type}`} aria-label={`${getBadgeLabel(config.type)} info`}>
+            i
+          </button>
+          <span className={styles.tooltipBubble}>{getBadgeDescription(config.type)}</span>
+        </span>
+      </div>
+      <span id={`desc-${config.type}`} className={styles.badgeDescriptionVisuallyHidden}>{getBadgeDescription(config.type)}</span>
+      {config.enabled && config.type !== 'stars' && (
         <div className={styles.colorControls}>
           <input
             type="color"
@@ -263,14 +379,24 @@ function Repository() {
 
   const renderWorkflowRow = (config: BadgeConfig) => (
     <div key={config.workflowFile} className={styles.badgeCheckboxRow}>
-      <label>
-        <input
-          type="checkbox"
-          checked={config.enabled}
-          onChange={() => handleWorkflowToggle(config.workflowFile!)}
-        />
-        ✅ {config.workflowFile?.replace(/\.(yml|yaml)$/, '')}
-      </label>
+      <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', gap:'0.5rem'}}>
+        <label>
+          <input
+            type="checkbox"
+            checked={config.enabled}
+            onChange={() => handleWorkflowToggle(config.workflowFile!)}
+            aria-describedby={`desc-workflow-${config.workflowFile}`}
+          />
+          ✅ {config.workflowFile?.replace(/\.(yml|yaml)$/,'')}
+        </label>
+        <span className={styles.tooltipWrapper}>
+          <button type="button" className={styles.infoIcon} aria-describedby={`desc-workflow-${config.workflowFile}`} aria-label={`Workflow ${config.workflowFile} info`}>
+            i
+          </button>
+          <span className={styles.tooltipBubble}>{getBadgeDescription('workflow')}</span>
+        </span>
+      </div>
+      <span id={`desc-workflow-${config.workflowFile}`} className={styles.badgeDescriptionVisuallyHidden}>{getBadgeDescription('workflow')}</span>
       <div className={styles.colorControls}>
         {config.enabled && (
           <>
@@ -336,71 +462,76 @@ function Repository() {
           </span>
 
           {/* Essential Badges Section */}
-          <div className={styles.sectionHeader}>
-            <h3>Essential Badges</h3>
-          </div>
-          {badgeConfigs
-            .filter(c => ['stars', 'license', 'contributors', 'release'].includes(c.type))
-            .map(renderBadgeRow)}
-
-          {/* CI/CD Workflows Section */}
-          <div className={styles.sectionHeader}>
-            <h3>CI/CD Workflows</h3>
-          </div>
-          
-          <div className={styles.workflowChips}>
-            {WORKFLOW_PRESETS.map(workflow => (
-              <button
-                key={workflow}
-                type="button"
-                className={`${styles.workflowChip} ${
-                  selectedWorkflowPresets.has(workflow) ? styles.workflowChipActive : ''
-                }`}
-                onClick={() => handleWorkflowPresetClick(workflow)}
-              >
-                {selectedWorkflowPresets.has(workflow) && '✓ '}
-                {workflow}
-              </button>
-            ))}
-          </div>
-
-          <div className={styles.customWorkflowInput}>
-            <label htmlFor="customWorkflow">Custom workflow filename</label>
-            <div className={styles.customWorkflowControls}>
-              <input
-                id="customWorkflow"
-                type="text"
-                placeholder="e.g. custom-ci.yml"
-                value={customWorkflowFilename}
-                onChange={handleCustomWorkflowChange}
-              />
-              <button
-                type="button"
-                className={styles.addWorkflowBtn}
-                onClick={handleAddCustomWorkflow}
-                disabled={!customWorkflowFilename.trim() || !!workflowValidationError}
-              >
-                Add Workflow
-              </button>
+          <fieldset className={styles.badgeFieldset}>
+            <legend>Essential Badges</legend>
+            <div className={styles.fieldsetActions}>
+              <button type="button" onClick={selectAllEssential}>Select All</button>
+              <button type="button" onClick={clearAllEssential}>Clear All</button>
             </div>
-            {workflowValidationError && (
-              <span className={styles.validationError}>{workflowValidationError}</span>
+            <div className={styles.badgeGrid}>
+              {badgeConfigs
+                .filter(c => ['stars', 'license', 'contributors', 'release','coverage','openssf'].includes(c.type))
+                .map(renderBadgeRow)}
+            </div>
+          </fieldset>
+
+          {/* CI/CD Workflows Section (fieldset style) */}
+          <fieldset className={styles.badgeFieldset}>
+            <legend>CI/CD Workflows</legend>
+            <div className={styles.workflowChips}>
+              {WORKFLOW_PRESETS.map(workflow => (
+                <button
+                  key={workflow}
+                  type="button"
+                  className={`${styles.workflowChip} ${
+                    selectedWorkflowPresets.has(workflow) ? styles.workflowChipActive : ''
+                  }`}
+                  onClick={() => handleWorkflowPresetClick(workflow)}
+                >
+                  {selectedWorkflowPresets.has(workflow) && '✓ '}
+                  {workflow}
+                </button>
+              ))}
+            </div>
+            <div className={styles.customWorkflowInput}>
+              <label htmlFor="customWorkflow">Custom workflow filename</label>
+              <div className={styles.customWorkflowControls}>
+                <input
+                  id="customWorkflow"
+                  type="text"
+                  placeholder="e.g. custom-ci.yml"
+                  value={customWorkflowFilename}
+                  onChange={handleCustomWorkflowChange}
+                />
+                <button
+                  type="button"
+                  className={styles.addWorkflowBtn}
+                  onClick={handleAddCustomWorkflow}
+                  disabled={!customWorkflowFilename.trim() || !!workflowValidationError}
+                >
+                  Add Workflow
+                </button>
+              </div>
+              {workflowValidationError && (
+                <span className={styles.validationError}>{workflowValidationError}</span>
+              )}
+            </div>
+            {workflowConfigs.length > 0 && (
+              <div className={styles.workflowList}>
+                {workflowConfigs.map(renderWorkflowRow)}
+              </div>
             )}
-          </div>
-
-          {workflowConfigs.length > 0 && (
-            <div className={styles.workflowList}>
-              {workflowConfigs.map(renderWorkflowRow)}
-            </div>
-          )}
+          </fieldset>
 
           {/* Advanced Badges Section */}
-          <div className={styles.sectionHeader}>
-            <h3>Advanced Badges</h3>
-          </div>
-          {badgeConfigs
-            .filter(c => ['forks', 'issues', 'language', 'codeSize', 'lastCommit', 'repoSize'].includes(c.type))
-            .map(renderBadgeRow)}
+          <fieldset id="advanced-badges" className={styles.badgeFieldset}>
+            <legend>Advanced Badges</legend>
+            <div className={styles.badgeGrid}>
+              {badgeConfigs
+                .filter(c => ['forks', 'issues', 'language', 'codeSize', 'lastCommit', 'repoSize'].includes(c.type))
+                .map(renderBadgeRow)}
+            </div>
+          </fieldset>
 
           <button type="submit" className="primary">
             Generate badges
