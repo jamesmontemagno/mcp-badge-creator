@@ -12,11 +12,10 @@ import Settings from './pages/Settings'
 type ThemeType = 'system' | 'light' | 'dark' | 'green' | 'tron' | 'pink'
 
 const navItems = [
-  { to: '/', label: 'Home', end: true },
   { to: '/mcp', label: 'MCP' },
   { to: '/extensions', label: 'Extensions' },
   { to: '/packages', label: 'Packages' },
-  { to: '/repository', label: 'Repository' },
+  { to: '/repository', label: 'Repo' },
   { to: '/profile', label: 'Profile' },
 ]
 
