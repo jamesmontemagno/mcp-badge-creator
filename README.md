@@ -1,12 +1,16 @@
-# 🎖️ MCP Badge Creator
+# 🎖️ README Badge Creator
 
-> Create beautiful one-click install badges for your Model Context Protocol (MCP) servers that work with VS Code, VS Code Insiders, Visual Studio, Cursor, Goose, and LM Studio.
+> Create beautiful one-click install badges for your projects - from MCP servers to VS Code extensions, npm packages, and GitHub repositories.
 
 ## 🌟 Features
 
-- ✅ **Easy to Use**: Simple form-based interface to generate badges
+- ✅ **Multiple Badge Types**: 
+  - **MCP Server Badges**: One-click install for Model Context Protocol servers
+  - **VS Code Extension Badges**: Marketplace badges for extensions
+  - **Package Badges**: Version and download badges for NPM, NuGet, PyPI, Maven, RubyGems, and Crates.io
+  - **GitHub Repository Badges**: Stars, workflows, contributors, and more with customizable colors
 - 🎨 **Multiple IDEs**: Support for VS Code, VS Code Insiders, Visual Studio, Cursor, Goose, and LM Studio
-- 🔧 **Six Configuration Types**: 
+- 🔧 **Six MCP Configuration Types**: 
   - Remote HTTP Server (HTTP/SSE transport)
   - NPX Package (Node.js packages)
   - UVX Package (Python packages with uv)
@@ -14,23 +18,46 @@
   - Docker Container
   - Local Binary (custom commands)
 - 📋 **Copy to Clipboard**: One-click copy of generated markdown
-- 📄 **README Export**: Generate complete "Getting Started" section for your README with installation instructions for all supported IDEs
+- 📄 **README Export**: Generate complete "Getting Started" sections with installation instructions
 - 🖥️ **CLI Commands**: Generate cross-platform `code --add-mcp` commands for terminal installation
 - 👁️ **Live Preview**: See your badges before copying
-- 🎨 **Beautiful Design**: Modern, responsive UI with VS Code Insiders green theme
+- 🎨 **Customizable Colors**: Pick custom colors for repository badges with semantic defaults
+- 🎨 **Beautiful Design**: Modern, responsive UI with multiple theme options
 
 ## 🚀 Live Demo
 
-Visit the live application: [MCP Badge Creator](https://mcpbadge.dev/)
+Visit the live application: [README Badge Creator](https://jamesmontemagno.github.io/mcp-badge-creator/)
 
-## 📖 About MCP Badges
+## 📖 About README Badges
 
+README Badge Creator is an all-in-one tool for generating professional badges for your projects:
+
+### MCP Server Badges
 MCP badges provide a seamless way for users to install your Model Context Protocol servers directly into their IDE with a single click. These badges:
-
-- Generate proper install URLs for each IDE
+- Generate proper install URLs for each IDE (VS Code, VS Code Insiders, Visual Studio, Cursor, Goose, LM Studio)
 - Handle URL encoding of JSON configurations
 - Follow official badge styling guidelines
 - Support all MCP server deployment methods
+
+### VS Code Extension Badges
+Generate marketplace badges for your VS Code extensions with one-click install functionality for both VS Code stable and Insiders.
+
+### Package Badges
+Create version and download badges for packages across multiple ecosystems:
+- **NPM** - Node.js packages with version and weekly downloads
+- **NuGet** - .NET packages with version and total downloads
+- **PyPI** - Python packages with version and downloads
+- **Maven Central** - Java packages with version badge
+- **RubyGems** - Ruby gems with version and downloads
+- **Crates.io** - Rust crates with version and downloads
+
+### GitHub Repository Badges
+Generate customizable badges for your GitHub repositories:
+- **Essential**: Stars, license, contributors, latest release
+- **CI/CD**: Workflow status badges with custom colors
+- **Advanced**: Forks, issues, top language, code size, last commit, repo size
+- **Custom Colors**: Pick any color for your badges with semantic defaults
+- **Workflow Support**: Easy selection of common workflows (ci.yml, test.yml, build.yml, deploy.yml, release.yml, lint.yml) plus custom workflow support
 
 ## 🛠️ Supported Configuration Types
 
@@ -125,6 +152,7 @@ For MCP servers running as local executables with custom commands.
 
 ## 🎯 How It Works
 
+### MCP Badges
 1. **Fill in Server Details**: Enter your MCP server name and configuration
 2. **Choose Configuration Type**: Select between HTTP, NPX, UVX, DNX, Docker, or Local
 3. **Select Target IDEs**: Choose which IDEs to generate badges for
@@ -133,6 +161,24 @@ For MCP servers running as local executables with custom commands.
    - Copy the JSON configuration for manual setup
    - Copy the CLI commands for terminal installation
    - Export a complete "Getting Started" README section with installation instructions for all IDEs
+
+### Extension Badges
+1. **Search or Enter Extension**: Search the VS Code Marketplace or paste an extension URL/ID
+2. **Generate Badges**: Automatically creates badges for both VS Code and VS Code Insiders
+3. **Copy Markdown**: Get individual or combined markdown for your README
+
+### Package Badges
+1. **Select Package Manager**: Choose from NPM, NuGet, PyPI, Maven, RubyGems, or Crates.io
+2. **Enter Package Name**: Input your package identifier
+3. **Pick Badge Types**: Select version, downloads, or both
+4. **Customize**: Choose styles and copy the markdown
+
+### Repository Badges
+1. **Enter Repository**: Input GitHub repository URL or owner/repo format
+2. **Select Badges**: Choose from Essential, CI/CD Workflows, and Advanced categories
+3. **Customize Colors**: Use inline color pickers with reset buttons for each badge
+4. **Add Workflows**: Click preset workflow chips or add custom workflow files
+5. **Preview & Copy**: Toggle between grouped and flat preview, then copy individual or combined markdown
 
 ## 🎨 Supported IDEs
 
@@ -241,7 +287,9 @@ npm run deploy
 
 - [Model Context Protocol Documentation](https://modelcontextprotocol.io)
 - [MCP Badge Documentation](https://github.com/jamesmontemagno/MonkeyMCP/blob/main/.github/prompts/add-mcp-install-badges.md)
-- [MonkeyMCP Example](https://github.com/jamesmontemagno/monkeymcp)
+- [VS Code Marketplace API](https://github.com/microsoft/vscode/wiki/Extension-API)
+- [Shields.io Badge Service](https://shields.io)
+- [GitHub Repository Badges Guide](https://docs.github.com/en/repositories)
 
 ## 🤝 Contributing
 
@@ -253,13 +301,14 @@ MIT License - feel free to use this tool for your projects!
 
 ## 🙏 Acknowledgments
 
-- Badge documentation based on [MonkeyMCP](https://github.com/jamesmontemagno/MonkeyMCP) by James Montemagno
+- MCP badge documentation based on [MonkeyMCP](https://github.com/jamesmontemagno/MonkeyMCP) by James Montemagno
 - Built with [Vite](https://vite.dev) and [React](https://react.dev)
 - Badges powered by [Shields.io](https://shields.io)
+- VS Code Extension search via [Marketplace API](https://marketplace.visualstudio.com)
 
 ---
 
-Made with ❤️ for the MCP community
+Made with ❤️ for the open source community
 
 ## 🧪 CSS Modules Migration Progress
 
