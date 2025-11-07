@@ -12,11 +12,11 @@ import Settings from './pages/Settings'
 type ThemeType = 'system' | 'light' | 'dark' | 'green' | 'tron' | 'pink'
 
 const navItems = [
-  { to: '/mcp', label: 'MCP' },
-  { to: '/extensions', label: 'Extensions' },
-  { to: '/packages', label: 'Packages' },
-  { to: '/repository', label: 'Repo' },
-  { to: '/profile', label: 'Profile' },
+  { to: '/mcp', label: 'MCP', end: false },
+  { to: '/extensions', label: 'Extensions', end: false },
+  { to: '/packages', label: 'Packages', end: false },
+  { to: '/repository', label: 'Repo', end: false },
+  { to: '/profile', label: 'Profile', end: false },
 ]
 
 function Layout() {
