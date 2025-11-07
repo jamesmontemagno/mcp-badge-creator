@@ -131,6 +131,21 @@
   border: 1px solid var(--border-color);
 }
 
+.cardBadgePreview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 0;
+  margin: 0.75rem 0;
+  background: var(--bg-light);
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+}
+
+.cardBadgePreview img {
+  height: 20px;
+}
+
 .extensionsPreviewRow {
   display: flex;
   flex-wrap: wrap;
@@ -139,7 +154,99 @@
 }
 
 .extensionsPreviewRow img {
-  height: 36px;
+  height: 20px;
+}
+
+.badgeFieldset {
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 1rem 1.1rem 1.25rem;
+  background: var(--bg-white);
+  margin: 0 0 1.2rem 0;
+}
+
+.badgeFieldset legend {
+  padding: 0 0.5rem;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text-color);
+}
+
+.badgeSectionHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.badgeSectionTitle {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text-color);
+}
+
+.badgeSectionButtons {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.selectButton {
+  padding: 0.35rem 0.75rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  border: 1px solid var(--border-color);
+  background: var(--bg-white);
+  color: var(--text-color);
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.selectButton:hover {
+  background: var(--bg-light);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.badgeGrid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.75rem;
+  margin-left: 0.5rem;
+}
+
+.badgeCheckboxLabel {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  color: var(--text-color);
+  padding: 0.5rem 0.75rem;
+  border-radius: 8px;
+  background: var(--bg-light);
+  border: 1px solid var(--border-light);
+  transition: all 0.2s;
+}
+
+.badgeCheckboxLabel:hover {
+  background: var(--bg-white);
+  border-color: var(--primary-color);
+}
+
+.badgeCheckboxLabel input[type="checkbox"] {
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+}
+
+.badgeEmoji {
+  font-size: 1.1rem;
+  line-height: 1;
+}
+
+.badgeSectionMargin {
+  margin-bottom: 1rem;
 }
 
 .sortControl {
