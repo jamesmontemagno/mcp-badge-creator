@@ -155,6 +155,8 @@ function Settings() {
           
           <div className={`${styles.aboutInfo} about-info`}>
             <p>Created by <a href="https://github.com/jamesmontemagno" target="_blank" rel="noopener noreferrer">James Montemagno</a> using <a href="https://code.visualstudio.com/" target="_blank" rel="noopener noreferrer">VS Code</a> and <a href="https://github.com/features/copilot" target="_blank" rel="noopener noreferrer">GitHub Copilot</a>.</p>
+            <p>Badges powered by <a href="https://shields.io/" target="_blank" rel="noopener noreferrer">Shields.io</a>.</p>
+            <p>To increase GitHub rate limits on badges, consider setting up a <a href="https://shields.io/blog/token-pool" target="_blank" rel="noopener noreferrer">Shields.io token pool</a>.</p>
             <div className={`${styles.aboutLinks} about-links`}>
               <a href="https://github.com/jamesmontemagno/mcp-badge-creator" target="_blank" rel="noopener noreferrer">
                 View on GitHub ↗
