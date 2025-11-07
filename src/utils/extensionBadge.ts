@@ -113,14 +113,49 @@ const badgeMarkdown = (label: string, color: string, extensionId: string, uriSch
   }
 }
 
+const marketplaceBadges = (extensionId: string) => {
+  const marketplaceUrl = `https://marketplace.visualstudio.com/items?itemName=${extensionId}`
+  
+  const createBadge = (metricType: string, altText: string) => {
+    const badgeUrl = `https://img.shields.io/visual-studio-marketplace/${metricType}/${extensionId}`
+    return {
+      markdown: `[![${altText}](${badgeUrl})](${marketplaceUrl})`,
+      badgeUrl,
+      marketplaceUrl,
+    }
+  }
+  
+  return {
+    rating: createBadge('r', 'Visual Studio Marketplace Rating'),
+    installs: createBadge('i', 'Visual Studio Marketplace Installs'),
+    downloads: createBadge('d', 'Visual Studio Marketplace Downloads'),
+    version: createBadge('v', 'Visual Studio Marketplace Version'),
+    lastUpdated: createBadge('last-updated', 'Visual Studio Marketplace Last Updated'),
+    releaseDate: createBadge('release-date', 'Visual Studio Marketplace Release Date'),
+  }
+}
+
 export const generateExtensionBadges = (extensionId: string) => {
   const stable = badgeMarkdown('VS Code', '0098FF', extensionId, 'vscode')
   const insiders = badgeMarkdown('VS Code Insiders', '24bfa5', extensionId, 'vscode-insiders')
+  const about = marketplaceBadges(extensionId)
+
+  // Install section markdown
+  const installMarkdown = `${stable.markdown}\n${insiders.markdown}`
+  
+  // About section markdown
+  const aboutMarkdown = `${about.rating.markdown}\n${about.installs.markdown}\n${about.downloads.markdown}\n${about.version.markdown}\n${about.lastUpdated.markdown}\n${about.releaseDate.markdown}`
+  
+  // Combined markdown with both sections
+  const allMarkdown = `### Install\n\n${installMarkdown}\n\n### About\n\n${aboutMarkdown}`
 
   return {
     extensionId,
     stable,
     insiders,
-    combinedMarkdown: `${stable.markdown}\n${insiders.markdown}`,
+    about,
+    installMarkdown,
+    aboutMarkdown,
+    allMarkdown,
   }
 }

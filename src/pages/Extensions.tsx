@@ -5,7 +5,7 @@ import { generateExtensionBadges, parseExtensionInput } from '../utils/extension
 import SearchDropdown from '../components/SearchDropdown'
 import type { SortBy } from '../utils/marketplaceApi'
 
-type BadgeVariant = 'stable' | 'insiders' | 'combined'
+type BadgeVariant = 'stable' | 'insiders' | 'install' | 'rating' | 'installs' | 'downloads' | 'version' | 'lastUpdated' | 'releaseDate' | 'about' | 'all'
 type InputMode = 'manual' | 'search'
 
 function Extensions() {
@@ -18,6 +18,8 @@ function Extensions() {
   const [info, setInfo] = useState<string | null>(null)
   const [badgeData, setBadgeData] = useState<ReturnType<typeof generateExtensionBadges> | null>(null)
   const [copiedVariant, setCopiedVariant] = useState<BadgeVariant | null>(null)
+  const [selectedInstallBadges, setSelectedInstallBadges] = useState(new Set(['stable', 'insiders']))
+  const [selectedAboutBadges, setSelectedAboutBadges] = useState(new Set(['rating', 'installs', 'version']))
 
   const showCopyState = (variant: BadgeVariant) => {
     setCopiedVariant(variant)
@@ -87,13 +89,101 @@ function Extensions() {
       return
     }
 
-    const markdown =
-      variant === 'stable'
-        ? badgeData.stable.markdown
-        : variant === 'insiders'
-        ? badgeData.insiders.markdown
-        : badgeData.combinedMarkdown
+    let markdown: string
+    switch (variant) {
+      case 'stable':
+        markdown = badgeData.stable.markdown
+        break
+      case 'insiders':
+        markdown = badgeData.insiders.markdown
+        break
+      case 'install':
+        markdown = badgeData.installMarkdown
+        break
+      case 'rating':
+        markdown = badgeData.about.rating.markdown
+        break
+      case 'installs':
+        markdown = badgeData.about.installs.markdown
+        break
+      case 'downloads':
+        markdown = badgeData.about.downloads.markdown
+        break
+      case 'version':
+        markdown = badgeData.about.version.markdown
+        break
+      case 'lastUpdated':
+        markdown = badgeData.about.lastUpdated.markdown
+        break
+      case 'releaseDate':
+        markdown = badgeData.about.releaseDate.markdown
+        break
+      case 'about':
+        markdown = badgeData.aboutMarkdown
+        break
+      case 'all':
+        markdown = badgeData.allMarkdown
+        break
+      default:
+        return
+    }
+    
     await copyMarkdown(markdown, variant)
+  }
+
+  // Helper to extract image and link URLs from markdown (supports linked and unlinked badges)
+  const parseBadgeMarkdown = (markdown: string): { imageUrl: string; linkUrl?: string } => {
+    // Linked form: [![Alt](imageUrl)](linkUrl)
+    const linkMatch = markdown.match(/^\[!\[[^\]]*\]\(([^)]+)\)\]\(([^)]+)\)$/)
+    if (linkMatch) {
+      return { imageUrl: linkMatch[1], linkUrl: linkMatch[2] }
+    }
+    // Image only form: ![Alt](imageUrl)
+    const imgMatch = markdown.match(/!\[[^\]]*\]\(([^)]+)\)/)
+    if (imgMatch) {
+      return { imageUrl: imgMatch[1] }
+    }
+    return { imageUrl: '' }
+  }
+
+  const toggleInstallBadge = (badge: string) => {
+    setSelectedInstallBadges(prev => {
+      const updated = new Set(prev)
+      if (updated.has(badge)) {
+        updated.delete(badge)
+      } else {
+        updated.add(badge)
+      }
+      return updated
+    })
+  }
+
+  const toggleAboutBadge = (badge: string) => {
+    setSelectedAboutBadges(prev => {
+      const updated = new Set(prev)
+      if (updated.has(badge)) {
+        updated.delete(badge)
+      } else {
+        updated.add(badge)
+      }
+      return updated
+    })
+  }
+
+  const selectAllInstallBadges = () => {
+    setSelectedInstallBadges(new Set(['stable', 'insiders']))
+  }
+
+  const deselectAllInstallBadges = () => {
+    setSelectedInstallBadges(new Set())
+  }
+
+  const selectAllAboutBadges = () => {
+    setSelectedAboutBadges(new Set(['rating', 'installs', 'downloads', 'version', 'lastUpdated', 'releaseDate']))
+  }
+
+  const deselectAllAboutBadges = () => {
+    setSelectedAboutBadges(new Set())
   }
 
   return (
@@ -180,6 +270,100 @@ function Extensions() {
               : 'Accepts Marketplace URLs, publisher.extension IDs, or display names.'}
           </span>
           
+          {badgeData && (
+            <fieldset className={styles.badgeFieldset}>
+              <legend>🎨 Select Badges to Display</legend>
+              
+              <div className={styles.badgeSectionMargin}>
+                <div className={styles.badgeSectionHeader}>
+                  <div className={styles.badgeSectionTitle}>📦 Install Badges</div>
+                  <div className={styles.badgeSectionButtons}>
+                    <button type="button" onClick={selectAllInstallBadges} className={styles.selectButton}>Select All</button>
+                    <button type="button" onClick={deselectAllInstallBadges} className={styles.selectButton}>Deselect All</button>
+                  </div>
+                </div>
+                <div className={styles.badgeGrid}>
+                  <label className={styles.badgeCheckboxLabel}>
+                    <input
+                      type="checkbox"
+                      checked={selectedInstallBadges.has('stable')}
+                      onChange={() => toggleInstallBadge('stable')}
+                    />
+                    <span className={styles.badgeEmoji}>💻</span> VS Code
+                  </label>
+                  <label className={styles.badgeCheckboxLabel}>
+                    <input
+                      type="checkbox"
+                      checked={selectedInstallBadges.has('insiders')}
+                      onChange={() => toggleInstallBadge('insiders')}
+                    />
+                    <span className={styles.badgeEmoji}>🚀</span> VS Code Insiders
+                  </label>
+                </div>
+              </div>
+              
+              <div>
+                <div className={styles.badgeSectionHeader}>
+                  <div className={styles.badgeSectionTitle}>📊 Marketplace Badges</div>
+                  <div className={styles.badgeSectionButtons}>
+                    <button type="button" onClick={selectAllAboutBadges} className={styles.selectButton}>Select All</button>
+                    <button type="button" onClick={deselectAllAboutBadges} className={styles.selectButton}>Deselect All</button>
+                  </div>
+                </div>
+                <div className={styles.badgeGrid}>
+                  <label className={styles.badgeCheckboxLabel}>
+                    <input
+                      type="checkbox"
+                      checked={selectedAboutBadges.has('rating')}
+                      onChange={() => toggleAboutBadge('rating')}
+                    />
+                    <span className={styles.badgeEmoji}>⭐</span> Rating
+                  </label>
+                  <label className={styles.badgeCheckboxLabel}>
+                    <input
+                      type="checkbox"
+                      checked={selectedAboutBadges.has('installs')}
+                      onChange={() => toggleAboutBadge('installs')}
+                    />
+                    <span className={styles.badgeEmoji}>📥</span> Installs
+                  </label>
+                  <label className={styles.badgeCheckboxLabel}>
+                    <input
+                      type="checkbox"
+                      checked={selectedAboutBadges.has('downloads')}
+                      onChange={() => toggleAboutBadge('downloads')}
+                    />
+                    <span className={styles.badgeEmoji}>⬇️</span> Downloads
+                  </label>
+                  <label className={styles.badgeCheckboxLabel}>
+                    <input
+                      type="checkbox"
+                      checked={selectedAboutBadges.has('version')}
+                      onChange={() => toggleAboutBadge('version')}
+                    />
+                    <span className={styles.badgeEmoji}>🔢</span> Version
+                  </label>
+                  <label className={styles.badgeCheckboxLabel}>
+                    <input
+                      type="checkbox"
+                      checked={selectedAboutBadges.has('lastUpdated')}
+                      onChange={() => toggleAboutBadge('lastUpdated')}
+                    />
+                    <span className={styles.badgeEmoji}>🕐</span> Last Updated
+                  </label>
+                  <label className={styles.badgeCheckboxLabel}>
+                    <input
+                      type="checkbox"
+                      checked={selectedAboutBadges.has('releaseDate')}
+                      onChange={() => toggleAboutBadge('releaseDate')}
+                    />
+                    <span className={styles.badgeEmoji}>📅</span> Release Date
+                  </label>
+                </div>
+              </div>
+            </fieldset>
+          )}
+          
           {inputMode === 'manual' && (
             <button type="submit" className="primary">
               Generate badges
@@ -194,12 +378,35 @@ function Extensions() {
         <section className={`${styles.extensionsOutput} extensions-output`} aria-live="polite">
           <div className={`${styles.extensionsPreview} extensions-preview`}>
             <h2>Preview</h2>
+            
+            <h3>Install</h3>
             <div className={`${styles.extensionsPreviewRow} extensions-preview-row`}>
               <a href={badgeData.stable.extensionUri} target="_blank" rel="noopener noreferrer">
                 <img src={badgeData.stable.badgeUrl} alt="Install in VS Code" />
               </a>
               <a href={badgeData.insiders.extensionUri} target="_blank" rel="noopener noreferrer">
                 <img src={badgeData.insiders.badgeUrl} alt="Install in VS Code Insiders" />
+              </a>
+            </div>
+            
+            <h3>About</h3>
+            <div className={`${styles.extensionsPreviewRow} extensions-preview-row`}>
+              <a href={badgeData.about.rating.marketplaceUrl} target="_blank" rel="noopener noreferrer">
+                <img src={badgeData.about.rating.badgeUrl} alt="Visual Studio Marketplace Rating" />
+              </a>
+              <a href={badgeData.about.installs.marketplaceUrl} target="_blank" rel="noopener noreferrer">
+                <img src={badgeData.about.installs.badgeUrl} alt="Visual Studio Marketplace Installs" />
+              </a>
+              <a href={badgeData.about.version.marketplaceUrl} target="_blank" rel="noopener noreferrer">
+                <img src={badgeData.about.version.badgeUrl} alt="Visual Studio Marketplace Version" />
+              </a>
+            </div>
+            <div className={`${styles.extensionsPreviewRow} extensions-preview-row`}>
+              <a href={badgeData.about.lastUpdated.marketplaceUrl} target="_blank" rel="noopener noreferrer">
+                <img src={badgeData.about.lastUpdated.badgeUrl} alt="Visual Studio Marketplace Last Updated" />
+              </a>
+              <a href={badgeData.about.releaseDate.marketplaceUrl} target="_blank" rel="noopener noreferrer">
+                <img src={badgeData.about.releaseDate.badgeUrl} alt="Visual Studio Marketplace Release Date" />
               </a>
             </div>
           </div>
@@ -212,6 +419,18 @@ function Extensions() {
                   {copiedVariant === 'stable' ? '✅ Copied!' : '📋 Copy'}
                 </button>
               </header>
+              <div className={styles.cardBadgePreview}>
+                {(() => {
+                  const { imageUrl, linkUrl } = parseBadgeMarkdown(badgeData.stable.markdown)
+                  return linkUrl ? (
+                    <a href={linkUrl} target="_blank" rel="noopener noreferrer">
+                      <img src={imageUrl} alt="Install in VS Code" />
+                    </a>
+                  ) : (
+                    <img src={imageUrl} alt="Install in VS Code" />
+                  )
+                })()}
+              </div>
               <pre><code>{badgeData.stable.markdown}</code></pre>
             </article>
 
@@ -222,18 +441,186 @@ function Extensions() {
                   {copiedVariant === 'insiders' ? '✅ Copied!' : '📋 Copy'}
                 </button>
               </header>
+              <div className={styles.cardBadgePreview}>
+                {(() => {
+                  const { imageUrl, linkUrl } = parseBadgeMarkdown(badgeData.insiders.markdown)
+                  return linkUrl ? (
+                    <a href={linkUrl} target="_blank" rel="noopener noreferrer">
+                      <img src={imageUrl} alt="Install in VS Code Insiders" />
+                    </a>
+                  ) : (
+                    <img src={imageUrl} alt="Install in VS Code Insiders" />
+                  )
+                })()}
+              </div>
               <pre><code>{badgeData.insiders.markdown}</code></pre>
             </article>
           </div>
 
           <div className={`${styles.combinedMarkdown} combined-markdown`}>
             <header className="output-header">
-              <h3>Combined Markdown</h3>
-              <button type="button" className="copy-btn" onClick={() => handleCopy('combined')}>
-                {copiedVariant === 'combined' ? '✅ Copied!' : '📋 Copy'}
+              <h3>Install Section - All Badges</h3>
+              <button type="button" className="copy-btn" onClick={() => handleCopy('install')}>
+                {copiedVariant === 'install' ? '✅ Copied!' : '📋 Copy'}
               </button>
             </header>
-            <pre><code>{badgeData.combinedMarkdown}</code></pre>
+            <pre><code>{badgeData.installMarkdown}</code></pre>
+          </div>
+
+          <div className={`${styles.markdownColumns} markdown-columns`}>
+            <article className={`${styles.markdownCard} markdown-card`}>
+              <header className="output-header">
+                <h3>Rating Badge</h3>
+                <button type="button" className="copy-btn" onClick={() => handleCopy('rating')}>
+                  {copiedVariant === 'rating' ? '✅ Copied!' : '📋 Copy'}
+                </button>
+              </header>
+              <div className={styles.cardBadgePreview}>
+                {(() => {
+                  const { imageUrl, linkUrl } = parseBadgeMarkdown(badgeData.about.rating.markdown)
+                  return linkUrl ? (
+                    <a href={linkUrl} target="_blank" rel="noopener noreferrer">
+                      <img src={imageUrl} alt="Visual Studio Marketplace Rating" />
+                    </a>
+                  ) : (
+                    <img src={imageUrl} alt="Visual Studio Marketplace Rating" />
+                  )
+                })()}
+              </div>
+              <pre><code>{badgeData.about.rating.markdown}</code></pre>
+            </article>
+
+            <article className={`${styles.markdownCard} markdown-card`}>
+              <header className="output-header">
+                <h3>Installs Badge</h3>
+                <button type="button" className="copy-btn" onClick={() => handleCopy('installs')}>
+                  {copiedVariant === 'installs' ? '✅ Copied!' : '📋 Copy'}
+                </button>
+              </header>
+              <div className={styles.cardBadgePreview}>
+                {(() => {
+                  const { imageUrl, linkUrl } = parseBadgeMarkdown(badgeData.about.installs.markdown)
+                  return linkUrl ? (
+                    <a href={linkUrl} target="_blank" rel="noopener noreferrer">
+                      <img src={imageUrl} alt="Visual Studio Marketplace Installs" />
+                    </a>
+                  ) : (
+                    <img src={imageUrl} alt="Visual Studio Marketplace Installs" />
+                  )
+                })()}
+              </div>
+              <pre><code>{badgeData.about.installs.markdown}</code></pre>
+            </article>
+          </div>
+
+          <div className={`${styles.markdownColumns} markdown-columns`}>
+            <article className={`${styles.markdownCard} markdown-card`}>
+              <header className="output-header">
+                <h3>Downloads Badge</h3>
+                <button type="button" className="copy-btn" onClick={() => handleCopy('downloads')}>
+                  {copiedVariant === 'downloads' ? '✅ Copied!' : '📋 Copy'}
+                </button>
+              </header>
+              <div className={styles.cardBadgePreview}>
+                {(() => {
+                  const { imageUrl, linkUrl } = parseBadgeMarkdown(badgeData.about.downloads.markdown)
+                  return linkUrl ? (
+                    <a href={linkUrl} target="_blank" rel="noopener noreferrer">
+                      <img src={imageUrl} alt="Visual Studio Marketplace Downloads" />
+                    </a>
+                  ) : (
+                    <img src={imageUrl} alt="Visual Studio Marketplace Downloads" />
+                  )
+                })()}
+              </div>
+              <pre><code>{badgeData.about.downloads.markdown}</code></pre>
+            </article>
+
+            <article className={`${styles.markdownCard} markdown-card`}>
+              <header className="output-header">
+                <h3>Version Badge</h3>
+                <button type="button" className="copy-btn" onClick={() => handleCopy('version')}>
+                  {copiedVariant === 'version' ? '✅ Copied!' : '📋 Copy'}
+                </button>
+              </header>
+              <div className={styles.cardBadgePreview}>
+                {(() => {
+                  const { imageUrl, linkUrl } = parseBadgeMarkdown(badgeData.about.version.markdown)
+                  return linkUrl ? (
+                    <a href={linkUrl} target="_blank" rel="noopener noreferrer">
+                      <img src={imageUrl} alt="Visual Studio Marketplace Version" />
+                    </a>
+                  ) : (
+                    <img src={imageUrl} alt="Visual Studio Marketplace Version" />
+                  )
+                })()}
+              </div>
+              <pre><code>{badgeData.about.version.markdown}</code></pre>
+            </article>
+
+            <article className={`${styles.markdownCard} markdown-card`}>
+              <header className="output-header">
+                <h3>Last Updated Badge</h3>
+                <button type="button" className="copy-btn" onClick={() => handleCopy('lastUpdated')}>
+                  {copiedVariant === 'lastUpdated' ? '✅ Copied!' : '📋 Copy'}
+                </button>
+              </header>
+              <div className={styles.cardBadgePreview}>
+                {(() => {
+                  const { imageUrl, linkUrl } = parseBadgeMarkdown(badgeData.about.lastUpdated.markdown)
+                  return linkUrl ? (
+                    <a href={linkUrl} target="_blank" rel="noopener noreferrer">
+                      <img src={imageUrl} alt="Visual Studio Marketplace Last Updated" />
+                    </a>
+                  ) : (
+                    <img src={imageUrl} alt="Visual Studio Marketplace Last Updated" />
+                  )
+                })()}
+              </div>
+              <pre><code>{badgeData.about.lastUpdated.markdown}</code></pre>
+            </article>
+          </div>
+
+          <div className={`${styles.combinedMarkdown} combined-markdown`}>
+            <header className="output-header">
+              <h3>Release Date Badge</h3>
+              <button type="button" className="copy-btn" onClick={() => handleCopy('releaseDate')}>
+                {copiedVariant === 'releaseDate' ? '✅ Copied!' : '📋 Copy'}
+              </button>
+            </header>
+            <div className={styles.cardBadgePreview}>
+              {(() => {
+                const { imageUrl, linkUrl } = parseBadgeMarkdown(badgeData.about.releaseDate.markdown)
+                return linkUrl ? (
+                  <a href={linkUrl} target="_blank" rel="noopener noreferrer">
+                    <img src={imageUrl} alt="Visual Studio Marketplace Release Date" />
+                  </a>
+                ) : (
+                  <img src={imageUrl} alt="Visual Studio Marketplace Release Date" />
+                )
+              })()}
+            </div>
+            <pre><code>{badgeData.about.releaseDate.markdown}</code></pre>
+          </div>
+
+          <div className={`${styles.combinedMarkdown} combined-markdown`}>
+            <header className="output-header">
+              <h3>About Section - All Badges</h3>
+              <button type="button" className="copy-btn" onClick={() => handleCopy('about')}>
+                {copiedVariant === 'about' ? '✅ Copied!' : '📋 Copy'}
+              </button>
+            </header>
+            <pre><code>{badgeData.aboutMarkdown}</code></pre>
+          </div>
+
+          <div className={`${styles.combinedMarkdown} combined-markdown`}>
+            <header className="output-header">
+              <h3>All Badges - Install & About</h3>
+              <button type="button" className="copy-btn" onClick={() => handleCopy('all')}>
+                {copiedVariant === 'all' ? '✅ Copied!' : '📋 Copy'}
+              </button>
+            </header>
+            <pre><code>{badgeData.allMarkdown}</code></pre>
           </div>
         </section>
       )}
