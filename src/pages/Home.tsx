@@ -35,6 +35,14 @@ const navigationCards = [
     icon: '⭐',
     className: 'card-repository',
   },
+  {
+    id: 'profile',
+    title: 'Profile Badges',
+    description: 'Generate badges for social media, GitHub stats, professional platforms, and community presence.',
+    to: '/profile',
+    icon: '👤',
+    className: 'card-profile',
+  },
 ]
 
 function Home() {
@@ -59,6 +67,8 @@ function Home() {
               ? styles.cardPackages
               : card.className === 'card-repository'
               ? styles.cardRepository
+              : card.className === 'card-profile'
+              ? styles.cardProfile
               : ''
           return (
             <Link

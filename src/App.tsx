@@ -6,6 +6,7 @@ import MCP from './pages/MCP'
 import Extensions from './pages/Extensions'
 import Packages from './pages/Packages'
 import Repository from './pages/Repository'
+import Profile from './pages/Profile'
 import Settings from './pages/Settings'
 
 type ThemeType = 'system' | 'light' | 'dark' | 'green' | 'tron' | 'pink'
@@ -16,6 +17,7 @@ const navItems = [
   { to: '/extensions', label: 'Extensions' },
   { to: '/packages', label: 'Packages' },
   { to: '/repository', label: 'Repository' },
+  { to: '/profile', label: 'Profile' },
 ]
 
 function Layout() {
@@ -129,6 +131,7 @@ function App() {
           <Route path="extensions" element={<Extensions />} />
           <Route path="packages" element={<Packages />} />
           <Route path="repository" element={<Repository />} />
+          <Route path="profile" element={<Profile />} />
           <Route path="settings" element={<Settings />} />
         </Route>
       </Routes>

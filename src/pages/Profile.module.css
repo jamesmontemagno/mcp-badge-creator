@@ -1,0 +1,637 @@
+/* Profile Page Styles */
+
+.profileHeader {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.eyebrow {
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+}
+
+.subtitle {
+  font-size: 1.125rem;
+  color: var(--text-light);
+  max-width: 42rem;
+  margin: 1rem auto 0;
+  line-height: 1.6;
+}
+
+.profilePage {
+  max-width: 72rem;
+  margin: 0 auto;
+  padding: 0 1.5rem 3rem;
+}
+
+.profileForm {
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 2px 8px var(--shadow-light);
+}
+
+.profileForm label {
+  display: block;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
+}
+
+.profileForm input[type="text"],
+.profileForm input[type="url"] {
+  width: 100%;
+  padding: 0.625rem 0.875rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-size: 0.9375rem;
+  background: var(--bg-white);
+  color: var(--text-color);
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.profileForm input[type="text"]:focus,
+.profileForm input[type="url"]:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px var(--shadow-light);
+}
+
+.profileForm button.primary {
+  width: 100%;
+  padding: 0.875rem 1.5rem;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.profileForm button.primary:hover {
+  background: var(--primary-dark);
+}
+
+.profileForm button.primary:active {
+  transform: scale(0.98);
+}
+
+.defaultUsernameField {
+  margin-bottom: 2rem;
+  padding-bottom: 2rem;
+  border-bottom: 2px solid var(--border-light);
+}
+
+/* Badge Fieldset */
+.badgeFieldset {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  margin-bottom: 1rem;
+  background: var(--bg-light);
+}
+
+.badgeFieldset legend {
+  font-weight: 600;
+  font-size: 1.0625rem;
+  color: var(--text-color);
+  padding: 0 0.5rem;
+}
+
+.fieldsetActions {
+  display: flex;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+  justify-content: flex-end;
+}
+
+.fieldsetActions button {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.8125rem;
+  background: var(--bg-light);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--text-color);
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.fieldsetActions button:hover {
+  background: var(--bg-white);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+/* Collapsible Category Sections */
+.badgeCategory {
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  margin-bottom: 1rem;
+  background: var(--bg-light);
+}
+
+.badgeCategory[open] {
+  background: var(--bg-white);
+}
+
+.categorySummary {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1.25rem;
+  cursor: pointer;
+  user-select: none;
+  font-weight: 600;
+  color: var(--text-color);
+  list-style: none;
+}
+
+.categorySummary::-webkit-details-marker {
+  display: none;
+}
+
+.categoryIcon {
+  font-size: 0.75rem;
+  transition: transform 0.2s;
+  color: var(--text-light);
+}
+
+.badgeCategory[open] .categoryIcon {
+  transform: rotate(90deg);
+}
+
+.categoryTitle {
+  flex: 1;
+  font-size: 1.0625rem;
+}
+
+.categoryActions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.categoryActions button {
+  padding: 0.375rem 0.75rem;
+  font-size: 0.8125rem;
+  background: var(--bg-light);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--text-color);
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.categoryActions button:hover {
+  background: var(--bg-white);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+}
+
+.badgeGrid {
+  padding: 1rem 1.25rem 1.25rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Badge Checkbox Rows */
+.badgeCheckboxRow {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.875rem;
+  background: var(--bg-light);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-md);
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.badgeCheckboxRow:hover {
+  background: var(--bg-white);
+  border-color: var(--border-color);
+}
+
+.badgeCheckboxRow label {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  cursor: pointer;
+  margin: 0;
+  font-weight: 500;
+}
+
+.badgeCheckboxRow input[type="checkbox"] {
+  cursor: pointer;
+  width: 1.125rem;
+  height: 1.125rem;
+  margin: 0;
+}
+
+.tooltipWrapper {
+  position: relative;
+  display: inline-flex;
+}
+
+.infoIcon {
+  width: 1.25rem;
+  height: 1.25rem;
+  border-radius: 50%;
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  font-size: 0.75rem;
+  font-weight: bold;
+  cursor: help;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.infoIcon:hover {
+  background: var(--primary-dark);
+}
+
+.tooltipBubble {
+  position: absolute;
+  bottom: calc(100% + 0.5rem);
+  right: 0;
+  background: var(--text-color);
+  color: var(--bg-white);
+  padding: 0.625rem 0.875rem;
+  border-radius: var(--radius-md);
+  font-size: 0.8125rem;
+  line-height: 1.4;
+  white-space: normal;
+  width: max-content;
+  max-width: 18rem;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.2s, visibility 0.2s;
+  pointer-events: none;
+  z-index: 100;
+  box-shadow: 0 4px 12px var(--shadow-color);
+  font-weight: normal;
+}
+
+.tooltipWrapper:hover .tooltipBubble,
+.tooltipWrapper:focus-within .tooltipBubble {
+  opacity: 1;
+  visibility: visible;
+}
+
+.badgeDescriptionVisuallyHidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Badge Input Fields */
+.badgeInputs {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding-top: 0.5rem;
+}
+
+.inlineField {
+  display: flex;
+  flex-direction: column;
+  gap: 0.375rem;
+}
+
+.inlineField label {
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-color);
+  margin: 0;
+}
+
+.inlineField input {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.875rem;
+}
+
+.colorControls {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+  margin-top: 0.25rem;
+}
+
+.colorPicker {
+  width: 3rem;
+  height: 2rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  background: none;
+  padding: 0.125rem;
+}
+
+.colorPicker::-webkit-color-swatch-wrapper {
+  padding: 0;
+}
+
+.colorPicker::-webkit-color-swatch {
+  border: none;
+  border-radius: calc(var(--radius-sm) - 2px);
+}
+
+.resetColorBtn {
+  padding: 0.375rem 0.75rem;
+  background: var(--bg-light);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-size: 1rem;
+  color: var(--text-color);
+  transition: background 0.2s, border-color 0.2s;
+}
+
+.resetColorBtn:hover {
+  background: var(--bg-white);
+  border-color: var(--primary-color);
+}
+
+/* Output Section */
+.profileOutput {
+  background: var(--bg-white);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: 2rem;
+  box-shadow: 0 2px 8px var(--shadow-light);
+}
+
+.previewHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1.5rem;
+}
+
+.previewHeader h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  color: var(--text-color);
+}
+
+.previewToggle {
+  display: flex;
+  gap: 0.5rem;
+  background: var(--bg-light);
+  padding: 0.25rem;
+  border-radius: var(--radius-md);
+}
+
+.previewToggle button {
+  padding: 0.5rem 1rem;
+  background: transparent;
+  border: none;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+  font-weight: 500;
+  color: var(--text-light);
+  transition: background 0.2s, color 0.2s;
+}
+
+.previewToggle button:hover {
+  color: var(--text-color);
+}
+
+.previewToggleActive {
+  background: var(--bg-white) !important;
+  color: var(--primary-color) !important;
+  box-shadow: 0 1px 3px var(--shadow-light);
+}
+
+/* Preview Modes */
+.previewGrouped {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.previewSection {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.previewSectionHeader {
+  font-size: 0.875rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-light);
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--border-light);
+}
+
+.previewRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.625rem;
+  align-items: center;
+}
+
+.previewFlat {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.625rem;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.previewRow img,
+.previewFlat img {
+  max-height: 1.25rem;
+  vertical-align: middle;
+}
+
+/* Combined Markdown */
+.combinedMarkdown {
+  background: var(--bg-light);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.combinedMarkdown pre {
+  margin: 0;
+  background: var(--bg-white);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+.combinedMarkdown code {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.875rem;
+  color: var(--text-color);
+  line-height: 1.6;
+  word-break: break-all;
+}
+
+/* Markdown Cards */
+.markdownColumns {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(20rem, 1fr));
+  gap: 1.5rem;
+}
+
+.markdownCard {
+  background: var(--bg-light);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  transition: box-shadow 0.2s, border-color 0.2s;
+}
+
+.markdownCard:hover {
+  border-color: var(--primary-color);
+  box-shadow: 0 4px 12px var(--shadow-light);
+}
+
+.markdownCard h3 {
+  margin: 0;
+  font-size: 1rem;
+  color: var(--text-color);
+}
+
+.cardBadgePreview {
+  margin: 1rem 0;
+  padding: 1rem;
+  background: var(--bg-white);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  text-align: center;
+  min-height: 3rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cardBadgePreview img {
+  max-height: 1.5rem;
+  vertical-align: middle;
+}
+
+.markdownCard pre {
+  margin: 0;
+  background: var(--bg-white);
+  border: 1px solid var(--border-light);
+  border-radius: var(--radius-sm);
+  padding: 1rem;
+  overflow-x: auto;
+}
+
+.markdownCard code {
+  font-family: 'Monaco', 'Menlo', 'Ubuntu Mono', monospace;
+  font-size: 0.8125rem;
+  color: var(--text-color);
+  line-height: 1.5;
+  word-break: break-all;
+}
+
+/* Request Badge Section */
+.requestBadgeSection {
+  margin-top: 3rem;
+  padding: 2rem;
+  background: var(--bg-light);
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  text-align: center;
+}
+
+.requestBadgeText {
+  margin: 0 0 1rem;
+  font-size: 1rem;
+  color: var(--text-color);
+}
+
+.requestBadgeBtn {
+  display: inline-block;
+  padding: 0.75rem 1.5rem;
+  background: var(--primary-color);
+  color: white;
+  text-decoration: none;
+  border-radius: var(--radius-md);
+  font-weight: 600;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.requestBadgeBtn:hover {
+  background: var(--primary-dark);
+  transform: translateY(-1px);
+}
+
+/* Mobile Responsive */
+@media (max-width: 48rem) {
+  .profileHeader {
+    margin-bottom: 2rem;
+  }
+
+  .subtitle {
+    font-size: 1rem;
+  }
+
+  .profilePage {
+    padding: 0 1rem 2rem;
+  }
+
+  .profileForm,
+  .profileOutput {
+    padding: 1.5rem;
+  }
+
+  .categorySummary {
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .categoryActions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+
+  .categoryActions button {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.625rem;
+  }
+
+  .previewHeader {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+  }
+
+  .markdownColumns {
+    grid-template-columns: 1fr;
+  }
+
+  .tooltipBubble {
+    right: auto;
+    left: 50%;
+    transform: translateX(-50%);
+  }
+}
