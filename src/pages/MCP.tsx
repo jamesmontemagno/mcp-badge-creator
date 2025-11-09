@@ -3,6 +3,7 @@ import styles from './MCP.module.css'
 import MCPSearchDropdown from '../components/MCPSearchDropdown'
 import { parseRuntimeConfig } from '../utils/mcpRegistryApi'
 import type { MCPSearchResult } from '../utils/mcpRegistryApi'
+import RequestBadge from '../components/RequestBadge'
 
 type ConfigType = 'http' | 'docker' | 'local' | 'npx' | 'uvx' | 'dnx';
 
@@ -2139,6 +2140,8 @@ function MCP() {
           )}
         </div>
       </div>
+      
+      <RequestBadge />
       </div>
       
       {/* Import JSON Modal */}

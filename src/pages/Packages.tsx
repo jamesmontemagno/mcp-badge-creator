@@ -3,6 +3,7 @@ import type { FormEvent, ChangeEvent } from 'react'
 import styles from './Packages.module.css'
 import { parsePackageInput, generatePackageBadges, getInstallCommands, type PackageManager } from '../utils/packageBadge'
 import PackageSearchDropdown from '../components/PackageSearchDropdown'
+import RequestBadge from '../components/RequestBadge'
 
 type CopyTarget = 'version' | 'versionPrerelease' | 'downloads' | 'downloadsMonthly' | 'downloadsRecent' | 'combined' | 'commands' | `command-${number}`
 type InputMode = 'manual' | 'search'
@@ -611,6 +612,8 @@ function Packages() {
           )}
         </section>
       )}
+      
+      <RequestBadge />
       </div>
     </>
   )
