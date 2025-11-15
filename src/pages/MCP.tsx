@@ -92,6 +92,7 @@ function MCP() {
   const [copiedCli, setCopiedCli] = useState(false)
   const [copiedCliInsiders, setCopiedCliInsiders] = useState(false)
   const [copiedReadme, setCopiedReadme] = useState(false)
+  const [copiedCopilotConfig, setCopiedCopilotConfig] = useState(false)
   const [activeTab, setActiveTab] = useState<'badges' | 'readme'>('badges')
   
   // Dynamic arguments and environment variables (per config type)
@@ -355,6 +356,24 @@ function MCP() {
         }
       };
     }
+  }
+
+  const generateGitHubCopilotCodingAgentConfig = () => {
+    const baseConfig = generateConfig();
+    
+    // GitHub Copilot Coding Agent uses "mcpServers" instead of "servers"
+    // and adds a "tools" field with ["*"] to select all tools
+    const copilotConfig = {
+      ...baseConfig,
+      type: configType === 'http' ? 'remote' : 'local',
+      tools: ['*'] as string[]
+    };
+
+    return {
+      mcpServers: {
+        [serverName]: copilotConfig
+      }
+    };
   }
 
   const addDynamicArg = () => {
@@ -1207,6 +1226,14 @@ function MCP() {
       readmeContent += `<details>\n<summary>Windsurf</summary>\n\n`;
       readmeContent += `Follow Windsurf MCP [documentation](https://docs.windsurf.com/windsurf/cascade/mcp). Use the standard config above.\n</details>\n\n`;
     }
+    
+    // GitHub Copilot Coding Agent section
+    readmeContent += `<details>\n<summary>GitHub Copilot Coding Agent</summary>\n\n`;
+    readmeContent += `GitHub Copilot Coding Agent can use MCP servers to extend its capabilities. Use the configuration below specifically formatted for the Coding Agent:\n\n`;
+    const copilotConfig = generateGitHubCopilotCodingAgentConfig();
+    readmeContent += `\`\`\`json\n${JSON.stringify(copilotConfig, null, 2)}\n\`\`\`\n\n`;
+    readmeContent += `Add this configuration to your repository settings under **Copilot > Coding agent**. The \`"tools": ["*"]\` setting enables all available tools from the MCP server.\n\n`;
+    readmeContent += `For more information, see the [GitHub Copilot Coding Agent MCP documentation](https://docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent/extend-coding-agent-with-mcp).\n</details>\n\n`;
     
     // Additional notes
     readmeContent += `### Configuration Details\n\n`;
@@ -2119,6 +2146,24 @@ function MCP() {
                       <small className="field-hint">Works in PowerShell, Bash, and Zsh</small>
                     </div>
                   )}
+
+                  <div className="config-output">
+                    <div className="output-header">
+                      <h3>GitHub Copilot Coding Agent Configuration</h3>
+                      <button 
+                        className="copy-btn" 
+                        onClick={() => copyToClipboardWithState(JSON.stringify(generateGitHubCopilotCodingAgentConfig(), null, 2), setCopiedCopilotConfig)}
+                      >
+                        {copiedCopilotConfig ? '✓ Copied!' : '📋 Copy'}
+                      </button>
+                    </div>
+                    <pre><code>{JSON.stringify(generateGitHubCopilotCodingAgentConfig(), null, 2)}</code></pre>
+                    <small className="field-hint">
+                      Configuration for GitHub Copilot Coding Agent with all tools enabled. 
+                      Add this to your repository settings under Copilot &gt; Coding agent. 
+                      Learn more at <a href="https://docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent/extend-coding-agent-with-mcp" target="_blank" rel="noopener noreferrer">GitHub Docs</a>
+                    </small>
+                  </div>
                 </>
               ) : (
                 <>
