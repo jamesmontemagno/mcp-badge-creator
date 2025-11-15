@@ -1227,6 +1227,14 @@ function MCP() {
       readmeContent += `Follow Windsurf MCP [documentation](https://docs.windsurf.com/windsurf/cascade/mcp). Use the standard config above.\n</details>\n\n`;
     }
     
+    // GitHub Copilot Coding Agent section
+    readmeContent += `<details>\n<summary>GitHub Copilot Coding Agent</summary>\n\n`;
+    readmeContent += `GitHub Copilot Coding Agent can use MCP servers to extend its capabilities. Use the configuration below specifically formatted for the Coding Agent:\n\n`;
+    const copilotConfig = generateGitHubCopilotCodingAgentConfig();
+    readmeContent += `\`\`\`json\n${JSON.stringify(copilotConfig, null, 2)}\n\`\`\`\n\n`;
+    readmeContent += `Add this configuration to your repository settings under **Copilot > Coding agent**. The \`"tools": ["*"]\` setting enables all available tools from the MCP server.\n\n`;
+    readmeContent += `For more information, see the [GitHub Copilot Coding Agent MCP documentation](https://docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent/extend-coding-agent-with-mcp).\n</details>\n\n`;
+    
     // Additional notes
     readmeContent += `### Configuration Details\n\n`;
     readmeContent += `- **Server Name:** \`${serverName}\`\n`;
