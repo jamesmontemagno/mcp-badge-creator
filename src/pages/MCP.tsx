@@ -92,6 +92,7 @@ function MCP() {
   const [copiedCli, setCopiedCli] = useState(false)
   const [copiedCliInsiders, setCopiedCliInsiders] = useState(false)
   const [copiedReadme, setCopiedReadme] = useState(false)
+  const [copiedCopilotConfig, setCopiedCopilotConfig] = useState(false)
   const [activeTab, setActiveTab] = useState<'badges' | 'readme'>('badges')
   
   // Dynamic arguments and environment variables (per config type)
@@ -355,6 +356,24 @@ function MCP() {
         }
       };
     }
+  }
+
+  const generateGitHubCopilotCodingAgentConfig = () => {
+    const baseConfig = generateConfig();
+    
+    // GitHub Copilot Coding Agent uses "mcpServers" instead of "servers"
+    // and adds a "tools" field with ["*"] to select all tools
+    const copilotConfig = {
+      ...baseConfig,
+      type: configType === 'http' ? 'remote' : 'local',
+      tools: ['*'] as string[]
+    };
+
+    return {
+      mcpServers: {
+        [serverName]: copilotConfig
+      }
+    };
   }
 
   const addDynamicArg = () => {
@@ -2119,6 +2138,24 @@ function MCP() {
                       <small className="field-hint">Works in PowerShell, Bash, and Zsh</small>
                     </div>
                   )}
+
+                  <div className="config-output">
+                    <div className="output-header">
+                      <h3>GitHub Copilot Coding Agent Configuration</h3>
+                      <button 
+                        className="copy-btn" 
+                        onClick={() => copyToClipboardWithState(JSON.stringify(generateGitHubCopilotCodingAgentConfig(), null, 2), setCopiedCopilotConfig)}
+                      >
+                        {copiedCopilotConfig ? '✓ Copied!' : '📋 Copy'}
+                      </button>
+                    </div>
+                    <pre><code>{JSON.stringify(generateGitHubCopilotCodingAgentConfig(), null, 2)}</code></pre>
+                    <small className="field-hint">
+                      Configuration for GitHub Copilot Coding Agent with all tools enabled. 
+                      Add this to your repository settings under Copilot &gt; Coding agent. 
+                      Learn more at <a href="https://docs.github.com/en/copilot/how-tos/use-copilot-agents/coding-agent/extend-coding-agent-with-mcp" target="_blank" rel="noopener noreferrer">GitHub Docs</a>
+                    </small>
+                  </div>
                 </>
               ) : (
                 <>
