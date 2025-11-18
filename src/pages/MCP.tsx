@@ -4,6 +4,14 @@ import MCPSearchDropdown from '../components/MCPSearchDropdown'
 import { parseRuntimeConfig } from '../utils/mcpRegistryApi'
 import type { MCPSearchResult } from '../utils/mcpRegistryApi'
 import RequestBadge from '../components/RequestBadge'
+import { useBadgeTheme } from '../BadgeThemeContext'
+import {
+  generateVSCodeBadge,
+  generateVSCodeInsidersBadge,
+  generateVisualStudioBadge,
+  generateCursorBadge,
+  type ConfigWithInputs
+} from '../utils/mcpBadgeGenerator'
 
 type ConfigType = 'http' | 'docker' | 'local' | 'npx' | 'uvx' | 'dnx';
 
@@ -52,6 +60,7 @@ interface StandaloneInput {
 }
 
 function MCP() {
+  const { badgeTheme } = useBadgeTheme()
   const [serverName, setServerName] = useState('')
   const [configType, setConfigType] = useState<ConfigType>('http')
   const [serverUrl, setServerUrl] = useState('')
@@ -897,62 +906,32 @@ function MCP() {
   const generateMarkdown = (): string => {
     if (!serverName) return '';
     
-    const configForBadge = getConfigForBadge();
-    const encodedConfig = encodeConfig(configForBadge);
-    const inputs = getInputsForBadge();
-    const encodedInputs = inputs.length > 0 ? encodeURIComponent(JSON.stringify(inputs)) : '';
+    const fullConfig = generateFullConfig();
+    const configForBadge: ConfigWithInputs = {
+      ...generateConfig(),
+      ...(fullConfig.inputs && fullConfig.inputs.length > 0 ? { inputs: fullConfig.inputs } : {})
+    };
     const badges: string[] = [];
 
-    const customBadgeText = badgeText.replace(/\s/g, '_');
-
     if (includeVSCode) {
-      let vscodeUrl = `https://vscode.dev/redirect/mcp/install?name=${encodeURIComponent(serverName)}`;
-      if (encodedInputs) {
-        vscodeUrl += `&inputs=${encodedInputs}`;
-      }
-      vscodeUrl += `&config=${encodedConfig}`;
-      vscodeUrl = escapeUrlForMarkdown(vscodeUrl);
-      badges.push(`[![Install in VS Code](https://img.shields.io/badge/${customBadgeText}-VS_Code-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](${vscodeUrl})`);
+      badges.push(generateVSCodeBadge(serverName, configForBadge, badgeText, badgeTheme));
     }
 
     if (includeVSCodeInsiders) {
-      let vscodeInsidersUrl = `https://insiders.vscode.dev/redirect/mcp/install?name=${encodeURIComponent(serverName)}`;
-      if (encodedInputs) {
-        vscodeInsidersUrl += `&inputs=${encodedInputs}`;
-      }
-      vscodeInsidersUrl += `&config=${encodedConfig}&quality=insiders`;
-      vscodeInsidersUrl = escapeUrlForMarkdown(vscodeInsidersUrl);
-      badges.push(`[![Install in VS Code Insiders](https://img.shields.io/badge/${customBadgeText}-VS_Code_Insiders-24bfa5?style=flat-square&logo=visualstudiocode&logoColor=white)](${vscodeInsidersUrl})`);
+      badges.push(generateVSCodeInsidersBadge(serverName, configForBadge, badgeText, badgeTheme));
     }
 
     if (includeVisualStudio) {
-      let vsUrl = `https://vs-open.link/mcp-install?${encodedConfig}`;
-      vsUrl = escapeUrlForMarkdown(vsUrl);
-      badges.push(`[![Install in Visual Studio](https://img.shields.io/badge/${customBadgeText}-Visual_Studio-C16FDE?style=flat-square&logo=visualstudio&logoColor=white)](${vsUrl})`);
+      badges.push(generateVisualStudioBadge(serverName, configForBadge, badgeText, badgeTheme));
     }
 
     if (includeCursor) {
-      // Use Cursor badge with same style as VS Code badges but black background
-      const fullConfig = generateFullConfig();
-      const configWithName = { 
-        name: serverName, 
-        ...generateConfig(),
-        ...(fullConfig.inputs && fullConfig.inputs.length > 0 ? { inputs: fullConfig.inputs } : {})
-      };
-      const base64Config = btoa(JSON.stringify(configWithName));
-      let cursorUrl = `https://cursor.com/en/install-mcp?name=${encodeURIComponent(serverName)}&config=${base64Config}`;
-      cursorUrl = escapeUrlForMarkdown(cursorUrl);
-      badges.push(`[![Install in Cursor](https://img.shields.io/badge/${customBadgeText}-Cursor-000000?style=flat-square&logoColor=white)](${cursorUrl})`);
+      badges.push(generateCursorBadge(serverName, configForBadge, badgeText, badgeTheme));
     }
 
     if (includeGoose) {
       // Use Goose's official badge format from Playwright repository
-      const fullConfig = generateFullConfig();
-      const configWithName = { 
-        name: serverName, 
-        ...generateConfig(),
-        ...(fullConfig.inputs && fullConfig.inputs.length > 0 ? { inputs: fullConfig.inputs } : {})
-      };
+      const configWithName = configForBadge;
       const args = configWithName.args ? configWithName.args.join('%20') : '';
       const cmd = configWithName.command || '';
       let gooseUrl = `https://block.github.io/goose/extension?cmd=${encodeURIComponent(cmd)}&arg=${encodeURIComponent(args)}&id=${encodeURIComponent(serverName)}&name=${encodeURIComponent(serverName)}&description=MCP%20Server%20for%20${encodeURIComponent(serverName)}`;
@@ -962,12 +941,7 @@ function MCP() {
 
     if (includeLMStudio) {
       // Use LM Studio's official badge format from Playwright repository
-      const fullConfig = generateFullConfig();
-      const configWithName = { 
-        name: serverName, 
-        ...generateConfig(),
-        ...(fullConfig.inputs && fullConfig.inputs.length > 0 ? { inputs: fullConfig.inputs } : {})
-      };
+      const configWithName = configForBadge;
       const base64Config = btoa(JSON.stringify(configWithName));
       let lmstudioUrl = `https://lmstudio.ai/install-mcp?name=${encodeURIComponent(serverName)}&config=${base64Config}`;
       lmstudioUrl = escapeUrlForMarkdown(lmstudioUrl);

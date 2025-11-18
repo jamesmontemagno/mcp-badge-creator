@@ -1,3 +1,5 @@
+import type { BadgeTheme } from '../types/badgeTheme'
+
 export type ExtensionSource = 'url' | 'id' | 'display'
 
 export interface ExtensionParseResult {
@@ -102,9 +104,20 @@ export const parseExtensionInput = (value: string): ExtensionParseResult => {
   }
 }
 
-const badgeMarkdown = (label: string, color: string, extensionId: string, uriScheme: string) => {
+const badgeMarkdown = (label: string, color: string, extensionId: string, uriScheme: string, theme?: BadgeTheme) => {
   const encodedLabel = encodeURIComponent(label)
-  const badgeUrl = `https://img.shields.io/badge/${encodedLabel}-Install-${color}?logo=visualstudiocode&logoColor=white`
+  const style = theme?.style || 'flat-square'
+  const logoColor = theme?.logoColor || 'white'
+  const logo = theme?.showLogo !== false ? 'visualstudiocode' : undefined
+  
+  let badgeUrl = `https://img.shields.io/badge/${encodedLabel}-Install-${color}?style=${style}`
+  
+  if (logo) {
+    badgeUrl += `&logo=${logo}`
+  }
+  
+  badgeUrl += `&logoColor=${logoColor}`
+  
   const extensionUri = `${uriScheme}:extension/${extensionId}`
   return {
     markdown: `[![Install in ${label}](${badgeUrl})](${extensionUri})`,
@@ -135,9 +148,12 @@ const marketplaceBadges = (extensionId: string) => {
   }
 }
 
-export const generateExtensionBadges = (extensionId: string) => {
-  const stable = badgeMarkdown('VS Code', '0098FF', extensionId, 'vscode')
-  const insiders = badgeMarkdown('VS Code Insiders', '24bfa5', extensionId, 'vscode-insiders')
+export const generateExtensionBadges = (extensionId: string, theme?: BadgeTheme) => {
+  const vscodeColor = theme?.customColors?.vscode || '0098FF'
+  const vscodeInsidersColor = theme?.customColors?.vscodeInsiders || '24bfa5'
+  
+  const stable = badgeMarkdown('VS Code', vscodeColor, extensionId, 'vscode', theme)
+  const insiders = badgeMarkdown('VS Code Insiders', vscodeInsidersColor, extensionId, 'vscode-insiders', theme)
   const about = marketplaceBadges(extensionId)
 
   // Install section markdown
