@@ -76,7 +76,7 @@ describe('profileBadge', () => {
       const badges = generateProfileBadges(configs)
       expect(badges).toHaveLength(1)
       expect(badges[0].markdown).toContain('color=ff69b4')
-      expect(badges[0].markdown).toContain('style=flat-square')
+      expect(badges[0].markdown).toContain('style=social')
     })
 
     it('generates YouTube subscribers badge with channel ID', () => {

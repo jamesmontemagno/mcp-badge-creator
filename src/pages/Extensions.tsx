@@ -5,11 +5,14 @@ import { generateExtensionBadges, parseExtensionInput } from '../utils/extension
 import SearchDropdown from '../components/SearchDropdown'
 import type { SortBy } from '../utils/marketplaceApi'
 import RequestBadge from '../components/RequestBadge'
+import { useBadgeTheme } from '../BadgeThemeContext'
 
 type BadgeVariant = 'stable' | 'insiders' | 'install' | 'rating' | 'installs' | 'downloads' | 'version' | 'lastUpdated' | 'releaseDate' | 'about' | 'all'
 type InputMode = 'manual' | 'search'
 
 function Extensions() {
+  const { badgeTheme } = useBadgeTheme()
+  const [badgeText] = useState(() => localStorage.getItem('readme-default-badge-text') || 'Install in')
   const [inputValue, setInputValue] = useState('')
   const [inputMode, setInputMode] = useState<InputMode>('search')
   const [searchQuery, setSearchQuery] = useState('')
@@ -53,7 +56,7 @@ function Extensions() {
     const parsed = parseExtensionInput(extensionId)
     if (parsed.extensionId) {
       setError(null)
-      setBadgeData(generateExtensionBadges(parsed.extensionId))
+      setBadgeData(generateExtensionBadges(parsed.extensionId, badgeTheme, badgeText))
     }
   }
 
@@ -82,7 +85,7 @@ function Extensions() {
 
     setError(null)
     setInfo(parsed.message ?? null)
-    setBadgeData(generateExtensionBadges(parsed.extensionId))
+    setBadgeData(generateExtensionBadges(parsed.extensionId, badgeTheme, badgeText))
   }
 
   const handleCopy = async (variant: BadgeVariant) => {

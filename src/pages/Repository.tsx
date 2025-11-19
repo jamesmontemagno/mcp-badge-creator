@@ -9,6 +9,7 @@ import {
   type BadgeConfig,
 } from '../utils/repositoryBadge'
 import RequestBadge from '../components/RequestBadge'
+import { useBadgeTheme } from '../BadgeThemeContext'
 
 type InputMode = 'manual' | 'search'
 type PreviewMode = 'grouped' | 'flat'
@@ -16,6 +17,7 @@ type PreviewMode = 'grouped' | 'flat'
 const WORKFLOW_PRESETS = ['ci.yml', 'test.yml', 'build.yml', 'deploy.yml', 'release.yml', 'lint.yml']
 
 function Repository() {
+  const { badgeTheme } = useBadgeTheme()
   const [inputValue, setInputValue] = useState('')
   const [inputMode] = useState<InputMode>('manual') // Search not implemented yet
   const [error, setError] = useState<string | null>(null)
@@ -298,7 +300,7 @@ function Repository() {
 
   const repoInfo = parseRepositoryInput(inputValue)
   const allConfigs = [...badgeConfigs, ...workflowConfigs]
-  const badges = repoInfo ? generateRepositoryBadges(repoInfo, allConfigs, defaultBranch || 'main') : []
+  const badges = repoInfo ? generateRepositoryBadges(repoInfo, allConfigs, defaultBranch || 'main', badgeTheme) : []
 
   const essentialBadges = badges.filter(b => ['stars', 'license', 'contributors', 'release','coverage','openssf'].includes(b.type))
   const workflowBadges = badges.filter(b => b.type === 'workflow')

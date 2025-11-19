@@ -1,3 +1,5 @@
+import type { BadgeTheme } from '../types/badgeTheme'
+
 export type PackageManager = 'npm' | 'nuget' | 'pypi' | 'maven' | 'rubygems' | 'crates';
 
 export interface PackageParseResult {
@@ -146,9 +148,10 @@ export function generatePackageBadges(
   manager: PackageManager,
   packageId: string | null,
   groupId?: string,
-  artifactId?: string
+  artifactId?: string,
+  theme?: BadgeTheme
 ): BadgeSet | null {
-  const style = 'flat-square';
+  const style = theme?.style || 'flat-square';
 
   switch (manager) {
     case 'npm': {

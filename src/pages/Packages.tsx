@@ -4,12 +4,14 @@ import styles from './Packages.module.css'
 import { parsePackageInput, generatePackageBadges, getInstallCommands, type PackageManager } from '../utils/packageBadge'
 import PackageSearchDropdown from '../components/PackageSearchDropdown'
 import RequestBadge from '../components/RequestBadge'
+import { useBadgeTheme } from '../BadgeThemeContext'
 
 type CopyTarget = 'version' | 'versionPrerelease' | 'downloads' | 'downloadsMonthly' | 'downloadsRecent' | 'combined' | 'commands' | `command-${number}`
 type InputMode = 'manual' | 'search'
 type Registry = 'npm' | 'pypi' | 'nuget' | 'rubygems' | 'crates' | 'maven'
 
 function Packages() {
+  const { badgeTheme } = useBadgeTheme()
   const [inputValue, setInputValue] = useState('')
   const [inputMode, setInputMode] = useState<InputMode>('search')
   const [searchQuery, setSearchQuery] = useState('')
@@ -87,7 +89,7 @@ function Packages() {
         setGroupId(parts[0])
         setArtifactId(parts[1])
         setManualManager('maven')
-        const badges = generatePackageBadges('maven', null, parts[0], parts[1])
+        const badges = generatePackageBadges('maven', null, parts[0], parts[1], badgeTheme)
         const cmds = getInstallCommands('maven', null, parts[0], parts[1])
         if (badges) {
           setError(null)
@@ -99,7 +101,7 @@ function Packages() {
     } else {
       // For other package managers, generate badges automatically
       setManualManager(manager)
-      const badges = generatePackageBadges(manager, packageName)
+      const badges = generatePackageBadges(manager, packageName, undefined, undefined, badgeTheme)
       const cmds = getInstallCommands(manager, packageName)
       if (badges) {
         setError(null)
@@ -144,7 +146,7 @@ function Packages() {
 
     // For Maven with manual input
     if (manualManager === 'maven' && groupId && artifactId) {
-      const badges = generatePackageBadges('maven', null, groupId, artifactId)
+      const badges = generatePackageBadges('maven', null, groupId, artifactId, badgeTheme)
       const cmds = getInstallCommands('maven', null, groupId, artifactId)
       
       if (badges) {
@@ -191,7 +193,8 @@ function Packages() {
       effectiveManager,
       parsed.packageId,
       parsed.groupId,
-      parsed.artifactId
+      parsed.artifactId,
+      badgeTheme
     )
     const cmds = getInstallCommands(
       effectiveManager,

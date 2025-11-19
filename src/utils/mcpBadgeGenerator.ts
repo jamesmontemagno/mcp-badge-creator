@@ -6,6 +6,8 @@
  * for testability and reusability.
  */
 
+import type { BadgeTheme } from '../types/badgeTheme';
+
 export type ConfigType = 'http' | 'docker' | 'local' | 'npx' | 'uvx' | 'dnx';
 
 export interface MCPConfig {
@@ -44,17 +46,52 @@ export function encodeConfig(config: MCPConfig | ConfigWithInputs): string {
 }
 
 /**
+ * Generates the badge URL with theming support
+ */
+function generateBadgeUrl(
+  badgeText: string,
+  platform: string,
+  color: string,
+  style: string = 'flat-square',
+  logo?: string,
+  logoColor?: string
+): string {
+  const customBadgeText = badgeText.replace(/\s/g, '_');
+  const platformText = platform.replace(/\s/g, '_');
+  
+  let badgeUrl = `https://img.shields.io/badge/${customBadgeText}-${platformText}-${color}?style=${style}`;
+  
+  if (logo) {
+    badgeUrl += `&logo=${logo}`;
+  }
+  
+  if (logoColor) {
+    badgeUrl += `&logoColor=${logoColor}`;
+  }
+  
+  return badgeUrl;
+}
+
+/**
  * Generates a VS Code badge markdown
  */
 export function generateVSCodeBadge(
   serverName: string,
   config: MCPConfig | ConfigWithInputs,
-  badgeText: string = 'Install in'
+  badgeText: string = 'Install in',
+  theme?: BadgeTheme
 ): string {
   const encodedConfig = encodeConfig(config);
   const vscodeUrl = `https://vscode.dev/redirect/mcp/install?name=${encodeURIComponent(serverName)}&config=${encodedConfig}`;
-  const customBadgeText = badgeText.replace(/\s/g, '_');
-  return `[![Install in VS Code](https://img.shields.io/badge/${customBadgeText}-VS_Code-0098FF?style=flat-square&logo=visualstudiocode&logoColor=white)](${vscodeUrl})`;
+  
+  const color = theme?.customColors?.vscode || '0098FF';
+  const style = theme?.style || 'flat-square';
+  const logo = theme?.showLogo !== false ? 'visualstudiocode' : undefined;
+  const logoColor = theme?.logoColor || 'white';
+  
+  const badgeUrl = generateBadgeUrl(badgeText, 'VS_Code', color, style, logo, logoColor);
+  
+  return `[![Install in VS Code](${badgeUrl})](${vscodeUrl})`;
 }
 
 /**
@@ -63,12 +100,20 @@ export function generateVSCodeBadge(
 export function generateVSCodeInsidersBadge(
   serverName: string,
   config: MCPConfig | ConfigWithInputs,
-  badgeText: string = 'Install in'
+  badgeText: string = 'Install in',
+  theme?: BadgeTheme
 ): string {
   const encodedConfig = encodeConfig(config);
   const vscodeInsidersUrl = `https://insiders.vscode.dev/redirect/mcp/install?name=${encodeURIComponent(serverName)}&config=${encodedConfig}&quality=insiders`;
-  const customBadgeText = badgeText.replace(/\s/g, '_');
-  return `[![Install in VS Code Insiders](https://img.shields.io/badge/${customBadgeText}-VS_Code_Insiders-24bfa5?style=flat-square&logo=visualstudiocode&logoColor=white)](${vscodeInsidersUrl})`;
+  
+  const color = theme?.customColors?.vscodeInsiders || '24bfa5';
+  const style = theme?.style || 'flat-square';
+  const logo = theme?.showLogo !== false ? 'visualstudiocode' : undefined;
+  const logoColor = theme?.logoColor || 'white';
+  
+  const badgeUrl = generateBadgeUrl(badgeText, 'VS_Code_Insiders', color, style, logo, logoColor);
+  
+  return `[![Install in VS Code Insiders](${badgeUrl})](${vscodeInsidersUrl})`;
 }
 
 /**
@@ -78,12 +123,20 @@ export function generateVSCodeInsidersBadge(
 export function generateVisualStudioBadge(
   _serverName: string, // Prefixed with _ to indicate intentionally unused
   config: MCPConfig | ConfigWithInputs,
-  badgeText: string = 'Install in'
+  badgeText: string = 'Install in',
+  theme?: BadgeTheme
 ): string {
   const encodedConfig = encodeConfig(config);
   const vsUrl = `https://vs-open.link/mcp-install?${encodedConfig}`;
-  const customBadgeText = badgeText.replace(/\s/g, '_');
-  return `[![Install in Visual Studio](https://img.shields.io/badge/${customBadgeText}-Visual_Studio-C16FDE?style=flat-square&logo=visualstudio&logoColor=white)](${vsUrl})`;
+  
+  const color = theme?.customColors?.visualStudio || 'C16FDE';
+  const style = theme?.style || 'flat-square';
+  const logo = theme?.showLogo !== false ? 'visualstudio' : undefined;
+  const logoColor = theme?.logoColor || 'white';
+  
+  const badgeUrl = generateBadgeUrl(badgeText, 'Visual_Studio', color, style, logo, logoColor);
+  
+  return `[![Install in Visual Studio](${badgeUrl})](${vsUrl})`;
 }
 
 /**
@@ -92,12 +145,20 @@ export function generateVisualStudioBadge(
 export function generateCursorBadge(
   serverName: string,
   config: ConfigWithInputs,
-  badgeText: string = 'Install in'
+  badgeText: string = 'Install in',
+  theme?: BadgeTheme
 ): string {
   const base64Config = btoa(JSON.stringify(config));
   const cursorUrl = `https://cursor.com/en/install-mcp?name=${encodeURIComponent(serverName)}&config=${base64Config}`;
-  const customBadgeText = badgeText.replace(/\s/g, '_');
-  return `[![Install in Cursor](https://img.shields.io/badge/${customBadgeText}-Cursor-000000?style=flat-square&logoColor=white)](${cursorUrl})`;
+  
+  const color = theme?.customColors?.cursor || '000000';
+  const style = theme?.style || 'flat-square';
+  const logo = theme?.showLogo !== false ? undefined : undefined; // Cursor doesn't have a standard logo in shields.io
+  const logoColor = theme?.logoColor || 'white';
+  
+  const badgeUrl = generateBadgeUrl(badgeText, 'Cursor', color, style, logo, logoColor);
+  
+  return `[![Install in Cursor](${badgeUrl})](${cursorUrl})`;
 }
 
 /**
@@ -165,6 +226,7 @@ export interface BadgeOptions {
   includeVisualStudio?: boolean;
   includeCursor?: boolean;
   badgeText?: string;
+  theme?: BadgeTheme;
 }
 
 export function generateAllBadges(
@@ -177,25 +239,26 @@ export function generateAllBadges(
     includeVSCodeInsiders = true,
     includeVisualStudio = true,
     includeCursor = false,
-    badgeText = 'Install in'
+    badgeText = 'Install in',
+    theme
   } = options;
   
   const badges: string[] = [];
   
   if (includeVSCode) {
-    badges.push(generateVSCodeBadge(serverName, config, badgeText));
+    badges.push(generateVSCodeBadge(serverName, config, badgeText, theme));
   }
   
   if (includeVSCodeInsiders) {
-    badges.push(generateVSCodeInsidersBadge(serverName, config, badgeText));
+    badges.push(generateVSCodeInsidersBadge(serverName, config, badgeText, theme));
   }
   
   if (includeVisualStudio) {
-    badges.push(generateVisualStudioBadge(serverName, config, badgeText));
+    badges.push(generateVisualStudioBadge(serverName, config, badgeText, theme));
   }
   
   if (includeCursor) {
-    badges.push(generateCursorBadge(serverName, config, badgeText));
+    badges.push(generateCursorBadge(serverName, config, badgeText, theme));
   }
   
   return badges.join('\n');
