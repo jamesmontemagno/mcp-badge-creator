@@ -104,13 +104,16 @@ export const parseExtensionInput = (value: string): ExtensionParseResult => {
   }
 }
 
-const badgeMarkdown = (label: string, color: string, extensionId: string, uriScheme: string, theme?: BadgeTheme) => {
-  const encodedLabel = encodeURIComponent(label)
+const badgeMarkdown = (platformName: string, color: string, extensionId: string, uriScheme: string, theme?: BadgeTheme, badgeText: string = 'Install in') => {
+  // Escape dashes for Shields.io
+  const safeLabel = encodeURIComponent(badgeText).replace(/-/g, '--')
+  const safeMessage = encodeURIComponent(platformName).replace(/-/g, '--')
+  
   const style = theme?.style || 'flat-square'
   const logoColor = theme?.logoColor || 'white'
   const logo = theme?.showLogo !== false ? 'visualstudiocode' : undefined
   
-  let badgeUrl = `https://img.shields.io/badge/${encodedLabel}-Install-${color}?style=${style}`
+  let badgeUrl = `https://img.shields.io/badge/${safeLabel}-${safeMessage}-${color}?style=${style}`
   
   if (logo) {
     badgeUrl += `&logo=${logo}`
@@ -120,17 +123,18 @@ const badgeMarkdown = (label: string, color: string, extensionId: string, uriSch
   
   const extensionUri = `${uriScheme}:extension/${extensionId}`
   return {
-    markdown: `[![Install in ${label}](${badgeUrl})](${extensionUri})`,
+    markdown: `[![${badgeText} ${platformName}](${badgeUrl})](${extensionUri})`,
     badgeUrl,
     extensionUri,
   }
 }
 
-const marketplaceBadges = (extensionId: string) => {
+const marketplaceBadges = (extensionId: string, theme?: BadgeTheme) => {
   const marketplaceUrl = `https://marketplace.visualstudio.com/items?itemName=${extensionId}`
+  const style = theme?.style || 'flat-square'
   
   const createBadge = (metricType: string, altText: string) => {
-    const badgeUrl = `https://img.shields.io/visual-studio-marketplace/${metricType}/${extensionId}`
+    const badgeUrl = `https://img.shields.io/visual-studio-marketplace/${metricType}/${extensionId}?style=${style}`
     return {
       markdown: `[![${altText}](${badgeUrl})](${marketplaceUrl})`,
       badgeUrl,
@@ -148,13 +152,13 @@ const marketplaceBadges = (extensionId: string) => {
   }
 }
 
-export const generateExtensionBadges = (extensionId: string, theme?: BadgeTheme) => {
+export const generateExtensionBadges = (extensionId: string, theme?: BadgeTheme, badgeText: string = 'Install in') => {
   const vscodeColor = theme?.customColors?.vscode || '0098FF'
   const vscodeInsidersColor = theme?.customColors?.vscodeInsiders || '24bfa5'
   
-  const stable = badgeMarkdown('VS Code', vscodeColor, extensionId, 'vscode', theme)
-  const insiders = badgeMarkdown('VS Code Insiders', vscodeInsidersColor, extensionId, 'vscode-insiders', theme)
-  const about = marketplaceBadges(extensionId)
+  const stable = badgeMarkdown('VS Code', vscodeColor, extensionId, 'vscode', theme, badgeText)
+  const insiders = badgeMarkdown('VS Code Insiders', vscodeInsidersColor, extensionId, 'vscode-insiders', theme, badgeText)
+  const about = marketplaceBadges(extensionId, theme)
 
   // Install section markdown
   const installMarkdown = `${stable.markdown}\n${insiders.markdown}`

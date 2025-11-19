@@ -12,6 +12,7 @@ type InputMode = 'manual' | 'search'
 
 function Extensions() {
   const { badgeTheme } = useBadgeTheme()
+  const [badgeText] = useState(() => localStorage.getItem('readme-default-badge-text') || 'Install in')
   const [inputValue, setInputValue] = useState('')
   const [inputMode, setInputMode] = useState<InputMode>('search')
   const [searchQuery, setSearchQuery] = useState('')
@@ -55,7 +56,7 @@ function Extensions() {
     const parsed = parseExtensionInput(extensionId)
     if (parsed.extensionId) {
       setError(null)
-      setBadgeData(generateExtensionBadges(parsed.extensionId, badgeTheme))
+      setBadgeData(generateExtensionBadges(parsed.extensionId, badgeTheme, badgeText))
     }
   }
 
@@ -84,7 +85,7 @@ function Extensions() {
 
     setError(null)
     setInfo(parsed.message ?? null)
-    setBadgeData(generateExtensionBadges(parsed.extensionId, badgeTheme))
+    setBadgeData(generateExtensionBadges(parsed.extensionId, badgeTheme, badgeText))
   }
 
   const handleCopy = async (variant: BadgeVariant) => {

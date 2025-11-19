@@ -7,8 +7,10 @@ import {
   type BadgeConfig,
   type BadgeType,
 } from '../utils/profileBadge'
+import { useBadgeTheme } from '../BadgeThemeContext'
 
 function Profile() {
+  const { badgeTheme } = useBadgeTheme()
   const [defaultUsername, setDefaultUsername] = useState('')
   const [error, setError] = useState<string | null>(null)
   const [copiedBadge, setCopiedBadge] = useState<string | null>(null)
@@ -190,7 +192,7 @@ function Profile() {
     setError(null)
   }
 
-  const allBadges = generateProfileBadges(badgeConfigs)
+  const allBadges = generateProfileBadges(badgeConfigs, badgeTheme)
   
   // Reordering: maintain order of enabled badges
   const [badgeOrder, setBadgeOrder] = useState<BadgeType[]>([])
