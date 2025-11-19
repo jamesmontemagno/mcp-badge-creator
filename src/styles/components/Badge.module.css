@@ -25,21 +25,22 @@
 
 .outputHeader h3 {
   margin: 0;
-  font-size: 1.25rem;
+  font-size: 1.1rem;
+  font-weight: 600;
   color: var(--text-color);
 }
 
 .markdownCard {
   background: var(--bg-white);
   border-radius: var(--radius-lg);
-  padding: 1.75rem;
-  box-shadow: var(--shadow-lg);
+  padding: 1.5rem;
+  box-shadow: var(--shadow-sm);
   border: 1px solid var(--border-color);
 }
 
 .markdownCard pre {
   background: var(--bg-light);
-  border: 2px solid var(--border-color);
+  border: 1px solid var(--border-color);
   border-radius: var(--radius-md);
   padding: var(--space-md);
   overflow-x: auto;
@@ -47,8 +48,8 @@
 }
 
 .markdownCard code {
-  font-family: 'Courier New', Courier, monospace;
-  font-size: 0.9rem;
+  font-family: 'JetBrains Mono', 'Fira Code', 'Consolas', monospace;
+  font-size: 0.85rem;
   color: var(--text-color);
   white-space: pre-wrap;
   word-break: break-all;
@@ -58,5 +59,8 @@
   text-align: center;
   color: var(--text-lighter);
   padding: 3rem 1rem;
-  font-style: italic;
+  font-style: normal;
+  background: var(--bg-light);
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--border-light);
 }

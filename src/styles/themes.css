@@ -1,141 +1,141 @@
 /* Theme Variables - 5 Color Themes */
 
-/* Default Theme (Green) */
+/* Default Theme (Professional Slate/Blue) */
 :root {
-  --primary-color: #24bfa5;
-  --primary-dark: #1a9667;
-  --primary-darker: #0e7153;
-  --bg-gradient-start: #1a9667;
-  --bg-gradient-mid: #24bfa5;
-  --bg-gradient-end: #0e7153;
-  --text-color: #333;
-  --text-light: #666;
-  --text-lighter: #999;
-  --bg-white: white;
-  --bg-light: #f8f9fa;
-  --border-color: #e9ecef;
-  --border-light: #e0e0e0;
-  --shadow-color: rgba(0, 0, 0, 0.2);
-  --shadow-light: rgba(0, 0, 0, 0.08);
-  --header-text: white;
-  --footer-text: rgba(255, 255, 255, 0.9);
-  --footer-border: rgba(255, 255, 255, 0.2);
+  --primary-color: #2563eb;       /* Blue 600 */
+  --primary-dark: #1d4ed8;        /* Blue 700 */
+  --primary-darker: #1e40af;      /* Blue 800 */
+  --bg-gradient-start: #f8fafc;   /* Slate 50 */
+  --bg-gradient-mid: #ffffff;     /* White */
+  --bg-gradient-end: #f1f5f9;     /* Slate 100 */
+  --text-color: #0f172a;          /* Slate 900 */
+  --text-light: #475569;          /* Slate 600 */
+  --text-lighter: #94a3b8;        /* Slate 400 */
+  --bg-white: #ffffff;
+  --bg-light: #f8fafc;            /* Slate 50 */
+  --border-color: #e2e8f0;        /* Slate 200 */
+  --border-light: #cbd5e1;        /* Slate 300 */
+  --shadow-color: rgba(15, 23, 42, 0.08);
+  --shadow-light: rgba(15, 23, 42, 0.04);
+  --header-text: #0f172a;
+  --footer-text: #64748b;
+  --footer-border: #e2e8f0;
 }
 
-/* Light Theme */
+/* Light Theme (Clean White) */
 .theme-light {
-  --primary-color: #24bfa5;
-  --primary-dark: #1a9667;
-  --primary-darker: #0e7153;
-  --bg-gradient-start: #f8f9fa;
-  --bg-gradient-mid: #ffffff;
-  --bg-gradient-end: #f0f1f3;
-  --text-color: #1f2937;
-  --text-light: #4b5563;
-  --text-lighter: #6b7280;
+  --primary-color: #2563eb;
+  --primary-dark: #1d4ed8;
+  --primary-darker: #1e40af;
+  --bg-gradient-start: #ffffff;
+  --bg-gradient-mid: #f8fafc;
+  --bg-gradient-end: #f1f5f9;
+  --text-color: #1e293b;
+  --text-light: #475569;
+  --text-lighter: #94a3b8;
   --bg-white: #ffffff;
-  --bg-light: #f8f9fa;
-  --border-color: #e5e7eb;
-  --border-light: #d1d5db;
-  --shadow-color: rgba(0, 0, 0, 0.08);
-  --shadow-light: rgba(0, 0, 0, 0.04);
-  --header-text: #1f2937;
-  --footer-text: #4b5563;
-  --footer-border: rgba(0, 0, 0, 0.1);
+  --bg-light: #f8fafc;
+  --border-color: #e2e8f0;
+  --border-light: #cbd5e1;
+  --shadow-color: rgba(0, 0, 0, 0.06);
+  --shadow-light: rgba(0, 0, 0, 0.03);
+  --header-text: #1e293b;
+  --footer-text: #64748b;
+  --footer-border: #e2e8f0;
 }
 
 /* Light theme eyebrow styling */
 .theme-light .eyebrow,
 .theme-light [class*="eyebrow"],
 .theme-light [class*="Overline"] {
-  background: rgba(31, 41, 55, 0.9) !important;
-  color: white !important;
+  background: #f1f5f9 !important;
+  color: #475569 !important;
 }
 
-/* Dark Theme */
+/* Dark Theme (Professional Dark) */
 .theme-dark {
-  --primary-color: #3b82f6;
-  --primary-dark: #2563eb;
-  --primary-darker: #1d4ed8;
-  --bg-gradient-start: #1e293b;
-  --bg-gradient-mid: #334155;
-  --bg-gradient-end: #0f172a;
-  --text-color: #e2e8f0;
-  --text-light: #cbd5e1;
-  --text-lighter: #94a3b8;
-  --bg-white: #1e293b;
-  --bg-light: #334155;
-  --border-color: #475569;
-  --border-light: #64748b;
-  --shadow-color: rgba(0, 0, 0, 0.5);
-  --shadow-light: rgba(0, 0, 0, 0.3);
-  --header-text: #e2e8f0;
-  --footer-text: #e2e8f0;
-  --footer-border: rgba(226, 232, 240, 0.2);
+  --primary-color: #3b82f6;       /* Blue 500 */
+  --primary-dark: #60a5fa;        /* Blue 400 (lighter for dark mode hover) */
+  --primary-darker: #93c5fd;      /* Blue 300 */
+  --bg-gradient-start: #0f172a;   /* Slate 900 */
+  --bg-gradient-mid: #1e293b;     /* Slate 800 */
+  --bg-gradient-end: #020617;     /* Slate 950 */
+  --text-color: #f1f5f9;          /* Slate 100 */
+  --text-light: #cbd5e1;          /* Slate 300 */
+  --text-lighter: #94a3b8;        /* Slate 400 */
+  --bg-white: #1e293b;            /* Slate 800 */
+  --bg-light: #334155;            /* Slate 700 */
+  --border-color: #334155;        /* Slate 700 */
+  --border-light: #475569;        /* Slate 600 */
+  --shadow-color: rgba(0, 0, 0, 0.4);
+  --shadow-light: rgba(0, 0, 0, 0.2);
+  --header-text: #f1f5f9;
+  --footer-text: #94a3b8;
+  --footer-border: #334155;
 }
 
-/* Green Theme (Explicit) */
+/* Green Theme (Forest) */
 .theme-green {
-  --primary-color: #24bfa5;
-  --primary-dark: #1a9667;
-  --primary-darker: #0e7153;
-  --bg-gradient-start: #1a9667;
-  --bg-gradient-mid: #24bfa5;
-  --bg-gradient-end: #0e7153;
-  --text-color: #333;
-  --text-light: #666;
-  --text-lighter: #999;
-  --bg-white: white;
-  --bg-light: #f8f9fa;
-  --border-color: #e9ecef;
-  --border-light: #e0e0e0;
-  --shadow-color: rgba(0, 0, 0, 0.2);
-  --shadow-light: rgba(0, 0, 0, 0.08);
-  --header-text: white;
-  --footer-text: rgba(255, 255, 255, 0.9);
-  --footer-border: rgba(255, 255, 255, 0.2);
+  --primary-color: #059669;       /* Emerald 600 */
+  --primary-dark: #047857;        /* Emerald 700 */
+  --primary-darker: #065f46;      /* Emerald 800 */
+  --bg-gradient-start: #f0fdf4;
+  --bg-gradient-mid: #ffffff;
+  --bg-gradient-end: #dcfce7;
+  --text-color: #064e3b;
+  --text-light: #065f46;
+  --text-lighter: #34d399;
+  --bg-white: #ffffff;
+  --bg-light: #f0fdf4;
+  --border-color: #a7f3d0;
+  --border-light: #6ee7b7;
+  --shadow-color: rgba(5, 150, 105, 0.1);
+  --shadow-light: rgba(5, 150, 105, 0.05);
+  --header-text: #064e3b;
+  --footer-text: #047857;
+  --footer-border: #a7f3d0;
 }
 
-/* Tron Theme - Classic Tron blue/cyan neon aesthetic */
+/* Tron Theme - Dark Cyan */
 .theme-tron {
-  --primary-color: #00d9ff;
-  --primary-dark: #00a8cc;
-  --primary-darker: #007799;
-  --bg-gradient-start: #001a1f;
-  --bg-gradient-mid: #002633;
-  --bg-gradient-end: #000d11;
-  --text-color: #00d9ff;
-  --text-light: #6dd5ed;
-  --text-lighter: #4facb8;
-  --bg-white: #001a1f;
-  --bg-light: #002633;
-  --border-color: #00a8cc;
-  --border-light: #007799;
-  --shadow-color: rgba(0, 217, 255, 0.3);
-  --shadow-light: rgba(0, 217, 255, 0.15);
-  --header-text: #00d9ff;
-  --footer-text: #6dd5ed;
-  --footer-border: rgba(0, 217, 255, 0.3);
+  --primary-color: #06b6d4;       /* Cyan 500 */
+  --primary-dark: #0891b2;        /* Cyan 600 */
+  --primary-darker: #0e7490;      /* Cyan 700 */
+  --bg-gradient-start: #083344;   /* Cyan 950 */
+  --bg-gradient-mid: #164e63;     /* Cyan 900 */
+  --bg-gradient-end: #082f49;
+  --text-color: #cffafe;          /* Cyan 100 */
+  --text-light: #a5f3fc;          /* Cyan 200 */
+  --text-lighter: #67e8f9;        /* Cyan 300 */
+  --bg-white: #164e63;
+  --bg-light: #155e75;
+  --border-color: #0e7490;
+  --border-light: #0891b2;
+  --shadow-color: rgba(6, 182, 212, 0.2);
+  --shadow-light: rgba(6, 182, 212, 0.1);
+  --header-text: #cffafe;
+  --footer-text: #a5f3fc;
+  --footer-border: #0e7490;
 }
 
-/* Pink Theme - Vibrant pink/magenta aesthetic */
+/* Pink Theme - Rose */
 .theme-pink {
-  --primary-color: #ec4899;
-  --primary-dark: #db2777;
-  --primary-darker: #be185d;
-  --bg-gradient-start: #db2777;
-  --bg-gradient-mid: #ec4899;
-  --bg-gradient-end: #be185d;
-  --text-color: #333;
-  --text-light: #666;
-  --text-lighter: #999;
-  --bg-white: white;
-  --bg-light: #fdf2f8;
-  --border-color: #fbcfe8;
-  --border-light: #f9a8d4;
-  --shadow-color: rgba(236, 72, 153, 0.2);
-  --shadow-light: rgba(236, 72, 153, 0.08);
-  --header-text: white;
-  --footer-text: rgba(255, 255, 255, 0.9);
-  --footer-border: rgba(255, 255, 255, 0.2);
+  --primary-color: #e11d48;       /* Rose 600 */
+  --primary-dark: #be123c;        /* Rose 700 */
+  --primary-darker: #9f1239;      /* Rose 800 */
+  --bg-gradient-start: #fff1f2;
+  --bg-gradient-mid: #ffffff;
+  --bg-gradient-end: #ffe4e6;
+  --text-color: #881337;
+  --text-light: #9f1239;
+  --text-lighter: #fb7185;
+  --bg-white: #ffffff;
+  --bg-light: #fff1f2;
+  --border-color: #fecdd3;
+  --border-light: #fda4af;
+  --shadow-color: rgba(225, 29, 72, 0.1);
+  --shadow-light: rgba(225, 29, 72, 0.05);
+  --header-text: #881337;
+  --footer-text: #9f1239;
+  --footer-border: #fecdd3;
 }
