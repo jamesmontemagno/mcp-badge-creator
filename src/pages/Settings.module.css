@@ -48,6 +48,7 @@
   display: grid;
   gap: 1.75rem;
   grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-auto-flow: dense;
 }
 
 .settingsCard {
@@ -65,6 +66,10 @@
 .settingsCard:hover {
   transform: translateY(-2px);
   box-shadow: 0 18px 40px var(--shadow-light);
+}
+
+.fullWidth {
+  grid-column: 1 / -1;
 }
 
 .settingsCard h2 {
@@ -218,142 +223,95 @@
 }
 
 /* Badge Theme Options */
-.badgeOption {
-  position: relative;
-  display: flex;
-  align-items: center;
-  gap: 0.85rem;
-  background: var(--bg-light);
-  border: 2px solid var(--border-color);
-  padding: 0.85rem 1rem;
-  border-radius: 12px;
-  cursor: pointer;
-  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  margin-bottom: 0.5rem;
-  overflow: hidden;
-}
-
-.badgeOption::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 4px;
-  height: 100%;
-  background: var(--primary-color);
-  transform: scaleY(0);
-  transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.badgeOption:has(input:checked)::before {
-  transform: scaleY(1);
-}
-
-.badgeOption input[type="radio"],
-.badgeOption input[type="checkbox"] { 
-  flex-shrink: 0;
-  cursor: pointer;
-  width: 18px;
-  height: 18px;
-  accent-color: var(--primary-color);
-}
-
-.badgeOption:hover { 
-  border-color: var(--primary-color);
-  background: var(--bg-white);
-  transform: translateX(4px);
-  box-shadow: 0 4px 12px var(--shadow-light);
-}
-
-.badgeOption:has(input:checked) {
-  border-color: var(--primary-color);
-  background: linear-gradient(135deg, rgba(36, 191, 165, 0.08), rgba(26, 150, 103, 0.05));
-  box-shadow: 0 0 0 3px rgba(36, 191, 165, 0.15), 0 4px 12px var(--shadow-light);
-}
-
-.badgeOptionContent {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-  flex: 1;
-}
-
-.badgeOptionLabel {
-  font-weight: 700;
-  font-size: 0.9rem;
-  color: var(--text-color);
-  letter-spacing: -0.01em;
-}
-
-.badgeOptionDescription {
-  font-size: 0.75rem;
-  color: var(--text-lighter);
-  line-height: 1.4;
-}
-
-.badgeStyleOptions,
-.badgeColorOptions {
+.badgeThemeGrid {
   display: grid;
-  gap: 0.6rem;
-  margin-top: 0.5rem;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 1.5rem;
 }
 
-.badgeStyleOptions {
-  grid-template-columns: 1fr;
-}
-
-.badgeColorOptions {
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-}
-
-.logoColorOptions {
-  display: flex;
-  gap: 0.75rem;
-  margin-top: 0.5rem;
-  flex-wrap: wrap;
-}
-
-.logoColorOptions .badgeOption {
-  flex: 1;
-  min-width: 80px;
-  justify-content: center;
-  margin-bottom: 0;
+.selectInput {
+  width: 100%;
   padding: 0.75rem 1rem;
+  border: 2px solid var(--border-color);
+  border-radius: 12px;
+  background: var(--bg-light);
+  color: var(--text-color);
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='currentColor' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 1rem center;
+  background-size: 1.2em;
+  padding-right: 2.5rem;
 }
 
-.logoColorOptions .badgeOption::before {
-  display: none;
+.selectInput:hover {
+  border-color: var(--primary-color);
+  background-color: var(--bg-white);
 }
 
-.logoColorOptions .badgeOption span {
-  font-weight: 600;
-  font-size: 0.85rem;
+.selectInput:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(36, 191, 165, 0.15);
+  background-color: var(--bg-white);
+}
+
+/* Dark mode adjustment for the chevron icon */
+:global(.theme-dark) .selectInput,
+:global(.theme-tron) .selectInput {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='24' height='24' viewBox='0 0 24 24' fill='none' stroke='rgba(255,255,255,0.7)' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+}
+
+.toggleGroup {
+  display: flex;
+  align-items: flex-end;
+  padding-bottom: 0.5rem;
 }
 
 .badgePreviewGrid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.75rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1.5rem;
   margin-top: 0.75rem;
-  padding: 1.25rem;
+  padding: 1.5rem;
   background: var(--bg-light);
   border-radius: 12px;
   border: 1px dashed var(--border-color);
+}
+
+.previewItem {
+  display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
+  gap: 0.75rem;
+  padding: 1rem;
+  background: var(--bg-white);
+  border-radius: 8px;
+  border: 1px solid var(--border-light);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.badgePreviewGrid img {
-  height: 22px;
-  max-width: 160px;
+.previewItem:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px var(--shadow-light);
+}
+
+.previewItemLabel {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--text-light);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.previewItem img {
+  height: 28px;
+  max-width: 100%;
   object-fit: contain;
-  transition: transform 0.2s ease, filter 0.2s ease;
-  filter: brightness(1);
-}
-
-.badgePreviewGrid img:hover {
-  transform: scale(1.08);
-  filter: brightness(1.05);
 }
 
 /* Enhanced Setting Group Styling */
