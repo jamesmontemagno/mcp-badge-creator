@@ -153,7 +153,7 @@ describe('generateRepositoryBadges', () => {
     expect(badges[0].type).toBe('stars');
     expect(badges[0].markdown).toContain('github/stars/testowner/testrepo');
     expect(badges[0].markdown).toContain('stargazers'); // linked to stargazers page
-    expect(badges[0].markdown).not.toContain('style=flat-square');
+    expect(badges[0].markdown).toContain('style=flat-square');
     expect(badges[0].markdown).not.toContain('color=');
     expect(badges[0].markdown).not.toContain('logo=');
     expect(badges[0].label).toBe('Stars');

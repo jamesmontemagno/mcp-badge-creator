@@ -22,7 +22,7 @@ describe('generateExtensionBadges', () => {
     const result = generateExtensionBadges(extensionId)
 
     expect(result.about.rating.badgeUrl).toBe(
-      'https://img.shields.io/visual-studio-marketplace/r/ms-python.python'
+      'https://img.shields.io/visual-studio-marketplace/r/ms-python.python?style=flat-square'
     )
     expect(result.about.rating.marketplaceUrl).toBe(
       'https://marketplace.visualstudio.com/items?itemName=ms-python.python'
@@ -34,7 +34,7 @@ describe('generateExtensionBadges', () => {
     const result = generateExtensionBadges(extensionId)
 
     expect(result.about.installs.badgeUrl).toBe(
-      'https://img.shields.io/visual-studio-marketplace/i/ms-python.python'
+      'https://img.shields.io/visual-studio-marketplace/i/ms-python.python?style=flat-square'
     )
   })
 
@@ -43,7 +43,7 @@ describe('generateExtensionBadges', () => {
     const result = generateExtensionBadges(extensionId)
 
     expect(result.about.version.badgeUrl).toBe(
-      'https://img.shields.io/visual-studio-marketplace/v/ms-python.python'
+      'https://img.shields.io/visual-studio-marketplace/v/ms-python.python?style=flat-square'
     )
   })
 
@@ -52,7 +52,7 @@ describe('generateExtensionBadges', () => {
     const result = generateExtensionBadges(extensionId)
 
     expect(result.about.lastUpdated.badgeUrl).toBe(
-      'https://img.shields.io/visual-studio-marketplace/last-updated/ms-python.python'
+      'https://img.shields.io/visual-studio-marketplace/last-updated/ms-python.python?style=flat-square'
     )
   })
 
@@ -61,7 +61,7 @@ describe('generateExtensionBadges', () => {
     const result = generateExtensionBadges(extensionId)
 
     expect(result.about.releaseDate.badgeUrl).toBe(
-      'https://img.shields.io/visual-studio-marketplace/release-date/ms-python.python'
+      'https://img.shields.io/visual-studio-marketplace/release-date/ms-python.python?style=flat-square'
     )
   })
 
@@ -70,7 +70,7 @@ describe('generateExtensionBadges', () => {
     const result = generateExtensionBadges(extensionId)
 
     expect(result.about.rating.markdown).toBe(
-      '[![Visual Studio Marketplace Rating](https://img.shields.io/visual-studio-marketplace/r/ms-python.python)](https://marketplace.visualstudio.com/items?itemName=ms-python.python)'
+      '[![Visual Studio Marketplace Rating](https://img.shields.io/visual-studio-marketplace/r/ms-python.python?style=flat-square)](https://marketplace.visualstudio.com/items?itemName=ms-python.python)'
     )
   })
 
