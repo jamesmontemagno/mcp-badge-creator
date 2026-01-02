@@ -1,0 +1,86 @@
+// For format details, see https://aka.ms/devcontainer.json. For config options, see the
+// README at: https://github.com/devcontainers/templates/tree/main/src/typescript-node
+{
+	"name": "Node.js & TypeScript",
+	// Or use a Dockerfile or Docker Compose file. More info: https://containers.dev/guide/dockerfile
+	"image": "mcr.microsoft.com/devcontainers/typescript-node:1-22-bookworm",
+
+	// Features to add to the dev container. More info: https://containers.dev/features.
+	// "features": {},
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	"forwardPorts": [5173, 4173],
+
+	// Port attributes for better UX
+	"portsAttributes": {
+		"5173": {
+			"label": "Vite Dev Server",
+			"onAutoForward": "notify"
+		},
+		"4173": {
+			"label": "Vite Preview",
+			"onAutoForward": "silent"
+		}
+	},
+
+	// Use 'postCreateCommand' to run commands after the container is created.
+	"postCreateCommand": "npm install && npx playwright install --with-deps",
+
+	// Configure tool-specific properties.
+	"customizations": {
+		"vscode": {
+			"extensions": [
+				// Essential for TypeScript + React development
+				"dbaeumer.vscode-eslint",
+				"esbenp.prettier-vscode",
+				"ms-vscode.vscode-typescript-next",
+				
+				// React development
+				"dsznajder.es7-react-js-snippets",
+				"styled-components.vscode-styled-components",
+				
+				// Testing
+				"ms-playwright.playwright",
+				"vitest.explorer",
+				
+				// Git & utilities
+				"eamodio.gitlens",
+				"usernamehw.errorlens"
+			],
+			"settings": {
+				// ESLint
+				"eslint.validate": ["javascript", "javascriptreact", "typescript", "typescriptreact"],
+				"editor.codeActionsOnSave": {
+					"source.fixAll.eslint": "explicit"
+				},
+				
+				// Editor
+				"editor.formatOnSave": true,
+				"editor.defaultFormatter": "esbenp.prettier-vscode",
+				"[typescript]": {
+					"editor.defaultFormatter": "esbenp.prettier-vscode"
+				},
+				"[typescriptreact]": {
+					"editor.defaultFormatter": "esbenp.prettier-vscode"
+				},
+				
+				// TypeScript
+				"typescript.tsdk": "node_modules/typescript/lib",
+				"typescript.enablePromptUseWorkspaceTsdk": true,
+				
+				// Files
+				"files.exclude": {
+					"**/node_modules": true,
+					"**/dist": true
+				},
+				
+				// Testing
+				"playwright.reuseBrowser": true,
+				"vitest.enable": true
+			}
+		}
+	}
+
+	// Uncomment to connect as root instead. More info: https://aka.ms/dev-containers-non-root.
+	// "remoteUser": "root"
+}
