@@ -12,6 +12,9 @@
 [![Built With](https://img.shields.io/badge/built_with-Vite_+_React-646CFF?logo=vite&logoColor=white)](https://github.com/jamesmontemagno/mcp-badge-creator)
 
 
+![](./public/og-image.svg)
+
+
 ## 🌟 Features
 
 - ✅ **Multiple Badge Types**: 
