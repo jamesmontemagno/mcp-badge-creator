@@ -23,5 +23,5 @@
   "theme_color": "#24bfa5",
   "background_color": "#1a9667",
   "display": "standalone",
-  "start_url": "/mcp-badge-creator/"
+  "start_url": "/"
 }
