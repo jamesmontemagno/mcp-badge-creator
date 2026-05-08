@@ -96,6 +96,7 @@ function MCP() {
   const [readmeVSCode, setReadmeVSCode] = useState(true)
   const [readmeVSCodeInsiders, setReadmeVSCodeInsiders] = useState(true)
   const [readmeVisualStudio, setReadmeVisualStudio] = useState(true)
+  const [readmeCopilotCLI, setReadmeCopilotCLI] = useState(true)
   const [readmeCursor, setReadmeCursor] = useState(false)
   const [readmeGoose, setReadmeGoose] = useState(false)
   const [readmeLMStudio, setReadmeLMStudio] = useState(false)
@@ -447,6 +448,20 @@ function MCP() {
     };
   }
 
+  const generateGitHubCopilotCLIConfig = () => {
+    const baseConfig = generateConfig();
+
+    return {
+      mcpServers: {
+        [serverName]: {
+          ...baseConfig,
+          type: configType === 'http' ? 'http' : 'local',
+          tools: ['*'] as string[]
+        }
+      }
+    };
+  }
+
   const addDynamicArg = () => {
     setDynamicArgs(prev => ({
       ...prev,
@@ -592,6 +607,7 @@ function MCP() {
     setReadmeVSCode(true);
     setReadmeVSCodeInsiders(true);
     setReadmeVisualStudio(true);
+    setReadmeCopilotCLI(true);
     setReadmeCursor(false);
     setReadmeGoose(false);
     setReadmeLMStudio(false);
@@ -1297,6 +1313,24 @@ function MCP() {
       readmeContent += `<details>\n<summary>Windsurf</summary>\n\n`;
       readmeContent += `Follow Windsurf MCP [documentation](https://docs.windsurf.com/windsurf/cascade/mcp). Use the standard config above.\n</details>\n\n`;
     }
+
+    if (readmeCopilotCLI) {
+      readmeContent += `<details>\n<summary>GitHub Copilot CLI</summary>\n\n`;
+      readmeContent += `GitHub Copilot CLI supports adding MCP servers interactively and through a config file.\n\n`;
+      readmeContent += `#### Option 1: Interactive setup with \`/mcp add\`\n\n`;
+      readmeContent += `1. Open GitHub Copilot CLI in interactive mode.\n`;
+      readmeContent += `2. Run \`/mcp add\`.\n`;
+      readmeContent += `3. Enter **Server Name**: \`${serverName}\`.\n`;
+      readmeContent += `4. Choose **Server Type**:\n`;
+      readmeContent += `   - \`STDIO\` for command-based servers\n`;
+      readmeContent += `   - \`HTTP\` for remote servers\n`;
+      readmeContent += `5. Fill in command/url settings from the standard config above and set **Tools** to \`*\`.\n`;
+      readmeContent += `6. Press \`Ctrl+S\` to save.\n\n`;
+      readmeContent += `#### Option 2: Edit \`~/.copilot/mcp-config.json\`\n\n`;
+      const copilotCliConfig = generateGitHubCopilotCLIConfig();
+      readmeContent += `\`\`\`json\n${JSON.stringify(copilotCliConfig, null, 2)}\n\`\`\`\n\n`;
+      readmeContent += `For more information, see the [GitHub Copilot CLI MCP documentation](https://docs.github.com/en/copilot/how-tos/copilot-cli/customize-copilot/add-mcp-servers).\n</details>\n\n`;
+    }
     
     // GitHub Copilot Coding Agent section
     readmeContent += `<details>\n<summary>GitHub Copilot Coding Agent</summary>\n\n`;
@@ -1959,7 +1993,7 @@ function MCP() {
                 className="copy-btn"
                 onClick={() => {
                   const allSelected = readmeVSCode && readmeVSCodeInsiders && readmeVisualStudio && 
-                                      readmeCursor && readmeGoose && readmeLMStudio &&
+                                      readmeCopilotCLI && readmeCursor && readmeGoose && readmeLMStudio &&
                                       readmeAmp && readmeClaudeCode && readmeClaudeDesktop &&
                                       readmeCodex && readmeGeminiCLI && readmeOpenCode &&
                                       readmeQodoGen && readmeWarp && readmeWindsurf
@@ -1967,6 +2001,7 @@ function MCP() {
                   setReadmeVSCode(newValue)
                   setReadmeVSCodeInsiders(newValue)
                   setReadmeVisualStudio(newValue)
+                  setReadmeCopilotCLI(newValue)
                   setReadmeCursor(newValue)
                   setReadmeGoose(newValue)
                   setReadmeLMStudio(newValue)
@@ -1982,7 +2017,7 @@ function MCP() {
                 }}
               >
                 {readmeVSCode && readmeVSCodeInsiders && readmeVisualStudio && 
-                 readmeCursor && readmeGoose && readmeLMStudio &&
+                 readmeCopilotCLI && readmeCursor && readmeGoose && readmeLMStudio &&
                  readmeAmp && readmeClaudeCode && readmeClaudeDesktop &&
                  readmeCodex && readmeGeminiCLI && readmeOpenCode &&
                  readmeQodoGen && readmeWarp && readmeWindsurf ? 'Deselect All' : 'Select All'}
@@ -2022,6 +2057,18 @@ function MCP() {
                   <h4>Visual Studio</h4>
                 </div>
                 <div className={`${styles.ideCardToggle} ide-card-toggle ${readmeVisualStudio ? 'checked' : ''}`}>
+                  <div className="toggle-dot"></div>
+                </div>
+              </div>
+
+              <div 
+                className={`${styles.ideCard} ide-card ${readmeCopilotCLI ? 'active' : ''}`}
+                onClick={() => setReadmeCopilotCLI(!readmeCopilotCLI)}
+              >
+                <div className="ide-card-content">
+                  <h4>GitHub Copilot CLI</h4>
+                </div>
+                <div className={`${styles.ideCardToggle} ide-card-toggle ${readmeCopilotCLI ? 'checked' : ''}`}>
                   <div className="toggle-dot"></div>
                 </div>
               </div>
