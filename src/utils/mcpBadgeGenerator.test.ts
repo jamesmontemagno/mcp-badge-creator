@@ -27,6 +27,21 @@ describe('mcpBadgeGenerator', () => {
       
       expect(decoded).toEqual(config);
     });
+
+    it('should encode HTTP config with additional root OAuth fields', () => {
+      const config: MCPConfig = {
+        type: 'http',
+        url: 'https://mcp.slack.com/mcp',
+        oauthClientId: '12348411142.11062036567072',
+        oauthPublicClient: true
+      };
+
+      const encoded = encodeConfig(config);
+      const decoded = JSON.parse(decodeURIComponent(encoded));
+
+      expect(decoded.oauthClientId).toBe('12348411142.11062036567072');
+      expect(decoded.oauthPublicClient).toBe(true);
+    });
     
     it('should encode a Docker config with environment variables', () => {
       const config: MCPConfig = {
@@ -67,6 +82,26 @@ describe('mcpBadgeGenerator', () => {
       expect(decoded.inputs).toBeDefined();
       expect(decoded.inputs).toHaveLength(1);
       expect(decoded.inputs[0].id).toBe('api_key');
+    });
+
+    it('should preserve object and array custom root fields', () => {
+      const config: MCPConfig = {
+        command: 'npx',
+        args: ['-y', 'test-package'],
+        env: {},
+        metadata: {
+          retries: 3,
+          tags: ['alpha', 'beta']
+        }
+      };
+
+      const encoded = encodeConfig(config);
+      const decoded = JSON.parse(decodeURIComponent(encoded));
+
+      expect(decoded.metadata).toEqual({
+        retries: 3,
+        tags: ['alpha', 'beta']
+      });
     });
   });
   

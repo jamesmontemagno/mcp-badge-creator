@@ -16,6 +16,7 @@ export interface MCPServerRuntime {
   type?: 'http' | 'stdio'
   url?: string
   headers?: Record<string, string>
+  [key: string]: unknown
 }
 
 export interface MCPServerMetadata {
@@ -255,17 +256,26 @@ export function parseRuntimeConfig(runtime?: MCPServerRuntime): {
   localArgs?: string
   env?: Record<string, string>
   headers?: Record<string, string>
+  additionalRootProps?: Record<string, unknown>
 } | null {
   if (!runtime) {
     return null
   }
+
+  const knownRuntimeKeys = new Set(['command', 'args', 'env', 'type', 'url', 'headers'])
+  const additionalRootProps = Object.fromEntries(
+    Object.entries(runtime).filter(([key]) => !knownRuntimeKeys.has(key))
+  )
+  const additionalProps =
+    Object.keys(additionalRootProps).length > 0 ? { additionalRootProps } : {}
 
   // HTTP server
   if (runtime.type === 'http' || runtime.url) {
     return {
       configType: 'http',
       serverUrl: runtime.url || '',
-      headers: runtime.headers
+      headers: runtime.headers,
+      ...additionalProps
     }
   }
 
@@ -279,7 +289,8 @@ export function parseRuntimeConfig(runtime?: MCPServerRuntime): {
       return {
         configType: 'npx',
         npxPackage: args[args.indexOf('-y') + 1] || args[1] || args[0] || '',
-        env: runtime.env
+        env: runtime.env,
+        ...additionalProps
       }
     }
 
@@ -291,13 +302,15 @@ export function parseRuntimeConfig(runtime?: MCPServerRuntime): {
           configType: 'uvx',
           uvxFrom: args[fromIndex + 1] || '',
           uvxPackage: args[fromIndex + 2] || '',
-          env: runtime.env
+          env: runtime.env,
+          ...additionalProps
         }
       }
       return {
         configType: 'uvx',
         uvxPackage: args[0] || '',
-        env: runtime.env
+        env: runtime.env,
+        ...additionalProps
       }
     }
 
@@ -306,7 +319,8 @@ export function parseRuntimeConfig(runtime?: MCPServerRuntime): {
       return {
         configType: 'dnx',
         dnxPackage: args[0] || '',
-        env: runtime.env
+        env: runtime.env,
+        ...additionalProps
       }
     }
 
@@ -325,7 +339,8 @@ export function parseRuntimeConfig(runtime?: MCPServerRuntime): {
       return {
         configType: 'docker',
         dockerImage,
-        env: runtime.env
+        env: runtime.env,
+        ...additionalProps
       }
     }
 
@@ -334,7 +349,8 @@ export function parseRuntimeConfig(runtime?: MCPServerRuntime): {
       configType: 'local',
       localCommand: runtime.command,
       localArgs: args.join(', '),
-      env: runtime.env
+      env: runtime.env,
+      ...additionalProps
     }
   }
 

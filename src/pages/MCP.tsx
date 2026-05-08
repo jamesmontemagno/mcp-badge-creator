@@ -15,6 +15,14 @@ import {
 
 type ConfigType = 'http' | 'docker' | 'local' | 'npx' | 'uvx' | 'dnx';
 
+type MCPJsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | MCPJsonValue[]
+  | { [key: string]: MCPJsonValue };
+
 interface MCPConfig {
   name?: string; // Only used for encoding in URL parameters, not in the actual config
   type?: string;
@@ -23,6 +31,7 @@ interface MCPConfig {
   args?: string[];
   env?: Record<string, string>;
   headers?: Record<string, string>;
+  [key: string]: MCPJsonValue | undefined;
 }
 
 interface MCPInput {
@@ -57,6 +66,11 @@ interface StandaloneInput {
   id: string;
   description: string;
   password?: boolean;
+}
+
+interface CustomRootProperty {
+  key: string;
+  value: string;
 }
 
 function MCP() {
@@ -127,6 +141,7 @@ function MCP() {
   
   // Standalone inputs (not tied to headers or env vars)
   const [standaloneInputs, setStandaloneInputs] = useState<StandaloneInput[]>([])
+  const [customRootProperties, setCustomRootProperties] = useState<CustomRootProperty[]>([])
   
   // Import modal state
   const [showImportModal, setShowImportModal] = useState(false)
@@ -141,6 +156,7 @@ function MCP() {
     const config: MCPConfig = {};
     const currentDynamicArgs = dynamicArgs[configType] || [];
     const currentDynamicEnv = dynamicEnv[configType] || [];
+    const customRootResult = getCustomRootPropertiesResult();
     
     // Helper function to get input ID for password fields
     const getInputId = (key: string, customName?: string) => {
@@ -275,8 +291,54 @@ function MCP() {
         }
         break;
     }
+
+    Object.entries(customRootResult.properties).forEach(([key, value]) => {
+      config[key] = value;
+    });
     
     return config;
+  }
+
+  const getCustomRootPropertiesResult = (): {
+    properties: Record<string, MCPJsonValue>
+    error: string | null
+  } => {
+    const properties: Record<string, MCPJsonValue> = {}
+
+    for (let index = 0; index < customRootProperties.length; index++) {
+      const property = customRootProperties[index]
+      const key = property.key.trim()
+      const rawValue = property.value.trim()
+
+      if (!key && !rawValue) {
+        continue
+      }
+
+      if (!key) {
+        return {
+          properties: {},
+          error: `Custom root property #${index + 1} is missing a key.`
+        }
+      }
+
+      if (!rawValue) {
+        return {
+          properties: {},
+          error: `Custom root property "${key}" is missing a JSON value.`
+        }
+      }
+
+      try {
+        properties[key] = JSON.parse(rawValue) as MCPJsonValue
+      } catch {
+        return {
+          properties: {},
+          error: `Custom root property "${key}" has invalid JSON.`
+        }
+      }
+    }
+
+    return { properties, error: null }
   }
 
   const encodeConfig = (config: MCPConfig): string => {
@@ -463,6 +525,20 @@ function MCP() {
     );
   }
 
+  const addCustomRootProperty = () => {
+    setCustomRootProperties(prev => [...prev, { key: '', value: '' }]);
+  }
+
+  const removeCustomRootProperty = (index: number) => {
+    setCustomRootProperties(prev => prev.filter((_, i) => i !== index));
+  }
+
+  const updateCustomRootProperty = (index: number, key: string, value: string) => {
+    setCustomRootProperties(prev =>
+      prev.map((property, i) => (i === index ? { key, value } : property))
+    );
+  }
+
   const resetForm = () => {
     if (!confirm('Are you sure you want to reset all fields? This action cannot be undone.')) {
       return;
@@ -502,6 +578,7 @@ function MCP() {
     // Reset HTTP headers and standalone inputs
     setHttpHeaders([]);
     setStandaloneInputs([]);
+    setCustomRootProperties([]);
 
     // Reset badge generation platforms
     setIncludeVSCode(true);
@@ -565,6 +642,16 @@ function MCP() {
 
       // Set server name
       setServerName(extractedServerName || 'imported-server');
+
+      const knownServerConfigKeys = new Set(['name', 'type', 'url', 'command', 'args', 'env', 'headers']);
+      const importedCustomRootProperties = Object.entries(serverConfig)
+        .filter(([key]) => !knownServerConfigKeys.has(key))
+        .map(([key, value]) => {
+          const serialized = JSON.stringify(value);
+          return serialized === undefined ? null : { key, value: serialized };
+        })
+        .filter((property): property is CustomRootProperty => property !== null);
+      setCustomRootProperties(importedCustomRootProperties);
 
       // Detect configuration type and populate fields
       if (serverConfig.type === 'http') {
@@ -880,6 +967,14 @@ function MCP() {
           [parsed.configType]: envList
         }))
       }
+
+      const importedCustomRootProperties = Object.entries(parsed.additionalRootProps || {})
+        .map(([key, value]) => {
+          const serialized = JSON.stringify(value)
+          return serialized === undefined ? null : { key, value: serialized }
+        })
+        .filter((property): property is CustomRootProperty => property !== null)
+      setCustomRootProperties(importedCustomRootProperties)
     }
     
     // Close search modal
@@ -905,6 +1000,7 @@ function MCP() {
 
   const generateMarkdown = (): string => {
     if (!serverName) return '';
+    if (getCustomRootPropertiesResult().error) return '';
     
     const fullConfig = generateFullConfig();
     const configForBadge: ConfigWithInputs = {
@@ -962,6 +1058,7 @@ function MCP() {
 
   const generateReadmeContent = (): string => {
     if (!serverName) return '';
+    if (getCustomRootPropertiesResult().error) return '';
     
     const fullConfig = generateFullConfig();
     const jsonConfig = JSON.stringify(fullConfig, null, 2);
@@ -1257,7 +1354,8 @@ function MCP() {
     }
   }
 
-  const markdown = generateMarkdown();
+  const customRootPropertiesError = getCustomRootPropertiesResult().error
+  const markdown = customRootPropertiesError ? '' : generateMarkdown();
 
   return (
     <>
@@ -1691,6 +1789,56 @@ function MCP() {
               <span>+</span> Add Input
             </button>
             <small className="field-hint">These inputs will be included in the root inputs array and can be referenced anywhere in your config.</small>
+          </div>
+
+          <div className="form-group">
+            <div className={styles.sectionHeader}>
+              <label>Custom Root Properties</label>
+            </div>
+            <p className="section-description">Add root-level JSON properties to the server config (for example OAuth settings):</p>
+            {customRootProperties.map((property, index) => (
+              <div key={index} className={styles.headerCard}>
+                <div className={styles.dynamicEnvRow}>
+                  <input
+                    type="text"
+                    placeholder="propertyName"
+                    value={property.key}
+                    onChange={(e) => updateCustomRootProperty(index, e.target.value, property.value)}
+                    className={styles.keyInput}
+                  />
+                  <input
+                    type="text"
+                    placeholder='JSON value (e.g., true, 123, "text", {"k":"v"})'
+                    value={property.value}
+                    onChange={(e) => updateCustomRootProperty(index, property.key, e.target.value)}
+                    className={styles.valueInput}
+                  />
+                  <button
+                    type="button"
+                    className={styles.deleteBtn}
+                    onClick={() => removeCustomRootProperty(index)}
+                    aria-label="Remove root property"
+                  >
+                    ✕
+                  </button>
+                </div>
+              </div>
+            ))}
+            <button
+              type="button"
+              className={styles.addBtn}
+              onClick={addCustomRootProperty}
+            >
+              <span>+</span> Add Root Property
+            </button>
+            {customRootPropertiesError && (
+              <small className="field-hint">{customRootPropertiesError}</small>
+            )}
+            {!customRootPropertiesError && (
+              <small className="field-hint">
+                Values are JSON-parsed. Use quotes for string values (for example, "my-client-id").
+              </small>
+            )}
           </div>
 
           <div className="form-group">
@@ -2154,6 +2302,8 @@ function MCP() {
                 </>
               )}
             </>
+          ) : customRootPropertiesError ? (
+            <p className="placeholder">{customRootPropertiesError}</p>
           ) : (
             <p className="placeholder">Fill in the form to generate your badges</p>
           )}
