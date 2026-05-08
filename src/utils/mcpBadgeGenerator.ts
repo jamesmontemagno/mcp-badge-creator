@@ -10,6 +10,23 @@ import type { BadgeTheme } from '../types/badgeTheme';
 
 export type ConfigType = 'http' | 'docker' | 'local' | 'npx' | 'uvx' | 'dnx';
 
+export interface MCPInput {
+  type: 'promptString';
+  id: string;
+  description: string;
+  password?: boolean;
+}
+
+export type MCPJsonValue =
+  | string
+  | number
+  | boolean
+  | null
+  | MCPJsonValue[]
+  | { [key: string]: MCPJsonValue }
+  | MCPInput
+  | MCPInput[];
+
 export interface MCPConfig {
   name?: string;
   type?: string;
@@ -18,13 +35,7 @@ export interface MCPConfig {
   args?: string[];
   env?: Record<string, string>;
   headers?: Record<string, string>;
-}
-
-export interface MCPInput {
-  type: 'promptString';
-  id: string;
-  description: string;
-  password?: boolean;
+  [key: string]: MCPJsonValue | undefined;
 }
 
 export interface FullMCPConfig {
